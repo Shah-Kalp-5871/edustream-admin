@@ -24,9 +24,12 @@ Route::get('/dashboard', [DashboardController::class, 'index']);
 
 // Content Routes
 Route::get('/content', [ContentController::class, 'index']);
-Route::get('/content/create', [ContentController::class, 'create']);
-Route::get('/content/{id}', [ContentController::class, 'show']);
-Route::get('/content/{id}/edit', [ContentController::class, 'edit']);
+Route::get('/content/course/{id}', [ContentController::class, 'courseSubjects']);
+Route::get('/content/subject/{id}', [ContentController::class, 'subjectManage']);
+Route::get('/content/notes/{id}', [ContentController::class, 'manageNotes']);
+Route::get('/content/videos/{id}', [ContentController::class, 'manageVideos']);
+Route::get('/content/quiz/{id}', [ContentController::class, 'manageQuiz']);
+Route::get('/content/qa-papers/{id}', [ContentController::class, 'manageQAPapers']);
 
 // Quiz Routes
 Route::get('/quizzes', [QuizController::class, 'index']);
