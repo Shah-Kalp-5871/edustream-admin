@@ -45,14 +45,6 @@
 </style>
 @endsection
 
-@section('actions')
-    <button class="quick-action-btn" onclick="openModal('quickAddModal')">
-        <i class="fa-solid fa-bolt"></i> Quick Add
-    </button>
-    <button class="quick-action-btn" onclick="openModal('uploadModal')">
-        <i class="fa-solid fa-cloud-arrow-up"></i> Bulk Upload
-    </button>
-@endsection
 
 @section('content')
 <div class="animate-fade-up">
@@ -67,22 +59,17 @@
     </div>
 
     <!-- Subject Overview Card -->
-    <div class="card" style="margin-bottom: 32px; background: linear-gradient(105deg, var(--surface) 0%, var(--surface-2) 100%);">
+    <div class="card card-pad" style="margin-bottom: 32px; background: linear-gradient(105deg, var(--surface) 0%, var(--surface-2) 100%);">
         <div style="display: flex; align-items: center; gap: 24px; flex-wrap: wrap;">
-            <div style="width: 72px; height: 72px; border-radius: 20px; background: var(--primary-glow); display: flex; align-items: center; justify-content: center; font-size: 32px; color: var(--primary);">
-                <i class="fa-solid fa-book"></i>
+            <div style="width: 72px; height: 72px; border-radius: 20px; background: {{ ($subject['color'] ?? '#1565C0') }}20; display: flex; align-items: center; justify-content: center; font-size: 32px; color: {{ $subject['color'] ?? 'var(--primary)' }};">
+                <i class="{{ $subject['icon'] ?? 'fa-solid fa-book' }}"></i>
             </div>
             <div style="flex: 1;">
                 <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;">
                     <h2 style="font-size: 22px; font-weight: 700;">{{ $subjectName }}</h2>
                     <span style="background: var(--primary-glow); color: var(--primary); padding: 4px 12px; border-radius: 30px; font-size: 12px; font-weight: 600;">{{ $courseName }}</span>
                 </div>
-                <p style="color: var(--text-muted); font-size: 13px;">Total Content: {{ $contentData['notes']['count'] + $contentData['videos']['count'] + $contentData['qa_papers']['count'] + $contentData['quiz']['count'] }} items • Last updated 2 days ago</p>
-            </div>
-            <div style="display: flex; gap: 12px;">
-                <button class="btn-manage" style="width: auto; padding: 10px 20px;" onclick="openModal('subjectSettingsModal')">
-                    <i class="fa-solid fa-pen"></i> Edit Subject
-                </button>
+                <p style="color: var(--text-muted); font-size: 13px;">Total Content: {{ $contentData['notes']['count'] + $contentData['videos']['count'] + $contentData['qa_papers']['count'] + $contentData['quiz']['count'] }} items</p>
             </div>
         </div>
     </div>
@@ -143,15 +130,7 @@
                 </div>
             </div>
             <div style="margin-bottom: 16px;">
-                <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 8px;">Recent:</div>
-                <ul style="list-style: none;">
-                    @foreach(array_slice($contentData['notes']['items'], 0, 3) as $item)
-                    <li style="font-size: 12px; padding: 4px 0; display: flex; align-items: center; gap: 6px;">
-                        <i class="fa-regular fa-file-pdf" style="color: var(--text-muted); font-size: 11px;"></i>
-                        {{ $item }}
-                    </li>
-                    @endforeach
-                </ul>
+                <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">Manage PDF, DOC and shared resources.</p>
             </div>
             <div class="content-actions">
                 <button class="btn-content btn-content-secondary" onclick="window.location.href='{{ url('/content/notes/' . $id) }}'">
@@ -172,15 +151,7 @@
                 </div>
             </div>
             <div style="margin-bottom: 16px;">
-                <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 8px;">Recent:</div>
-                <ul style="list-style: none;">
-                    @foreach(array_slice($contentData['videos']['items'], 0, 3) as $item)
-                    <li style="font-size: 12px; padding: 4px 0; display: flex; align-items: center; gap: 6px;">
-                        <i class="fa-solid fa-play" style="color: var(--text-muted); font-size: 9px;"></i>
-                        {{ $item }}
-                    </li>
-                    @endforeach
-                </ul>
+                <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">Upload and manage video lectures.</p>
             </div>
             <div class="content-actions">
                 <button class="btn-content btn-content-secondary" onclick="window.location.href='{{ url('/content/videos/' . $id) }}'">
@@ -201,15 +172,7 @@
                 </div>
             </div>
             <div style="margin-bottom: 16px;">
-                <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 8px;">Recent:</div>
-                <ul style="list-style: none;">
-                    @foreach(array_slice($contentData['qa_papers']['items'], 0, 3) as $item)
-                    <li style="font-size: 12px; padding: 4px 0; display: flex; align-items: center; gap: 6px;">
-                        <i class="fa-regular fa-file-lines" style="color: var(--text-muted); font-size: 11px;"></i>
-                        {{ $item }}
-                    </li>
-                    @endforeach
-                </ul>
+                <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">Previous year questions and solutions.</p>
             </div>
             <div class="content-actions">
                 <button class="btn-content btn-content-secondary" onclick="window.location.href='{{ url('/content/qa-papers/' . $id) }}'">
@@ -230,15 +193,7 @@
                 </div>
             </div>
             <div style="margin-bottom: 16px;">
-                <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 8px;">Recent:</div>
-                <ul style="list-style: none;">
-                    @foreach(array_slice($contentData['quiz']['items'], 0, 3) as $item)
-                    <li style="font-size: 12px; padding: 4px 0; display: flex; align-items: center; gap: 6px;">
-                        <i class="fa-regular fa-circle-check" style="color: var(--text-muted); font-size: 11px;"></i>
-                        {{ $item }}
-                    </li>
-                    @endforeach
-                </ul>
+                <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">Interactive assessments and mock tests.</p>
             </div>
             <div class="content-actions">
                 <button class="btn-content btn-content-secondary" onclick="window.location.href='{{ url('/content/quiz/' . $id) }}'">
@@ -248,88 +203,9 @@
         </div>
     </div>
 
-    <!-- Recent Activity for this Subject -->
-    <div style="margin-top: 40px;">
-        <h2 style="font-size: 18px; font-weight: 600; margin-bottom: 16px;">Recent Activity</h2>
-        <div class="card">
-            <div style="display: flex; flex-direction: column; gap: 16px;">
-                <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--surface-2); border-radius: var(--r);">
-                    <div style="width: 32px; height: 32px; border-radius: 8px; background: #E3F2FD; display: flex; align-items: center; justify-content: center; color: #1565C0;">
-                        <i class="fa-regular fa-file-lines"></i>
-                    </div>
-                    <div style="flex: 1;">
-                        <div style="font-weight: 600; font-size: 13px;">Chapter 5: Polynomials</div>
-                        <div style="font-size: 11px; color: var(--text-muted);">Added 2 hours ago • Notes</div>
-                    </div>
-                    <span style="font-size: 11px; color: var(--text-muted);">by John Doe</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--surface-2); border-radius: var(--r);">
-                    <div style="width: 32px; height: 32px; border-radius: 8px; background: #F3E5F5; display: flex; align-items: center; justify-content: center; color: #7B1FA2;">
-                        <i class="fa-solid fa-video"></i>
-                    </div>
-                    <div style="flex: 1;">
-                        <div style="font-weight: 600; font-size: 13px;">Quadratic Equations - Lecture 3</div>
-                        <div style="font-size: 11px; color: var(--text-muted);">Updated 5 hours ago • Video</div>
-                    </div>
-                    <span style="font-size: 11px; color: var(--text-muted);">by Jane Smith</span>
-                </div>
-            </div>
-        </div>
-    </div>
 
 </div>
 
-<!-- Add Note Modal -->
-<div class="modal-backdrop" id="addNoteModal" onclick="if(event.target===this) closeModal('addNoteModal')">
-    <div class="modal" style="max-width: 550px;">
-        <div class="modal-header">
-            <h3>Add New Note to {{ $subjectName }}</h3>
-            <button class="modal-close" onclick="closeModal('addNoteModal')">&times;</button>
-        </div>
-        <div class="modal-body">
-            <form>
-                <div style="margin-bottom: 16px;">
-                    <label style="display: block; margin-bottom: 6px; font-size: 13px; font-weight: 500;">Title</label>
-                    <input type="text" class="form-control" placeholder="e.g., Introduction to Algebra">
-                </div>
-                <div style="margin-bottom: 16px;">
-                    <label style="display: block; margin-bottom: 6px; font-size: 13px; font-weight: 500;">Description</label>
-                    <textarea class="form-control" rows="2" placeholder="Brief description..."></textarea>
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
-                    <div>
-                        <label style="display: block; margin-bottom: 6px; font-size: 13px; font-weight: 500;">Chapter</label>
-                        <select class="form-control">
-                            <option>Chapter 1</option>
-                            <option>Chapter 2</option>
-                            <option>Chapter 3</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label style="display: block; margin-bottom: 6px; font-size: 13px; font-weight: 500;">File Type</label>
-                        <select class="form-control">
-                            <option>PDF</option>
-                            <option>DOC</option>
-                            <option>PPT</option>
-                        </select>
-                    </div>
-                </div>
-                <div>
-                    <label style="display: block; margin-bottom: 6px; font-size: 13px; font-weight: 500;">Upload File</label>
-                    <div style="border: 2px dashed var(--border); border-radius: var(--r); padding: 20px; text-align: center; background: var(--surface-2); cursor: pointer;">
-                        <i class="fa-solid fa-cloud-arrow-up" style="font-size: 24px; color: var(--primary); margin-bottom: 8px;"></i>
-                        <p style="font-size: 12px;">Click to upload or drag and drop</p>
-                        <p style="font-size: 10px; color: var(--text-muted);">PDF, DOC, PPT (Max 50MB)</p>
-                    </div>
-                </div>
-            </form>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-secondary" onclick="closeModal('addNoteModal')">Cancel</button>
-            <button class="btn btn-primary">Upload Note</button>
-        </div>
-    </div>
-</div>
 @endsection
 
 @section('scripts')

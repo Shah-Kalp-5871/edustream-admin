@@ -1,0 +1,257 @@
+@extends('layouts.app', ['title' => 'Edit Course'])
+
+@section('subtitle', 'Update course information and settings')
+
+@section('styles')
+<style>
+    .form-card {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        margin-bottom: 24px;
+    }
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .form-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text);
+    }
+    .form-control {
+        padding: 12px 16px;
+        border: 1px solid var(--border);
+        border-radius: var(--r);
+        background: var(--surface);
+        color: var(--text);
+        font-size: 14px;
+        transition: all var(--tr);
+    }
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+    .form-control.textarea {
+        resize: vertical;
+        min-height: 120px;
+    }
+    .image-upload-preview {
+        width: 100%;
+        height: 200px;
+        border: 1px solid var(--primary);
+        border-radius: var(--r-lg);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        color: var(--primary);
+        cursor: pointer;
+        transition: all var(--tr);
+        background: var(--primary-glow-sm);
+        overflow: hidden;
+        position: relative;
+    }
+    .image-preview-img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0.3;
+    }
+    .btn-submit {
+        padding: 12px 24px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: var(--r);
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all var(--tr);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .btn-submit:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+    }
+    .icon-selector-grid, .color-selector-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+        gap: 12px;
+        margin-top: 8px;
+    }
+    .icon-opt, .color-opt {
+        width: 60px;
+        height: 60px;
+        border-radius: var(--r);
+        border: 2px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all var(--tr);
+        font-size: 20px;
+        color: var(--text-muted);
+    }
+    .icon-opt:hover, .color-opt:hover {
+        border-color: var(--primary-light);
+        background: var(--surface-2);
+    }
+    .icon-opt.selected, .color-opt.selected {
+        border-color: var(--primary);
+        background: var(--primary-glow);
+        color: var(--primary);
+        box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+    .color-opt.selected {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 4px var(--surface), 0 0 0 6px var(--primary);
+    }
+</style>
+@endsection
+
+@section('scripts')
+<script>
+document.querySelectorAll('.icon-opt').forEach(opt => {
+    opt.addEventListener('click', function() {
+        document.querySelectorAll('.icon-opt.selected').forEach(s => s.classList.remove('selected'));
+        this.classList.add('selected');
+        document.getElementById('selectedIcon').value = this.dataset.icon;
+    });
+});
+
+document.querySelectorAll('.color-opt').forEach(opt => {
+    opt.addEventListener('click', function() {
+        document.querySelectorAll('.color-opt.selected').forEach(s => s.classList.remove('selected'));
+        this.classList.add('selected');
+        document.getElementById('selectedColor').value = this.dataset.color;
+    });
+});
+</script>
+@endsection
+
+@section('actions')
+    <a href="{{ url('/content') }}" class="quick-action-btn" style="text-decoration: none;">
+        <i class="fa-solid fa-arrow-left"></i> Back to Courses
+    </a>
+@endsection
+
+@section('content')
+<div class="animate-fade-up">
+    <div class="form-card">
+        <div class="card card-pad">
+            <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 24px; display: flex; align-items: center; gap: 12px;">
+                <i class="fa-solid fa-pen-to-square" style="color: var(--primary);"></i>
+                Edit Course: {{ $course['name'] ?? 'Course Name' }}
+            </h2>
+
+            <form action="{{ url('/content') }}" method="GET" onsubmit="event.preventDefault(); alert('Static demo: Course updated!'); window.location.href='{{ url('/content') }}';">
+                <div class="form-grid">
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label class="form-label">Course Title</label>
+                        <input type="text" class="form-control" value="{{ $course['name'] ?? 'Standard 10 - Science' }}" required>
+                    </div>
+
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label class="form-label">Select Course Icon</label>
+                        <div class="icon-selector-grid" id="iconGrid">
+                            @php
+                                $presetIcons = [
+                                    'fa-solid fa-graduation-cap', 'fa-solid fa-flask', 'fa-solid fa-calculator',
+                                    'fa-solid fa-atom', 'fa-solid fa-microscope', 'fa-solid fa-code',
+                                    'fa-solid fa-laptop-code', 'fa-solid fa-chart-simple', 'fa-solid fa-briefcase',
+                                    'fa-solid fa-microchip', 'fa-solid fa-book', 'fa-solid fa-dna'
+                                ];
+                                $currentIcon = $course['icon'] ?? 'fa-solid fa-graduation-cap';
+                            @endphp
+                            @foreach($presetIcons as $icon)
+                                <div class="icon-opt {{ $currentIcon == $icon ? 'selected' : '' }}" data-icon="{{ $icon }}">
+                                    <i class="{{ $icon }}"></i>
+                                </div>
+                            @endforeach
+                        </div>
+                        <input type="hidden" name="icon" id="selectedIcon" value="{{ $currentIcon }}">
+                    </div>
+
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label class="form-label">Select Theme Color</label>
+                        <div class="color-selector-grid" id="colorGrid">
+                            @php
+                                $presetColors = [
+                                    '#1565C0', '#C2185B', '#7B1FA2', '#2E7D32',
+                                    '#E64A19', '#4A148C', '#B71C1C', '#00838F',
+                                    '#283593', '#F9A825'
+                                ];
+                                $currentColor = $course['color'] ?? '#1565C0';
+                            @endphp
+                            @foreach($presetColors as $color)
+                                <div class="color-opt {{ $currentColor == $color ? 'selected' : '' }}" data-color="{{ $color }}" style="background: {{ $color }};"></div>
+                            @endforeach
+                        </div>
+                        <input type="hidden" name="color" id="selectedColor" value="{{ $currentColor }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Course Category</label>
+                        <select class="form-control">
+                            <option {{ ($course['category'] ?? '') == 'Primary School' ? 'selected' : '' }}>Primary School</option>
+                            <option {{ ($course['category'] ?? '') == 'Secondary School' ? 'selected' : '' }}>Secondary School</option>
+                            <option {{ ($course['category'] ?? '') == 'High School' ? 'selected' : '' }}>High School</option>
+                            <option {{ ($course['category'] ?? '') == 'Higher Secondary' ? 'selected' : '' }}>Higher Secondary</option>
+                            <option {{ ($course['category'] ?? '') == 'Undergraduate' ? 'selected' : '' }}>Undergraduate</option>
+                            <option {{ ($course['category'] ?? '') == 'Postgraduate' ? 'selected' : '' }}>Postgraduate</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Full Course Price (₹)</label>
+                        <input type="number" class="form-control" value="{{ $course['price'] ?? 5000 }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Course Status</label>
+                        <select class="form-control">
+                            <option {{ ($course['status'] ?? '') == 'Active' ? 'selected' : '' }}>Active</option>
+                            <option {{ ($course['status'] ?? '') == 'Inactive' ? 'selected' : '' }}>Inactive</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control textarea" placeholder="Enter course overview and objectives...">Comprehensive curriculum covering Physics, Chemistry, and Biology for 10th-grade students.</textarea>
+                    </div>
+
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label class="form-label">Course Thumbnail</label>
+                        <div class="image-upload-preview" onclick="alert('File upload dialog would open here')">
+                            <!-- Placeholder image if available -->
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                            <span>Click to change thumbnail</span>
+                            <small>PNG, JPG up to 5MB</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border);">
+                    <button type="button" class="btn-manage" style="width: auto; padding: 12px 24px;" onclick="window.location.href='{{ url('/content') }}'">Cancel</button>
+                    <button type="submit" class="btn-submit">
+                        <i class="fa-solid fa-save"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endsection

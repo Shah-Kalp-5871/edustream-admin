@@ -83,9 +83,9 @@
 @endsection
 
 @section('actions')
-    <button class="quick-action-btn" onclick="openModal('newCourseModal')">
-        <i class="fa-solid fa-plus"></i> Add Course
-    </button>
+    <a href="{{ url('/content/course/create') }}" class="quick-action-btn" style="text-decoration: none;">
+        <i class="fa-solid fa-plus"></i> Add New Course
+    </a>
     <button class="quick-action-btn" onclick="openModal('importModal')">
         <i class="fa-solid fa-upload"></i> Import
     </button>
@@ -149,29 +149,37 @@
                     <i class="{{ $course['icon'] }}"></i>
                 </div>
                 <div class="course-list-info">
-                    <h3 class="course-list-name">{{ $course['name'] }}</h3>
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 4px;">
+                        <h3 class="course-list-name" style="margin-bottom: 0;">{{ $course['name'] }}</h3>
+                        <span class="status-badge {{ $course['status'] == 'Active' ? 'status-active' : 'status-pending' }}" style="padding: 2px 8px; font-size: 10px;">
+                            {{ $course['status'] }}
+                        </span>
+                    </div>
                     <p class="course-list-desc">{{ $course['description'] }}</p>
                     <div class="course-list-meta">
-                        <span><i class="fa-regular fa-bookmark"></i> {{ $course['subjects_count'] }} subjects</span>
-                        <span><i class="fa-regular fa-file-lines"></i> 124 files</span>
+                        <span style="color: var(--primary); font-weight: 700; font-size: 13px;">₹{{ number_format($course['price']) }}</span>
+                        <span><i class="fa-regular fa-bookmark"></i> {{ $course['category'] }}</span>
+                        <span><i class="fa-regular fa-folder"></i> {{ $course['subjects_count'] }} subjects</span>
                         <span><i class="fa-regular fa-clock"></i> Updated 2 days ago</span>
                     </div>
                 </div>
             </div>
             <div class="course-list-right">
-                <span class="status-badge status-active">Active</span>
+                <a href="{{ url('/content/course/' . $course['id'] . '/edit') }}" class="course-list-menu" onclick="event.stopPropagation();" title="Edit Course" style="color: var(--primary); text-decoration: none;">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                </a>
+                <button class="course-list-menu" onclick="event.stopPropagation(); confirmDelete('{{ $course['name'] }}')" title="Delete Course" style="color: #ef4444;">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
                 <button class="course-list-manage" onclick="event.stopPropagation(); window.location.href='{{ url('/content/course/' . $course['id']) }}'">
                     Manage <i class="fa-solid fa-arrow-right"></i>
-                </button>
-                <button class="course-list-menu" onclick="event.stopPropagation(); showCourseMenu(this, {{ $course['id'] }}, '{{ $course['name'] }}')">
-                    <i class="fa-solid fa-ellipsis-vertical"></i>
                 </button>
             </div>
         </div>
         @endforeach
 
         <!-- Add New Course Item -->
-        <div class="course-list-item add-new-item" onclick="openModal('newCourseModal')">
+        <div class="course-list-item add-new-item" onclick="window.location.href='{{ url('/content/course/create') }}'">
             <div class="course-list-left">
                 <div class="course-list-icon" style="background: var(--surface-2); color: var(--primary);">
                     <i class="fa-solid fa-plus"></i>
@@ -182,65 +190,13 @@
                 </div>
             </div>
             <div class="course-list-right">
-                <button class="course-list-manage" onclick="event.stopPropagation(); openModal('newCourseModal')">
+                <button class="course-list-manage" onclick="event.stopPropagation(); window.location.href='{{ url('/content/course/create') }}'">
                     <i class="fa-solid fa-plus"></i> Add
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Recent Activity Section -->
-    <div style="margin-top: 48px;">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-            <h2 style="font-size: 16px; font-weight: 600;">Recent Activity</h2>
-            <a href="#" style="color: var(--primary); font-size: 13px; text-decoration: none;">View all <i class="fa-solid fa-arrow-right" style="margin-left: 4px; font-size: 11px;"></i></a>
-        </div>
-
-        <div class="activity-list">
-            <div class="activity-item">
-                <div class="activity-icon" style="background: #E3F2FD; color: #1565C0;"><i class="fa-regular fa-file-lines"></i></div>
-                <div class="activity-content">
-                    <div class="activity-title">
-                        <span class="activity-name">Algebra Basics</span>
-                        <span class="activity-type" style="background: #E3F2FD; color: #1565C0;">Notes</span>
-                    </div>
-                    <div class="activity-meta">
-                        <span><i class="fa-regular fa-folder"></i> Standard 8 / Mathematics</span>
-                        <span><i class="fa-regular fa-user"></i> John Doe</span>
-                        <span><i class="fa-regular fa-clock"></i> 2 hours ago</span>
-                    </div>
-                </div>
-            </div>
-            <div class="activity-item">
-                <div class="activity-icon" style="background: #F3E5F5; color: #7B1FA2;"><i class="fa-solid fa-video"></i></div>
-                <div class="activity-content">
-                    <div class="activity-title">
-                        <span class="activity-name">Quadratic Equations - Lecture 3</span>
-                        <span class="activity-type" style="background: #F3E5F5; color: #7B1FA2;">Video</span>
-                    </div>
-                    <div class="activity-meta">
-                        <span><i class="fa-regular fa-folder"></i> Standard 10 / Mathematics</span>
-                        <span><i class="fa-regular fa-user"></i> Jane Smith</span>
-                        <span><i class="fa-regular fa-clock"></i> 5 hours ago</span>
-                    </div>
-                </div>
-            </div>
-            <div class="activity-item">
-                <div class="activity-icon" style="background: #E8F5E9; color: #2E7D32;"><i class="fa-regular fa-circle-question"></i></div>
-                <div class="activity-content">
-                    <div class="activity-title">
-                        <span class="activity-name">Programming Fundamentals Quiz</span>
-                        <span class="activity-type" style="background: #E8F5E9; color: #2E7D32;">Quiz</span>
-                    </div>
-                    <div class="activity-meta">
-                        <span><i class="fa-regular fa-folder"></i> BCA / Computer Science</span>
-                        <span><i class="fa-regular fa-user"></i> Admin</span>
-                        <span><i class="fa-regular fa-clock"></i> Yesterday</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
 </div>
 
@@ -282,6 +238,7 @@
 
 @section('scripts')
 <script src="{{ asset('js/content-manager.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 document.getElementById('courseSearch')?.addEventListener('input', function(e) {
     const searchTerm = e.target.value.toLowerCase();
@@ -293,11 +250,26 @@ document.getElementById('courseSearch')?.addEventListener('input', function(e) {
     });
 });
 
-function showCourseMenu(btn, courseId, courseName) {
-    const action = prompt(`Options for ${courseName}:\n1. Edit\n2. Archive\n3. Delete\n\nEnter number (1-3):`);
-    if (action === '1') alert(`Edit course: ${courseName}`);
-    else if (action === '2') alert(`Archive course: ${courseName}`);
-    else if (action === '3') { if (confirm(`Delete ${courseName}?`)) alert('Course deleted (demo)'); }
+function confirmDelete(courseName) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You are about to delete '" + courseName + "'. This action cannot be undone!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#1565C0',
+        cancelButtonColor: '#ef4444',
+        confirmButtonText: 'Yes, delete it!',
+        background: 'var(--surface)',
+        color: 'var(--text)'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire(
+                'Deleted!',
+                'The course has been deleted (Demo only).',
+                'success'
+            )
+        }
+    })
 }
 
 document.querySelector('.filter-btn')?.addEventListener('click', function() {

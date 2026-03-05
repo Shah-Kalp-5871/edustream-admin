@@ -5,7 +5,7 @@
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/content-manager.css') }}">
 <style>
-.file-row { display: grid; grid-template-columns: 3fr 1fr 1fr 80px; padding: 12px 20px; align-items: center; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.2s ease; }
+.file-row { display: grid; grid-template-columns: 1fr 100px 100px 170px; padding: 12px 20px; align-items: center; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.2s ease; }
 .file-row:hover { background: var(--surface-2); }
 .action-btn { padding: 8px 16px; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r-sm); color: var(--text); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; }
 .action-btn:hover { background: var(--primary); border-color: var(--primary); color: white; }
@@ -22,15 +22,21 @@
 .form-control { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--surface); color: var(--text); font-size: 14px; transition: all var(--tr); box-sizing: border-box; }
 .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
 .quiz-badge { font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 30px; }
+
+/* Toggle Switch Styles */
+.switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border-strong); transition: .4s; border-radius: 20px; }
+.slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+input:checked + .slider { background-color: var(--primary); }
+input:focus + .slider { box-shadow: 0 0 1px var(--primary); }
+input:checked + .slider:before { transform: translateX(20px); }
 </style>
 @endsection
 
 @section('actions')
-    <button class="action-btn" onclick="openModal('addQuizModal')">
-        <i class="fa-solid fa-plus"></i> Create Quiz
-    </button>
-    <button class="action-btn" onclick="openModal('importQModal')">
-        <i class="fa-solid fa-file-import"></i> Import Questions
+    <button class="action-btn" style="background: var(--primary); color: white; border-color: var(--primary);" onclick="window.location.href='{{ url('/content/quiz/' . $id . '/builder') }}'">
+        <i class="fa-solid fa-plus"></i> Create New Quiz
     </button>
 @endsection
 
@@ -56,11 +62,8 @@
     <!-- Action Bar -->
     <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 16px 20px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
         <div style="display: flex; align-items: center; gap: 12px;">
-            <button class="action-btn" onclick="openModal('addQuizModal')">
-                <i class="fa-solid fa-plus"></i> Create Quiz
-            </button>
-            <button class="action-btn" onclick="openModal('importQModal')">
-                <i class="fa-solid fa-file-import"></i> Import Questions
+            <button class="action-btn" style="background: var(--primary); color: white; border-color: var(--primary);" onclick="window.location.href='{{ url('/content/quiz/' . $id . '/builder') }}'">
+                <i class="fa-solid fa-plus"></i> Create New Quiz
             </button>
         </div>
         <div>
@@ -89,7 +92,7 @@
 
     <!-- Quiz List -->
     <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden;">
-        <div style="display: grid; grid-template-columns: 3fr 1fr 1fr 80px; padding: 12px 20px; background: var(--surface-2); border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 600; color: var(--text-muted);">
+        <div style="display: grid; grid-template-columns: 1fr 100px 100px 170px; padding: 12px 20px; background: var(--surface-2); border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 600; color: var(--text-muted);">
             <div>Quiz Name</div>
             <div>Questions</div>
             <div>Status</div>
@@ -107,8 +110,17 @@
                 </div>
             </div>
             <div style="color: var(--text-muted);">25 Qs</div>
-            <div><span class="quiz-badge" style="background: #E8F5E9; color: #2E7D32;">Published</span></div>
-            <div><button class="action-icon-btn" onclick="showQuizOptions(event, 'q1')"><i class="fa-solid fa-ellipsis-vertical"></i></button></div>
+            <div>
+                <label class="switch">
+                    <input type="checkbox" checked onchange="toggleStatus('Algebra Quiz - Chapter 1', this.checked)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div>
+                <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 11px;" onclick="window.location.href='{{ url('/content/quiz/' . $id . '/builder') }}'">
+                    <i class="fa-solid fa-list-check"></i> Manage Questions
+                </button>
+            </div>
         </div>
 
         <div class="file-row">
@@ -122,8 +134,17 @@
                 </div>
             </div>
             <div style="color: var(--text-muted);">20 Qs</div>
-            <div><span class="quiz-badge" style="background: #E8F5E9; color: #2E7D32;">Published</span></div>
-            <div><button class="action-icon-btn" onclick="showQuizOptions(event, 'q2')"><i class="fa-solid fa-ellipsis-vertical"></i></button></div>
+            <div>
+                <label class="switch">
+                    <input type="checkbox" checked onchange="toggleStatus('Geometry Quiz - Shapes', this.checked)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div>
+                <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 11px;" onclick="window.location.href='{{ url('/content/quiz/' . $id . '/builder') }}'">
+                    <i class="fa-solid fa-list-check"></i> Manage Questions
+                </button>
+            </div>
         </div>
 
         <div class="file-row">
@@ -137,52 +158,23 @@
                 </div>
             </div>
             <div style="color: var(--text-muted);">18 Qs</div>
-            <div><span class="quiz-badge" style="background: #FFF3E0; color: #E65100;">Draft</span></div>
-            <div><button class="action-icon-btn" onclick="showQuizOptions(event, 'q3')"><i class="fa-solid fa-ellipsis-vertical"></i></button></div>
+            <div>
+                <label class="switch">
+                    <input type="checkbox" onchange="toggleStatus('Mensuration Quiz - Draft', this.checked)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div>
+                <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 11px;" onclick="window.location.href='{{ url('/content/quiz/' . $id . '/builder') }}'">
+                    <i class="fa-solid fa-list-check"></i> Manage Questions
+                </button>
+            </div>
         </div>
     </div>
 
     <div style="margin-top: 20px; font-size: 12px; color: var(--text-muted);">3 quizzes shown</div>
 </div>
 
-<!-- Add Quiz Modal -->
-<div class="modal-backdrop" id="addQuizModal" onclick="if(event.target===this) closeModal('addQuizModal')">
-    <div class="modal" style="max-width: 500px;">
-        <div class="modal-header">
-            <h3>Create New Quiz</h3>
-            <button class="modal-close" onclick="closeModal('addQuizModal')">&times;</button>
-        </div>
-        <div class="modal-body">
-            <div style="margin-bottom: 16px;">
-                <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Quiz Title</label>
-                <input type="text" class="form-control" placeholder="e.g., Chapter 1 - Algebra Quiz">
-            </div>
-            <div style="margin-bottom: 16px;">
-                <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Quiz Type</label>
-                <select class="form-control">
-                    <option>MCQ (Multiple Choice)</option>
-                    <option>Fill in the Blank</option>
-                    <option>True/False</option>
-                    <option>Mixed</option>
-                </select>
-            </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                <div>
-                    <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Duration (mins)</label>
-                    <input type="number" class="form-control" placeholder="30" value="30">
-                </div>
-                <div>
-                    <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Total Marks</label>
-                    <input type="number" class="form-control" placeholder="100" value="100">
-                </div>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-secondary" onclick="closeModal('addQuizModal')">Cancel</button>
-            <button class="btn btn-primary">Create Quiz</button>
-        </div>
-    </div>
-</div>
 @endsection
 
 @section('scripts')
@@ -196,8 +188,21 @@ function searchRows(q) {
 }
 function showQuizOptions(e, id) {
     e.stopPropagation();
-    const a = prompt('Options:\n1. Edit Quiz\n2. Publish/Unpublish\n3. Delete\n\nEnter (1-3):');
-    if (a === '3' && confirm('Delete this quiz?')) alert('Quiz deleted (demo)');
+    const a = prompt('Options:\n1. Edit Quiz\n2. Delete\n\nEnter (1-2):');
+    if (a === '2' && confirm('Delete this quiz?')) alert('Quiz deleted (demo)');
+}
+function toggleStatus(name, active) {
+    const status = active ? 'Active' : 'Inactive';
+    const color = active ? 'var(--primary)' : '#6c757d';
+    Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'success',
+        title: `${name} is now ${status}`,
+        showConfirmButton: false,
+        timer: 1500,
+        timerProgressBar: true
+    });
 }
 </script>
 @endsection

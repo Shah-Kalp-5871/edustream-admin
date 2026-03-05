@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ContentController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\UserController;
@@ -22,13 +23,27 @@ Route::get('/reset-password', [AuthController::class, 'resetPassword']);
 // Dashboard
 Route::get('/dashboard', [DashboardController::class, 'index']);
 
+// Category Routes
+Route::get('/content/categories', [CategoryController::class, 'index']);
+Route::get('/content/categories/create', [CategoryController::class, 'create']);
+Route::get('/content/categories/{id}/edit', [CategoryController::class, 'edit']);
+
 // Content Routes
 Route::get('/content', [ContentController::class, 'index']);
+Route::get('/content/course/create', [ContentController::class, 'create']);
+Route::get('/content/course/{id}/edit', [ContentController::class, 'edit']);
 Route::get('/content/course/{id}', [ContentController::class, 'courseSubjects']);
-Route::get('/content/subject/{id}', [ContentController::class, 'subjectManage']);
+// Subject Routes
+Route::get('/content/course/{id}/subject/create', [ContentController::class, 'createSubject']);
+Route::post('/content/course/{id}/subject', [ContentController::class, 'storeSubject']);
+Route::get('/content/subject/{id}/edit', [ContentController::class, 'editSubject']);
+Route::put('/content/subject/{id}', [ContentController::class, 'updateSubject']);
+Route::delete('/content/subject/{id}', [ContentController::class, 'destroySubject']);
+Route::get('/content/subject/{id}', [ContentController::class, 'subjectContent']);
 Route::get('/content/notes/{id}', [ContentController::class, 'manageNotes']);
 Route::get('/content/videos/{id}', [ContentController::class, 'manageVideos']);
 Route::get('/content/quiz/{id}', [ContentController::class, 'manageQuiz']);
+Route::get('/content/quiz/{id}/builder', [ContentController::class, 'quizBuilder']);
 Route::get('/content/qa-papers/{id}', [ContentController::class, 'manageQAPapers']);
 
 // Quiz Routes

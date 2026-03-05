@@ -16,9 +16,14 @@
 
         <span class="nav-section">Learning</span>
 
-        <a href="/content" class="nav-link {{ request()->is('content*') ? 'active' : '' }}">
+        <a href="/content" class="nav-link {{ request()->is('content*') && !request()->is('content/categories*') ? 'active' : '' }}">
             <span class="nav-icon"><i class="fas fa-folder-open"></i></span>
             Content Manager
+        </a>
+
+        <a href="/content/categories" class="nav-link {{ request()->is('content/categories*') ? 'active' : '' }}">
+            <span class="nav-icon"><i class="fas fa-tags"></i></span>
+            Categories
         </a>
 
         <span class="nav-section">People</span>

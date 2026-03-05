@@ -48,12 +48,9 @@
 @endsection
 
 @section('actions')
-    <button class="quick-action-btn" onclick="openModal('newSubjectModal')">
+    <a href="{{ url('/content/course/' . $id . '/subject/create') }}" class="quick-action-btn" style="text-decoration: none;">
         <i class="fa-solid fa-plus"></i> New Subject
-    </button>
-    <button class="quick-action-btn" onclick="openModal('reorderModal')">
-        <i class="fa-solid fa-arrow-up-wide-short"></i> Reorder
-    </button>
+    </a>
 @endsection
 
 @section('content')
@@ -67,19 +64,14 @@
     </div>
 
     <!-- Course Info Card -->
-    <div class="card" style="margin-bottom: 24px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white;">
+    <div class="card card-pad" style="margin-bottom: 24px; background: linear-gradient(135deg, {{ $course['color'] ?? 'var(--primary)' }} 0%, {{ $course['color'] ?? 'var(--primary-dark)' }}dd 100%); color: white;">
         <div style="display: flex; align-items: center; gap: 24px; flex-wrap: wrap;">
             <div style="width: 64px; height: 64px; border-radius: 16px; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 28px;">
-                <i class="fa-solid fa-graduation-cap"></i>
+                <i class="{{ $course['icon'] ?? 'fa-solid fa-graduation-cap' }}"></i>
             </div>
             <div style="flex: 1;">
                 <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 4px;">{{ $courseName }}</h2>
-                <p style="opacity: 0.9; font-size: 13px;">{{ count($subjects) }} Subjects • 1,284 Total Contents • Last updated 2 hours ago</p>
-            </div>
-            <div style="display: flex; gap: 12px;">
-                <button class="btn-manage" style="background: rgba(255,255,255,0.2); border: none; color: white; width: auto; padding: 10px 20px;" onclick="openModal('courseSettingsModal')">
-                    <i class="fa-solid fa-gear"></i> Settings
-                </button>
+                <p style="opacity: 0.9; font-size: 13px;">{{ count($subjects) }} Subjects • 1,284 Total Contents</p>
             </div>
         </div>
     </div>
@@ -110,10 +102,31 @@
     <div class="subjects-grid">
         @foreach($subjects as $subject)
         <div class="subject-card" onclick="window.location.href='{{ url('/content/subject/' . $subject['id']) }}'">
-            <div class="subject-icon">
-                <i class="{{ $subject['icon'] }}"></i>
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px;">
+                <div class="subject-icon" style="margin-bottom: 0; background: {{ ($subject['color'] ?? '#1565C0') }}20; color: {{ $subject['color'] ?? 'var(--primary)' }};">
+                    <i class="{{ $subject['icon'] }}"></i>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <a href="{{ url('/content/subject/' . $subject['id'] . '/edit') }}" class="action-circle-btn" onclick="event.stopPropagation();" title="Edit Subject" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid var(--border); color: var(--text-muted); text-decoration: none;">
+                        <i class="fa-solid fa-pen-to-square" style="font-size: 12px;"></i>
+                    </a>
+                    <button class="action-circle-btn delete" onclick="event.stopPropagation(); confirmDeleteSubject('{{ $subject['name'] }}')" title="Delete Subject" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid var(--border); color: var(--text-muted); background: transparent; cursor: pointer;">
+                        <i class="fa-solid fa-trash-can" style="font-size: 12px;"></i>
+                    </button>
+                </div>
             </div>
-            <h3 class="subject-name">{{ $subject['name'] }}</h3>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                <h3 class="subject-name" style="margin-bottom: 0;">{{ $subject['name'] }}</h3>
+                <span style="font-weight: 700; color: var(--primary); font-size: 14px;">₹{{ $subject['price'] ?? '0' }}</span>
+            </div>
+
+            <div style="margin-bottom: 16px;">
+                <span class="status-badge {{ ($subject['status'] ?? 'Active') == 'Active' ? 'status-active' : 'status-pending' }}" style="padding: 2px 8px; font-size: 10px;">
+                    {{ $subject['status'] ?? 'Active' }}
+                </span>
+            </div>
+
             <div class="subject-stats">
                 <span class="subject-stat"><i class="fa-regular fa-file-lines"></i> {{ $subject['notes_count'] }} Notes</span>
                 <span class="subject-stat"><i class="fa-solid fa-video"></i> {{ $subject['videos_count'] }} Videos</span>
@@ -126,47 +139,37 @@
         @endforeach
 
         <!-- Add New Subject Card -->
-        <div class="subject-card" style="background: var(--surface-2); border: 2px dashed var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;" onclick="openModal('newSubjectModal')">
+        <a href="{{ url('/content/course/' . $id . '/subject/create') }}" class="subject-card" style="background: var(--surface-2); border: 2px dashed var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; text-decoration: none;">
             <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--surface); display: flex; align-items: center; justify-content: center; margin-bottom: 12px; color: var(--primary); font-size: 20px;">
                 <i class="fa-solid fa-plus"></i>
             </div>
-            <h3 style="font-size: 15px; font-weight: 600; margin-bottom: 4px;">Add New Subject</h3>
+            <h3 style="font-size: 15px; font-weight: 600; margin-bottom: 4px; color: var(--text);">Add New Subject</h3>
             <p style="font-size: 12px; color: var(--text-muted);">Create a new subject</p>
-        </div>
+        </a>
     </div>
 </div>
 
-<!-- New Subject Modal -->
-<div class="modal-backdrop" id="newSubjectModal" onclick="if(event.target===this) closeModal('newSubjectModal')">
-    <div class="modal" style="max-width: 500px;">
-        <div class="modal-header">
-            <h3>Add New Subject to {{ $courseName }}</h3>
-            <button class="modal-close" onclick="closeModal('newSubjectModal')">&times;</button>
-        </div>
-        <div class="modal-body">
-            <form>
-                <div style="margin-bottom: 20px;">
-                    <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Subject Name</label>
-                    <input type="text" class="form-control" placeholder="e.g., Mathematics, Physics, English">
-                </div>
-                <div style="margin-bottom: 20px;">
-                    <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Subject Code (Optional)</label>
-                    <input type="text" class="form-control" placeholder="e.g., MATH101">
-                </div>
-                <div style="margin-bottom: 20px;">
-                    <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Description</label>
-                    <textarea class="form-control" rows="3" placeholder="Brief description..."></textarea>
-                </div>
-            </form>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-secondary" onclick="closeModal('newSubjectModal')">Cancel</button>
-            <button class="btn btn-primary">Add Subject</button>
-        </div>
-    </div>
-</div>
 @endsection
 
 @section('scripts')
-<script src="{{ asset('js/content-manager.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+function confirmDeleteSubject(name) {
+    Swal.fire({
+        title: 'Delete Subject?',
+        text: "Are you sure you want to delete '" + name + "'? All contents within this subject will be lost.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#1565C0',
+        cancelButtonColor: '#ef4444',
+        confirmButtonText: 'Yes, delete it!',
+        background: 'var(--surface)',
+        color: 'var(--text)'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire('Deleted!', 'Subject has been removed (Demo).', 'success')
+        }
+    })
+}
+</script>
 @endsection
