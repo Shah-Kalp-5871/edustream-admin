@@ -5,36 +5,12 @@
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/content-manager.css') }}">
 <style>
-.file-row { display: grid; grid-template-columns: 1fr 100px 100px 170px; padding: 12px 20px; align-items: center; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.2s ease; }
-.file-row:hover { background: var(--surface-2); }
-.action-btn { padding: 8px 16px; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r-sm); color: var(--text); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; }
-.action-btn:hover { background: var(--primary); border-color: var(--primary); color: white; }
-.action-icon-btn { width: 32px; height: 32px; border-radius: 50%; border: none; background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; }
-.action-icon-btn:hover { background: var(--surface); color: var(--primary); }
-.modal-backdrop { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
-.modal-backdrop.show { display: flex; }
-.modal { background: var(--surface); border-radius: var(--r-lg); width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg); }
-.modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-.modal-header h3 { font-size: 18px; font-weight: 600; }
-.modal-close { background: transparent; border: none; font-size: 24px; cursor: pointer; color: var(--text-muted); }
-.modal-body { padding: 24px; }
-.modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 12px; }
-.form-control { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--surface); color: var(--text); font-size: 14px; transition: all var(--tr); box-sizing: border-box; }
-.form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
 .quiz-badge { font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 30px; }
-
-/* Toggle Switch Styles */
-.switch { position: relative; display: inline-block; width: 40px; height: 20px; }
-.switch input { opacity: 0; width: 0; height: 0; }
-.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border-strong); transition: .4s; border-radius: 20px; }
-.slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-input:checked + .slider { background-color: var(--primary); }
-input:focus + .slider { box-shadow: 0 0 1px var(--primary); }
-input:checked + .slider:before { transform: translateX(20px); }
 </style>
 @endsection
 
 @section('actions')
+
     <button class="action-btn" style="background: var(--primary); color: white; border-color: var(--primary);" onclick="window.location.href='{{ url('/content/quiz/' . $id . '/builder') }}'">
         <i class="fa-solid fa-plus"></i> Create New Quiz
     </button>
@@ -92,14 +68,15 @@ input:checked + .slider:before { transform: translateX(20px); }
 
     <!-- Quiz List -->
     <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden;">
-        <div style="display: grid; grid-template-columns: 1fr 100px 100px 170px; padding: 12px 20px; background: var(--surface-2); border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 600; color: var(--text-muted);">
+        <div style="display: grid; grid-template-columns: 1fr 90px 90px 110px 160px; padding: 12px 20px; background: var(--surface-2); border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 600; color: var(--text-muted);">
             <div>Quiz Name</div>
             <div>Questions</div>
             <div>Status</div>
+            <div>Access</div>
             <div>Actions</div>
         </div>
 
-        <div class="file-row">
+        <div class="file-row quiz-row">
             <div style="display: flex; align-items: center; gap: 12px;">
                 <div style="width: 36px; height: 36px; border-radius: 10px; background: #E8F5E9; color: #2E7D32; display: flex; align-items: center; justify-content: center; font-size: 16px;">
                     <i class="fa-regular fa-circle-question"></i>
@@ -116,14 +93,20 @@ input:checked + .slider:before { transform: translateX(20px); }
                     <span class="slider"></span>
                 </label>
             </div>
-            <div>
-                <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 11px;" onclick="window.location.href='{{ url('/content/quiz/' . $id . '/builder') }}'">
-                    <i class="fa-solid fa-list-check"></i> Manage Questions
-                </button>
+            <div style="display: flex; align-items: center;" onclick="event.stopPropagation()">
+                <label class="toggle-switch" style="position: relative; display: inline-block; width: 36px; height: 20px; margin: 0;">
+                    <input type="checkbox" style="opacity: 0; width: 0; height: 0; cursor: pointer;" onchange="this.parentElement.nextElementSibling.textContent = this.checked ? 'Free' : 'Paid'; this.parentElement.nextElementSibling.style.color = this.checked ? 'var(--primary)' : 'var(--text-muted)';">
+                    <span class="slider round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px;"></span>
+                </label>
+                <span style="font-size: 11px; margin-left: 8px; color: var(--text-muted); font-weight: 600;">Paid</span>
+            </div>
+            <div style="display: flex; gap: 4px;">
+                <button class="action-icon-btn" onclick="openEditDetailsModal('Algebra Quiz - Chapter 1', 'q1')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
+                <button class="action-icon-btn" onclick="window.location.href='{{ url('/content/quiz/' . $id . '/builder') }}'" title="Manage Questions"><i class="fa-solid fa-list-check"></i></button>
             </div>
         </div>
 
-        <div class="file-row">
+        <div class="file-row quiz-row">
             <div style="display: flex; align-items: center; gap: 12px;">
                 <div style="width: 36px; height: 36px; border-radius: 10px; background: #E8F5E9; color: #2E7D32; display: flex; align-items: center; justify-content: center; font-size: 16px;">
                     <i class="fa-regular fa-circle-question"></i>
@@ -140,14 +123,20 @@ input:checked + .slider:before { transform: translateX(20px); }
                     <span class="slider"></span>
                 </label>
             </div>
-            <div>
-                <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 11px;" onclick="window.location.href='{{ url('/content/quiz/' . $id . '/builder') }}'">
-                    <i class="fa-solid fa-list-check"></i> Manage Questions
-                </button>
+            <div style="display: flex; align-items: center;" onclick="event.stopPropagation()">
+                <label class="toggle-switch" style="position: relative; display: inline-block; width: 36px; height: 20px; margin: 0;">
+                    <input type="checkbox" style="opacity: 0; width: 0; height: 0; cursor: pointer;" onchange="this.parentElement.nextElementSibling.textContent = this.checked ? 'Free' : 'Paid'; this.parentElement.nextElementSibling.style.color = this.checked ? 'var(--primary)' : 'var(--text-muted)';">
+                    <span class="slider round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; transition: .4s; border-radius: 34px;"></span>
+                </label>
+                <span style="font-size: 11px; margin-left: 8px; color: var(--text-muted); font-weight: 600;">Paid</span>
+            </div>
+            <div style="display: flex; gap: 4px;">
+                <button class="action-icon-btn" onclick="openEditDetailsModal('Geometry Quiz - Shapes', 'q2')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
+                <button class="action-icon-btn" onclick="window.location.href='{{ url('/content/quiz/' . $id . '/builder') }}'" title="Manage Questions"><i class="fa-solid fa-list-check"></i></button>
             </div>
         </div>
 
-        <div class="file-row">
+        <div class="file-row quiz-row">
             <div style="display: flex; align-items: center; gap: 12px;">
                 <div style="width: 36px; height: 36px; border-radius: 10px; background: #FFF3E0; color: #E65100; display: flex; align-items: center; justify-content: center; font-size: 16px;">
                     <i class="fa-regular fa-circle-question"></i>
@@ -158,16 +147,23 @@ input:checked + .slider:before { transform: translateX(20px); }
                 </div>
             </div>
             <div style="color: var(--text-muted);">18 Qs</div>
+
             <div>
                 <label class="switch">
                     <input type="checkbox" onchange="toggleStatus('Mensuration Quiz - Draft', this.checked)">
                     <span class="slider"></span>
                 </label>
             </div>
-            <div>
-                <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 11px;" onclick="window.location.href='{{ url('/content/quiz/' . $id . '/builder') }}'">
-                    <i class="fa-solid fa-list-check"></i> Manage Questions
-                </button>
+            <div style="display: flex; align-items: center;" onclick="event.stopPropagation()">
+                <label class="toggle-switch" style="position: relative; display: inline-block; width: 36px; height: 20px; margin: 0;">
+                    <input type="checkbox" style="opacity: 0; width: 0; height: 0; cursor: pointer;" onchange="this.parentElement.nextElementSibling.textContent = this.checked ? 'Free' : 'Paid'; this.parentElement.nextElementSibling.style.color = this.checked ? 'var(--primary)' : 'var(--text-muted)';">
+                    <span class="slider round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; transition: .4s; border-radius: 34px;"></span>
+                </label>
+                <span style="font-size: 11px; margin-left: 8px; color: var(--text-muted); font-weight: 600;">Paid</span>
+            </div>
+            <div style="display: flex; gap: 4px;">
+                <button class="action-icon-btn" onclick="openEditDetailsModal('Mensuration Quiz - Draft', 'q3')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
+                <button class="action-icon-btn" onclick="window.location.href='{{ url('/content/quiz/' . $id . '/builder') }}'" title="Manage Questions"><i class="fa-solid fa-list-check"></i></button>
             </div>
         </div>
     </div>
@@ -175,9 +171,47 @@ input:checked + .slider:before { transform: translateX(20px); }
     <div style="margin-top: 20px; font-size: 12px; color: var(--text-muted);">3 quizzes shown</div>
 </div>
 
+<!-- Edit Details Modal -->
+<div class="modal-backdrop" id="editDetailsModal" onclick="if(event.target===this) closeModal('editDetailsModal')">
+    <div class="modal" style="max-width: 500px;">
+        <div class="modal-header">
+            <h3>Edit Quiz Details</h3>
+            <button class="modal-close" onclick="closeModal('editDetailsModal')">&times;</button>
+        </div>
+        <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Title</label>
+                <input type="text" class="form-control" id="editTitle" placeholder="Item title">
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Description</label>
+                <textarea class="form-control" id="editDescription" rows="3" placeholder="Add a description or instructions..."></textarea>
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Thumbnail (Optional)</label>
+                <input type="file" class="form-control" id="editThumbnail" accept="image/*">
+                <small style="color: var(--text-muted); font-size: 11px;">Leave empty to use default auto-generated thumbnail.</small>
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Sort Order</label>
+                <input type="number" class="form-control" id="editSortOrder" placeholder="e.g. 1" value="0">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('editDetailsModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveDetails()">Save Details</button>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle scripts moved inline
+    });
+</script>
 <script src="{{ asset('js/content-manager.js') }}"></script>
 <script>
 function searchRows(q) {
@@ -203,6 +237,27 @@ function toggleStatus(name, active) {
         timer: 1500,
         timerProgressBar: true
     });
+}
+function openEditDetailsModal(name, id) {
+    document.getElementById('editTitle').value = name;
+    document.getElementById('editDescription').value = '';
+    document.getElementById('editSortOrder').value = '0';
+    document.getElementById('editThumbnail').value = '';
+    
+    const isFreeCheckbox = document.getElementById('editIsFree');
+    const accessLabel = document.getElementById('accessLabel');
+    isFreeCheckbox.checked = false;
+    accessLabel.textContent = 'Requires Purchase';
+    accessLabel.style.color = 'var(--text-muted)';
+    
+    document.getElementById('editDetailsModal').classList.add('show');
+}
+function closeModal(id) {
+    document.getElementById(id).classList.remove('show');
+}
+function saveDetails() {
+    closeModal('editDetailsModal');
+    alert('Details saved successfully for ' + document.getElementById('editTitle').value);
 }
 </script>
 @endsection

@@ -241,7 +241,7 @@ document.querySelectorAll('.color-opt').forEach(opt => {
                 </div>
 
                 <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border);">
-                    <button type="button" class="btn-manage" style="width: auto; padding: 12px 24px;" onclick="window.location.href='{{ url('/content') }}'">Cancel</button>
+                    <a href="{{ url('/content') }}" class="btn btn-secondary" style="width: auto; padding: 12px 24px; text-decoration: none;">Cancel</a>
                     <button type="submit" class="btn-submit">
                         <i class="fa-solid fa-check"></i> Create Course
                     </button>

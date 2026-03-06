@@ -4,37 +4,6 @@
 
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/content-manager.css') }}">
-<style>
-/* File Row Styles */
-.file-row { display: grid; grid-template-columns: 3fr 1fr 1fr 80px; padding: 12px 20px; align-items: center; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.2s ease; }
-.file-row:hover { background: var(--surface-2); }
-.file-row.selected { background: var(--primary-glow); }
-.folder-row { background: var(--surface-2); }
-.folder-row:hover { background: var(--border); }
-.action-btn { padding: 8px 16px; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r-sm); color: var(--text); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; }
-.action-btn:hover { background: var(--primary); border-color: var(--primary); color: white; }
-.action-icon-btn { width: 32px; height: 32px; border-radius: 50%; border: none; background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; }
-.action-icon-btn:hover { background: var(--surface); color: var(--primary); }
-.text-btn { padding: 6px 12px; border: none; background: transparent; color: var(--text); font-size: 12px; cursor: pointer; border-radius: var(--r-sm); display: inline-flex; align-items: center; gap: 6px; }
-.text-btn:hover { background: var(--surface-2); }
-.breadcrumb-item { color: var(--text-muted); font-size: 13px; cursor: pointer; transition: color 0.2s ease; }
-.breadcrumb-item:hover { color: var(--primary); }
-.breadcrumb-item.active { color: var(--text); font-weight: 500; }
-.breadcrumb-sep { color: var(--border-strong); }
-.storage-info { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; padding: 4px 10px; background: var(--surface-2); border-radius: 30px; }
-/* Modal */
-.modal-backdrop { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
-.modal-backdrop.show { display: flex; }
-.modal { background: var(--surface); border-radius: var(--r-lg); width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg); }
-.modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-.modal-header h3 { font-size: 18px; font-weight: 600; }
-.modal-close { background: transparent; border: none; font-size: 24px; cursor: pointer; color: var(--text-muted); }
-.modal-body { padding: 24px; }
-.modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 12px; }
-.form-control { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--surface); color: var(--text); font-size: 14px; transition: all var(--tr); box-sizing: border-box; }
-.form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
-@media (max-width: 768px) { .file-row { grid-template-columns: 2fr 1fr 60px; } .file-row > div:nth-child(2) { display: none; } }
-</style>
 @endsection
 
 @section('actions')
@@ -98,12 +67,13 @@
     </div>
 
     <!-- Files List -->
-    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden;">
+    <div id="fileList" style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden;">
         <!-- Table Header -->
-        <div style="display: grid; grid-template-columns: 3fr 1fr 1fr 80px; padding: 12px 20px; background: var(--surface-2); border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 600; color: var(--text-muted);">
+        <div style="display: grid; grid-template-columns: 3fr 1fr 1fr 110px 160px; padding: 12px 20px; background: var(--surface-2); border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 600; color: var(--text-muted);">
             <div>Name</div>
             <div>Size</div>
             <div>Modified</div>
+            <div>Access</div>
             <div>Actions</div>
         </div>
 
@@ -115,7 +85,12 @@
             </div>
             <div style="color: var(--text-muted);">—</div>
             <div style="color: var(--text-muted);">2026-03-04</div>
-            <div><button class="action-icon-btn" onclick="showFolderOptions(event, 'chapter2')"><i class="fa-solid fa-ellipsis-vertical"></i></button></div>
+            <div></div> <!-- Folders have no toggle -->
+            <div style="display: flex; gap: 4px;">
+                <button class="action-icon-btn" onclick="openEditDetailsModal('Chapter 2 - Quadratic Equations', 'chapter2')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
+                <button class="action-icon-btn" onclick="openRenameModal('Chapter 2 - Quadratic Equations', 'chapter2')" title="Rename"><i class="fa-solid fa-pen"></i></button>
+                <button class="action-icon-btn" onclick="openDeleteModal('Chapter 2 - Quadratic Equations', 'chapter2')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
+            </div>
         </div>
 
         <div class="file-row folder-row" ondblclick="navigateTo('chapter3')">
@@ -125,7 +100,12 @@
             </div>
             <div style="color: var(--text-muted);">—</div>
             <div style="color: var(--text-muted);">2026-03-03</div>
-            <div><button class="action-icon-btn" onclick="showFolderOptions(event, 'chapter3')"><i class="fa-solid fa-ellipsis-vertical"></i></button></div>
+            <div></div> <!-- Folders have no toggle -->
+            <div style="display: flex; gap: 4px;">
+                <button class="action-icon-btn" onclick="openEditDetailsModal('Chapter 3 - Polynomials', 'chapter3')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
+                <button class="action-icon-btn" onclick="openRenameModal('Chapter 3 - Polynomials', 'chapter3')" title="Rename"><i class="fa-solid fa-pen"></i></button>
+                <button class="action-icon-btn" onclick="openDeleteModal('Chapter 3 - Polynomials', 'chapter3')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
+            </div>
         </div>
 
         <!-- PDF Files -->
@@ -136,7 +116,19 @@
             </div>
             <div style="color: var(--text-muted);">2.4 MB</div>
             <div style="color: var(--text-muted);">2026-03-04</div>
-            <div><button class="action-icon-btn" onclick="showFileOptions(event, 'file1')"><i class="fa-solid fa-ellipsis-vertical"></i></button></div>
+            <div style="display: flex; align-items: center;" onclick="event.stopPropagation()">
+                <label class="toggle-switch" style="position: relative; display: inline-block; width: 36px; height: 20px; margin: 0;">
+                    <input type="checkbox" style="opacity: 0; width: 0; height: 0; cursor: pointer;" onchange="this.parentElement.nextElementSibling.textContent = this.checked ? 'Free' : 'Paid'; this.parentElement.nextElementSibling.style.color = this.checked ? 'var(--primary)' : 'var(--text-muted)';">
+                    <span class="slider round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; transition: .4s; border-radius: 34px;"></span>
+                </label>
+                <span style="font-size: 11px; margin-left: 8px; color: var(--text-muted); font-weight: 600;">Paid</span>
+            </div>
+            <div style="display: flex; gap: 4px;">
+                <button class="action-icon-btn" onclick="openEditDetailsModal('Algebra_Basics_Chapter_1.pdf', 'file1')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
+                <button class="action-icon-btn" onclick="openRenameModal('Algebra_Basics_Chapter_1.pdf', 'file1')" title="Rename"><i class="fa-solid fa-pen"></i></button>
+                <button class="action-icon-btn" onclick="downloadFile('file1')" title="Download"><i class="fa-solid fa-download"></i></button>
+                <button class="action-icon-btn" onclick="openDeleteModal('Algebra_Basics_Chapter_1.pdf', 'file1')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
+            </div>
         </div>
 
         <div class="file-row" ondblclick="previewFile('linear_equations.pdf')">
@@ -146,7 +138,19 @@
             </div>
             <div style="color: var(--text-muted);">1.8 MB</div>
             <div style="color: var(--text-muted);">2026-03-03</div>
-            <div><button class="action-icon-btn" onclick="showFileOptions(event, 'file2')"><i class="fa-solid fa-ellipsis-vertical"></i></button></div>
+            <div style="display: flex; align-items: center;" onclick="event.stopPropagation()">
+                <label class="toggle-switch" style="position: relative; display: inline-block; width: 36px; height: 20px; margin: 0;">
+                    <input type="checkbox" style="opacity: 0; width: 0; height: 0; cursor: pointer;" onchange="this.parentElement.nextElementSibling.textContent = this.checked ? 'Free' : 'Paid'; this.parentElement.nextElementSibling.style.color = this.checked ? 'var(--primary)' : 'var(--text-muted)';">
+                    <span class="slider round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; transition: .4s; border-radius: 34px;"></span>
+                </label>
+                <span style="font-size: 11px; margin-left: 8px; color: var(--text-muted); font-weight: 600;">Paid</span>
+            </div>
+            <div style="display: flex; gap: 4px;">
+                <button class="action-icon-btn" onclick="openEditDetailsModal('Linear_Equations_Complete.pdf', 'file2')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
+                <button class="action-icon-btn" onclick="openRenameModal('Linear_Equations_Complete.pdf', 'file2')" title="Rename"><i class="fa-solid fa-pen"></i></button>
+                <button class="action-icon-btn" onclick="downloadFile('file2')" title="Download"><i class="fa-solid fa-download"></i></button>
+                <button class="action-icon-btn" onclick="openDeleteModal('Linear_Equations_Complete.pdf', 'file2')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
+            </div>
         </div>
 
         <div class="file-row" ondblclick="previewFile('quadratic_formula.docx')">
@@ -156,7 +160,19 @@
             </div>
             <div style="color: var(--text-muted);">856 KB</div>
             <div style="color: var(--text-muted);">2026-03-02</div>
-            <div><button class="action-icon-btn" onclick="showFileOptions(event, 'file3')"><i class="fa-solid fa-ellipsis-vertical"></i></button></div>
+            <div style="display: flex; align-items: center;" onclick="event.stopPropagation()">
+                <label class="toggle-switch" style="position: relative; display: inline-block; width: 36px; height: 20px; margin: 0;">
+                    <input type="checkbox" style="opacity: 0; width: 0; height: 0; cursor: pointer;" onchange="this.parentElement.nextElementSibling.textContent = this.checked ? 'Free' : 'Paid'; this.parentElement.nextElementSibling.style.color = this.checked ? 'var(--primary)' : 'var(--text-muted)';">
+                    <span class="slider round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; transition: .4s; border-radius: 34px;"></span>
+                </label>
+                <span style="font-size: 11px; margin-left: 8px; color: var(--text-muted); font-weight: 600;">Paid</span>
+            </div>
+            <div style="display: flex; gap: 4px;">
+                <button class="action-icon-btn" onclick="openEditDetailsModal('Quadratic_Formula_Notes.docx', 'file3')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
+                <button class="action-icon-btn" onclick="openRenameModal('Quadratic_Formula_Notes.docx', 'file3')" title="Rename"><i class="fa-solid fa-pen"></i></button>
+                <button class="action-icon-btn" onclick="downloadFile('file3')" title="Download"><i class="fa-solid fa-download"></i></button>
+                <button class="action-icon-btn" onclick="openDeleteModal('Quadratic_Formula_Notes.docx', 'file3')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
+            </div>
         </div>
 
         <div class="file-row" ondblclick="previewFile('practice_problems.pdf')">
@@ -166,7 +182,19 @@
             </div>
             <div style="color: var(--text-muted);">1.2 MB</div>
             <div style="color: var(--text-muted);">2026-03-01</div>
-            <div><button class="action-icon-btn" onclick="showFileOptions(event, 'file4')"><i class="fa-solid fa-ellipsis-vertical"></i></button></div>
+            <div style="display: flex; align-items: center;" onclick="event.stopPropagation()">
+                <label class="toggle-switch" style="position: relative; display: inline-block; width: 36px; height: 20px; margin: 0;">
+                    <input type="checkbox" style="opacity: 0; width: 0; height: 0; cursor: pointer;" onchange="this.parentElement.nextElementSibling.textContent = this.checked ? 'Free' : 'Paid'; this.parentElement.nextElementSibling.style.color = this.checked ? 'var(--primary)' : 'var(--text-muted)';">
+                    <span class="slider round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; transition: .4s; border-radius: 34px;"></span>
+                </label>
+                <span style="font-size: 11px; margin-left: 8px; color: var(--text-muted); font-weight: 600;">Paid</span>
+            </div>
+            <div style="display: flex; gap: 4px;">
+                <button class="action-icon-btn" onclick="openEditDetailsModal('Practice_Problems_Set_1.pdf', 'file4')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
+                <button class="action-icon-btn" onclick="openRenameModal('Practice_Problems_Set_1.pdf', 'file4')" title="Rename"><i class="fa-solid fa-pen"></i></button>
+                <button class="action-icon-btn" onclick="downloadFile('file4')" title="Download"><i class="fa-solid fa-download"></i></button>
+                <button class="action-icon-btn" onclick="openDeleteModal('Practice_Problems_Set_1.pdf', 'file4')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
+            </div>
         </div>
     </div>
 
@@ -243,9 +271,46 @@
         </div>
     </div>
 </div>
+<!-- Edit Details Modal -->
+<div class="modal-backdrop" id="editDetailsModal" onclick="if(event.target===this) closeModal('editDetailsModal')">
+    <div class="modal" style="max-width: 500px;">
+        <div class="modal-header">
+            <h3>Edit Details</h3>
+            <button class="modal-close" onclick="closeModal('editDetailsModal')">&times;</button>
+        </div>
+        <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Title</label>
+                <input type="text" class="form-control" id="editTitle" placeholder="Item title">
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Description</label>
+                <textarea class="form-control" id="editDescription" rows="3" placeholder="Add a description or instructions..."></textarea>
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Thumbnail (Optional)</label>
+                <input type="file" class="form-control" id="editThumbnail" accept="image/*">
+                <small style="color: var(--text-muted); font-size: 11px;">Leave empty to use default auto-generated thumbnail.</small>
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Sort Order</label>
+                <input type="number" class="form-control" id="editSortOrder" placeholder="e.g. 1" value="0">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('editDetailsModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveDetails()">Save Details</button>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle scripts moved to inline
+    });
+</script>
 <script src="{{ asset('js/content-manager.js') }}"></script>
 <script>
 let currentPath = 'root';
@@ -265,8 +330,48 @@ function showNewFolderModal() {
 function createFolder() {
     const folderName = document.getElementById('folderName').value;
     if (!folderName) { alert('Please enter a folder name'); return; }
+    
+    // Simulate folder creation by adding it to the UI
+    const fileList = document.getElementById('fileList');
+    const folderId = 'folder-' + Date.now();
+    
+    const newRow = document.createElement('div');
+    newRow.className = 'file-row folder-row';
+    newRow.ondblclick = () => navigateTo(folderId);
+    newRow.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <i class="fa-regular fa-folder" style="color: var(--primary); font-size: 18px;"></i>
+            <span style="font-weight: 500;">${folderName}</span>
+        </div>
+        <div style="color: var(--text-muted);">—</div>
+        <div style="color: var(--text-muted);">${new Date().toISOString().split('T')[0]}</div>
+        <div></div> <!-- Folders have no toggle -->
+            <div style="display: flex; gap: 4px;">
+                <button class="action-icon-btn" onclick="openEditDetailsModal('${folderName}', '${folderId}')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
+                <button class="action-icon-btn" onclick="openRenameModal('${folderName}', '${folderId}')" title="Rename"><i class="fa-solid fa-pen"></i></button>
+                <button class="action-icon-btn" onclick="openDeleteModal('${folderName}', '${folderId}')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
+            </div>
+    `;
+    
+    // Insert after the header or at the top of the list
+    const header = fileList.firstElementChild;
+    if (header && header.textContent.includes('Name')) {
+        header.after(newRow);
+    } else {
+        fileList.prepend(newRow);
+    }
+    
+    // Add selection listener to new row
+    newRow.addEventListener('click', function(e) {
+        if (e.ctrlKey || e.metaKey) { toggleSelect(this, folderId); }
+        else if (!e.target.closest('button')) {
+            document.querySelectorAll('.file-row').forEach(r => r.classList.remove('selected'));
+            selectedItems.clear(); toggleSelect(this, folderId);
+        }
+    });
+
     closeModal('newFolderModal');
-    setTimeout(() => { alert('Folder "' + folderName + '" created'); }, 500);
+    setTimeout(() => { alert('Folder "' + folderName + '" created'); }, 300);
 }
 
 function navigateTo(path) { currentPath = path; }
@@ -279,39 +384,15 @@ function searchNotes(query) {
     });
 }
 
-function showFileOptions(event, fileId) {
-    event.stopPropagation();
-    currentActionItem = fileId;
-    const action = prompt('Options:\n1. Rename\n2. Delete\n3. Download\n\nEnter number (1-3):');
-    if (action === '1') openRenameModal('Algebra_Basics.pdf');
-    else if (action === '2') openDeleteModal('Algebra_Basics.pdf');
-    else if (action === '3') downloadFile(fileId);
-}
-
-function showFolderOptions(event, folderId) {
-    event.stopPropagation();
-    currentActionItem = folderId;
-    const action = prompt('Options:\n1. Rename\n2. Delete\n\nEnter number (1-2):');
-    if (action === '1') openRenameModal('Chapter Folder');
-    else if (action === '2') openDeleteModal('Chapter Folder');
-}
-
-function openRenameModal(n) { document.getElementById('renameInput').value = n; openModal('renameModal'); }
-function renameItem() { closeModal('renameModal'); alert('Renamed successfully'); }
-function openDeleteModal(n) { document.getElementById('deleteItemName').textContent = n; openModal('deleteModal'); }
-function confirmDelete() { closeModal('deleteModal'); alert('Item deleted'); }
-function previewFile(f) { if (f.endsWith('.pdf')) window.open('#' + f, '_blank'); else alert('Preview: ' + f); }
-function downloadFile(id) { alert('Download started'); }
-
 function toggleSelect(row, fileId) {
     row.classList.toggle('selected');
     if (row.classList.contains('selected')) selectedItems.add(fileId); else selectedItems.delete(fileId);
+    updateSelectedCounter('selectedCount', selectedItems.size);
     updateSelectionUI();
 }
 
 function updateSelectionUI() {
     const count = selectedItems.size;
-    document.getElementById('selectedCount').textContent = count;
     document.getElementById('downloadBtn').style.display = count > 0 ? 'inline-flex' : 'none';
     document.getElementById('deleteBtn').style.display = count > 0 ? 'inline-flex' : 'none';
 }

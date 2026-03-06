@@ -1,0 +1,1265 @@
+# EduStream — Database Schema & API Architecture Design
+
+---
+
+## 1. Project Understanding
+
+EduStream is an **educational content platform** consisting of two applications:
+
+| Component | Technology | Purpose |
+|---|---|---|
+| **Admin Panel** | Laravel (Blade UI) | Content management, user management, order tracking, analytics |
+| **Mobile App** | Flutter | Student-facing app for browsing courses, watching videos, taking quizzes, purchasing content |
+
+**Current State**: Both applications have **static UI only** — no backend logic, no database, no API integration. All data is hardcoded in views and Dart models.
+
+**Business Model**: The platform sells educational content organized by school standards (Nursery through Std 10). Content can be purchased as full courses, individual subjects, or custom bundles. Content items (notes, videos, quizzes) can be individually marked as free or paid.
+
+---
+
+## 2. UI Feature Analysis
+
+### Admin Panel Features (from Blade views)
+
+| Page | Key Features | Data Implications |
+|---|---|---|
+| **Dashboard** | Stats: total students, content items, enrollments, quizzes, revenue; Recent enrollments table; Activity feed | Aggregated counts from multiple tables |
+| **Login** | Email + password login, remember me, forgot password | `users` table with admin credentials |
+| **Categories** | CRUD for education categories (Primary, Secondary, etc.) with course counts | `categories` table |
+| **Courses** | CRUD with: title, icon, color, category, price, status, description, thumbnail | `courses` table linked to categories |
+| **Subjects** | CRUD within a course: name, icon, color, price, status, description | `subjects` table linked to courses |
+| **Notes Manager** | Folder-based file manager; upload PDF/DOC; free/paid toggle; title, description, thumbnail, sort order | `notes` + `note_folders` tables |
+| **Videos Manager** | Same folder structure; upload video; duration; free/paid toggle; title, description, thumbnail, sort order | `videos` + `video_folders` tables |
+| **QA Papers Manager** | Same folder pattern; upload question papers; free/paid toggle | `qa_papers` + `qa_paper_folders` tables |
+| **Quiz Manager** | List quizzes per subject; status toggle; free/paid; quiz builder with MCQ/TF/Short Answer | `quizzes` + `quiz_questions` + `quiz_options` tables |
+| **Quiz Builder** | Question text, type (MCQ/TF/Short), options with correct answer marking, marks per question, time per question; Settings: total time, total marks, pass %, max attempts, shuffle, show results, pricing | Extended quiz schema with settings |
+| **Users/Students** | List: name, email, plan (premium/free), status (active/blocked), enrollment date, courses count; Actions: view, block/unblock, export | `users` table with role/plan fields |
+| **Orders/Enrollments** | List: enrollment ID, student, course, date, amount, payment method (UPI/Card/Net Banking), status (enrolled/pending/cancelled/refunded); Filters by status and date; Manual enrollment | `enrollments` + `payments` tables |
+| **Analytics** | Dashboard analytics (placeholder) | Aggregation queries |
+| **Settings** | Platform settings (placeholder) | `settings` table |
+
+### Flutter App Features (from Dart screens/models)
+
+| Screen | Key Features | Data Implications |
+|---|---|---|
+| **Splash → Auth** | Mobile number login, OTP verification, signup with name/email/mobile | Mobile-first auth with OTP |
+| **Home** | Recent content cards, quiz cards, upgrade banner | Personalized content based on enrollment |
+| **Explore Standards** | Browse by category (Primary/Middle School/High School) → Standards list | `categories` → `courses` hierarchy |
+| **Standard Detail** | Subject cards within a standard; Purchase options: full course, individual subject, custom bundle | Flexible purchase model |
+| **Course Preview** | Preview content tree before purchase; See folders, videos, notes, tests in tree structure | `content_items` hierarchy with preview access |
+| **Subject Detail** | View content for a purchased subject | Access control per enrollment |
+| **Video Player** | Play video lectures (uploaded + demo) | Video file storage path |
+| **Notes Screen** | View/download PDF notes | File download URLs |
+| **Quiz List** | Available quizzes with difficulty, duration, attempts used/max; Free/paid badges | Quiz access tied to enrollment |
+| **Quiz Attempt** | Take quiz: display questions, options, timer; Submit and see results | `quiz_attempts` + `quiz_answers` tables |
+| **Cart** | Add full course / individual subject / custom bundle; Checkout | `cart_items` → `orders` flow |
+| **Checkout** | Payment processing | Payment gateway integration point |
+| **My Courses** | View enrolled/purchased courses | User enrollments query |
+| **Profile** | User profile management | User profile data |
+| **Live Class** | Live class feature (placeholder) | Future `live_classes` table |
+
+---
+
+## 3. System Architecture
+
+```
+┌─────────────────────┐    ┌───────────────────────┐
+│   Admin Panel        │    │    Flutter App          │
+│   (Laravel Blade)    │    │    (Dart/Flutter)       │
+│                      │    │                         │
+│  - Session Auth      │    │  - JWT Auth             │
+│  - Server-rendered   │    │  - API Consumer         │
+└──────────┬───────────┘    └──────────┬──────────────┘
+           │                           │
+           │  Web Requests             │  REST API (JSON)
+           │  (Session/CSRF)           │  (Bearer JWT Token)
+           │                           │
+           ▼                           ▼
+┌──────────────────────────────────────────────────────┐
+│              Laravel API Backend                      │
+│                                                       │
+│  ┌──────────┐    ┌──────────────┐    ┌────────────┐  │
+│  │Controller │───▶│ Service Layer │───▶│  Repository │  │
+│  │  (Thin)   │    │  (Business   │    │  (Eloquent  │  │
+│  │           │    │   Logic)     │    │   Models)   │  │
+│  └──────────┘    └──────────────┘    └──────┬─────┘  │
+│                                              │        │
+│  ┌──────────────┐    ┌───────────────────┐   │        │
+│  │ Middleware    │    │ File Storage       │   │        │
+│  │ (Auth, CORS, │    │ (Local / S3)       │   │        │
+│  │  Rate Limit) │    └───────────────────┘   │        │
+│  └──────────────┘                            │        │
+└──────────────────────────────────────────────┼────────┘
+                                               │
+                                               ▼
+                                    ┌──────────────────┐
+                                    │    MySQL / PgSQL  │
+                                    │    Database       │
+                                    └──────────────────┘
+```
+
+### Layer Responsibilities
+
+| Layer | Responsibility |
+|---|---|
+| **Controllers** | Validate input, call service, return response. **No business logic.** |
+| **Services** | All business logic: enrollment rules, pricing calculations, access control, file management |
+| **Repositories / Models** | Database queries via Eloquent ORM. Relationships, scopes, accessors |
+| **Middleware** | JWT validation (app API), session auth (admin), CORS, rate limiting |
+| **File Storage** | Laravel filesystem abstraction for notes/videos/QA papers (local or S3) |
+
+### Admin Panel Flow
+- Uses **Laravel session authentication** (standard web auth)
+- Server-side rendered Blade views with CSRF protection
+- Admin-only access, no JWT needed
+
+### Flutter App Flow
+- Uses **JWT authentication** via REST API
+- All requests include `Authorization: Bearer <token>` header
+- Stateless API, no sessions
+
+---
+
+## 4. Database Schema
+
+### Authentication Module
+
+---
+
+#### Table: `admins`
+
+**Purpose**: Stores admin panel users who manage the platform via the Laravel admin panel.
+
+| Column | Type | Constraints | Notes |
+|---|---|---|---|
+| `id` | `BIGINT UNSIGNED` | PK, AUTO_INCREMENT | |
+| `name` | `VARCHAR(255)` | NOT NULL | Full name |
+| `email` | `VARCHAR(255)` | UNIQUE, NOT NULL | Login email |
+| `password` | `VARCHAR(255)` | NOT NULL | Hashed password |
+| `avatar_url` | `VARCHAR(500)` | NULLABLE | Profile photo URL |
+| `status` | `ENUM('active','inactive')` | DEFAULT 'active' | |
+| `remember_token` | `VARCHAR(100)` | NULLABLE | Laravel remember me |
+| `created_at` | `TIMESTAMP` | | |
+| `updated_at` | `TIMESTAMP` | | |
+
+**Indexes**: `email` (unique)
+
+**Relationships**:
+- Has many `activity_logs`
+
+---
+
+#### Table: `students`
+
+**Purpose**: Stores mobile app students who consume educational content via the Flutter app.
+
+| Column | Type | Constraints | Notes |
+|---|---|---|---|
+| `id` | `BIGINT UNSIGNED` | PK, AUTO_INCREMENT | |
+| `name` | `VARCHAR(255)` | NOT NULL | Full name |
+| `email` | `VARCHAR(255)` | NULLABLE | Optional email |
+| `mobile` | `VARCHAR(15)` | UNIQUE, NOT NULL | Login via OTP |
+| `avatar_url` | `VARCHAR(500)` | NULLABLE | Profile photo URL |
+| `plan` | `ENUM('free','premium')` | DEFAULT 'free' | Subscription plan |
+| `status` | `ENUM('active','blocked')` | DEFAULT 'active' | |
+| `mobile_verified_at` | `TIMESTAMP` | NULLABLE | OTP verification timestamp |
+| `created_at` | `TIMESTAMP` | | |
+| `updated_at` | `TIMESTAMP` | | |
+
+**Indexes**: `mobile` (unique), `status`, `plan`
+
+**Relationships**:
+- Has many `enrollments`
+- Has many `quiz_attempts`
+- Has many `refresh_tokens`
+
+---
+
+#### Table: `refresh_tokens`
+
+**Purpose**: Stores JWT refresh tokens for mobile app authentication.
+
+| Column | Type | Constraints | Notes |
+|---|---|---|---|
+| `id` | `BIGINT UNSIGNED` | PK, AUTO_INCREMENT | |
+| `student_id` | `BIGINT UNSIGNED` | FK → `students.id`, ON DELETE CASCADE | |
+| `token` | `VARCHAR(500)` | UNIQUE, NOT NULL | Hashed refresh token |
+| `device_name` | `VARCHAR(255)` | NULLABLE | e.g. "Samsung Galaxy S23" |
+| `device_id` | `VARCHAR(255)` | NULLABLE | Unique device identifier |
+| `expires_at` | `TIMESTAMP` | NOT NULL | Token expiration |
+| `revoked_at` | `TIMESTAMP` | NULLABLE | NULL = active; set when revoked |
+| `created_at` | `TIMESTAMP` | | |
+
+**Indexes**: `token` (unique), `student_id`, `expires_at`
+
+---
+
+#### Table: `otp_verifications`
+
+**Purpose**: Temporary OTP storage for mobile authentication.
+
+| Column | Type | Constraints | Notes |
+|---|---|---|---|
+| `id` | `BIGINT UNSIGNED` | PK, AUTO_INCREMENT | |
+| `mobile` | `VARCHAR(15)` | NOT NULL | Mobile number |
+| `otp` | `VARCHAR(10)` | NOT NULL | Hashed OTP code |
+| `purpose` | `ENUM('login','signup','reset')` | NOT NULL | |
+| `attempts` | `TINYINT` | DEFAULT 0 | Failed verification attempts |
+| `expires_at` | `TIMESTAMP` | NOT NULL | OTP validity (typically 5 mins) |
+| `verified_at` | `TIMESTAMP` | NULLABLE | |
+| `created_at` | `TIMESTAMP` | | |
+
+**Indexes**: `mobile`, `expires_at`
+
+---
+
+### Content Module
+
+---
+
+#### Table: `categories`
+
+**Purpose**: Top-level grouping for courses (e.g., Primary, Middle School, High School).
+
+| Column | Type | Constraints | Notes |
+|---|---|---|---|
+| `id` | `BIGINT UNSIGNED` | PK, AUTO_INCREMENT | |
+| `name` | `VARCHAR(255)` | NOT NULL, UNIQUE | e.g. "Primary School", "High School" |
+| `slug` | `VARCHAR(255)` | NOT NULL, UNIQUE | URL-safe identifier |
+| `sort_order` | `INT` | DEFAULT 0 | Display ordering |
+| `created_at` | `TIMESTAMP` | | |
+| `updated_at` | `TIMESTAMP` | | |
+
+**Relationships**:
+- Has many `courses`
+
+---
+
+#### Table: `courses`
+
+**Purpose**: Represents a standard/course (e.g., "Standard 10", "BCA Semester 1"). This is the primary purchasable unit in the admin panel.
+
+| Column | Type | Constraints | Notes |
+|---|---|---|---|
+| `id` | `BIGINT UNSIGNED` | PK, AUTO_INCREMENT | |
+| `category_id` | `BIGINT UNSIGNED` | FK → `categories.id`, ON DELETE RESTRICT | |
+| `name` | `VARCHAR(255)` | NOT NULL | e.g. "Standard 10" |
+| `slug` | `VARCHAR(255)` | NOT NULL, UNIQUE | |
+| `description` | `TEXT` | NULLABLE | Course overview |
+| `icon` | `VARCHAR(100)` | NULLABLE | FontAwesome class: "fa-solid fa-graduation-cap" |
+| `color` | `VARCHAR(10)` | DEFAULT '#1565C0' | Hex color for theming |
+| `price` | `DECIMAL(10,2)` | NOT NULL, DEFAULT 0 | Full course price in ₹ |
+| `thumbnail_url` | `VARCHAR(500)` | NULLABLE | Course thumbnail image path |
+| `status` | `ENUM('active','inactive')` | NOT NULL, DEFAULT 'active' | |
+| `sort_order` | `INT` | DEFAULT 0 | |
+| `created_at` | `TIMESTAMP` | | |
+| `updated_at` | `TIMESTAMP` | | |
+
+**Indexes**: `category_id`, `status`, `slug` (unique)
+
+**Relationships**:
+- Belongs to `category`
+- Has many `subjects`
+- Has many `enrollments`
+
+---
+
+#### Table: `subjects`
+
+**Purpose**: A subject within a course (e.g., "Mathematics" under "Standard 10"). Can be purchased individually or as part of a course.
+
+| Column | Type | Constraints | Notes |
+|---|---|---|---|
+| `id` | `BIGINT UNSIGNED` | PK, AUTO_INCREMENT | |
+| `course_id` | `BIGINT UNSIGNED` | FK → `courses.id`, ON DELETE CASCADE | |
+| `name` | `VARCHAR(255)` | NOT NULL | e.g. "Mathematics" |
+| `slug` | `VARCHAR(255)` | NOT NULL | Unique within course |
+| `description` | `TEXT` | NULLABLE | |
+| `icon` | `VARCHAR(100)` | NULLABLE | FontAwesome class |
+| `color` | `VARCHAR(10)` | DEFAULT '#1565C0' | |
+| `price` | `DECIMAL(10,2)` | NOT NULL, DEFAULT 0 | Individual subject price |
+| `status` | `ENUM('active','inactive')` | NOT NULL, DEFAULT 'active' | |
+| `sort_order` | `INT` | DEFAULT 0 | |
+| `created_at` | `TIMESTAMP` | | |
+| `updated_at` | `TIMESTAMP` | | |
+
+**Indexes**: `course_id`, `status`, composite unique [(course_id, slug)](file:///c:/Flutter/edustream/lib/features/home/presentation/screens/home_screen.dart#36-71)
+
+**Relationships**:
+- Belongs to `course`
+- Has many `note_folders`, `video_folders`, `qa_paper_folders`
+- Has many `notes`, `videos`, `qa_papers`
+- Has many `quizzes`
+
+---
+
+#### Table: `note_folders`
+
+**Purpose**: Hierarchical folder structure for organizing notes (PDF/DOC) within each subject. Supports nested folders.
+
+| Column | Type | Constraints | Notes |
+|---|---|---|---|
+| `id` | `BIGINT UNSIGNED` | PK, AUTO_INCREMENT | |
+| `subject_id` | `BIGINT UNSIGNED` | FK → `subjects.id`, ON DELETE CASCADE | |
+| `parent_id` | `BIGINT UNSIGNED` | FK → `note_folders.id`, NULLABLE | NULL = root folder |
+| `name` | `VARCHAR(255)` | NOT NULL | e.g. "Chapter 1 - Algebra" |
+| `description` | `TEXT` | NULLABLE | |
+| `thumbnail_url` | `VARCHAR(500)` | NULLABLE | |
+| `sort_order` | `INT` | DEFAULT 0 | |
+| `created_at` | `TIMESTAMP` | | |
+| `updated_at` | `TIMESTAMP` | | |
+
+**Indexes**: `subject_id`, `parent_id`
+
+**Relationships**:
+- Belongs to `subject`
+- Belongs to `parent` (self-referencing)
+- Has many `children` folders
+- Has many `notes`
+
+---
+
+#### Table: `notes`
+
+**Purpose**: Stores note files (PDF, DOC, TXT). Each note belongs to a subject and optionally a note folder.
+
+| Column | Type | Constraints | Notes |
+|---|---|---|---|
+| `id` | `BIGINT UNSIGNED` | PK, AUTO_INCREMENT | |
+| `subject_id` | `BIGINT UNSIGNED` | FK → `subjects.id`, ON DELETE CASCADE | |
+| `folder_id` | `BIGINT UNSIGNED` | FK → `note_folders.id`, NULLABLE | NULL = root level |
+| `title` | `VARCHAR(255)` | NOT NULL | Display title |
+| `description` | `TEXT` | NULLABLE | |
+| `file_name` | `VARCHAR(255)` | NOT NULL | Original filename |
+| `file_path` | `VARCHAR(500)` | NOT NULL | Storage path (local or S3 key) |
+| `file_size` | `BIGINT` | NULLABLE | Size in bytes |
+| `mime_type` | `VARCHAR(100)` | NULLABLE | e.g. "application/pdf", "application/msword" |
+| `thumbnail_url` | `VARCHAR(500)` | NULLABLE | Optional custom thumbnail |
+| `is_free` | `BOOLEAN` | DEFAULT false | Free = accessible without purchase |
+| `sort_order` | `INT` | DEFAULT 0 | |
+| `status` | `ENUM('active','inactive')` | DEFAULT 'active' | |
+| `created_at` | `TIMESTAMP` | | |
+| `updated_at` | `TIMESTAMP` | | |
+
+**Indexes**: `subject_id`, `folder_id`, `is_free`, `status`
+
+**Relationships**:
+- Belongs to `subject`
+- Belongs to `note_folder` (optional)
+
+---
+
+#### Table: `video_folders`
+
+**Purpose**: Hierarchical folder structure for organizing videos within each subject. Supports nested folders.
+
+| Column | Type | Constraints | Notes |
+|---|---|---|---|
+| `id` | `BIGINT UNSIGNED` | PK, AUTO_INCREMENT | |
+| `subject_id` | `BIGINT UNSIGNED` | FK → `subjects.id`, ON DELETE CASCADE | |
+| `parent_id` | `BIGINT UNSIGNED` | FK → `video_folders.id`, NULLABLE | NULL = root folder |
+| `name` | `VARCHAR(255)` | NOT NULL | e.g. "Module 1 — Introduction" |
+| `description` | `TEXT` | NULLABLE | |
+| `thumbnail_url` | `VARCHAR(500)` | NULLABLE | |
+| `sort_order` | `INT` | DEFAULT 0 | |
+| `created_at` | `TIMESTAMP` | | |
+| `updated_at` | `TIMESTAMP` | | |
+
+**Indexes**: `subject_id`, `parent_id`
+
+**Relationships**:
+- Belongs to `subject`
+- Belongs to `parent` (self-referencing)
+- Has many `children` folders
+- Has many `videos`
+
+---
+
+#### Table: `videos`
+
+**Purpose**: Stores video lecture files (MP4). Each video belongs to a subject and optionally a video folder.
+
+| Column | Type | Constraints | Notes |
+|---|---|---|---|
+| `id` | `BIGINT UNSIGNED` | PK, AUTO_INCREMENT | |
+| `subject_id` | `BIGINT UNSIGNED` | FK → `subjects.id`, ON DELETE CASCADE | |
+| `folder_id` | `BIGINT UNSIGNED` | FK → `video_folders.id`, NULLABLE | NULL = root level |
+| `title` | `VARCHAR(255)` | NOT NULL | Display title |
+| `description` | `TEXT` | NULLABLE | |
+| `file_name` | `VARCHAR(255)` | NOT NULL | Original filename |
+| `file_path` | `VARCHAR(500)` | NOT NULL | Storage path (local or S3 key) |
+| `file_size` | `BIGINT` | NULLABLE | Size in bytes |
+| `mime_type` | `VARCHAR(100)` | NULLABLE | e.g. "video/mp4" |
+| `duration` | `VARCHAR(20)` | NULLABLE | Video length: "18:24" |
+| `thumbnail_url` | `VARCHAR(500)` | NULLABLE | Optional custom thumbnail |
+| `is_free` | `BOOLEAN` | DEFAULT false | Free = accessible without purchase |
+| `sort_order` | `INT` | DEFAULT 0 | |
+| `status` | `ENUM('active','inactive','processing')` | DEFAULT 'active' | 'processing' while upload/encoding |
+| `created_at` | `TIMESTAMP` | | |
+| `updated_at` | `TIMESTAMP` | | |
+
+**Indexes**: `subject_id`, `folder_id`, `is_free`, `status`
+
+**Relationships**:
+- Belongs to `subject`
+- Belongs to `video_folder` (optional)
+
+---
+
+#### Table: `qa_paper_folders`
+
+**Purpose**: Hierarchical folder structure for organizing QA papers within each subject. Supports nested folders.
+
+| Column | Type | Constraints | Notes |
+|---|---|---|---|
+| `id` | `BIGINT UNSIGNED` | PK, AUTO_INCREMENT | |
+| `subject_id` | `BIGINT UNSIGNED` | FK → `subjects.id`, ON DELETE CASCADE | |
+| `parent_id` | `BIGINT UNSIGNED` | FK → `qa_paper_folders.id`, NULLABLE | NULL = root folder |
+| `name` | `VARCHAR(255)` | NOT NULL | e.g. "2024 Board Papers" |
+| `description` | `TEXT` | NULLABLE | |
+| `thumbnail_url` | `VARCHAR(500)` | NULLABLE | |
+| `sort_order` | `INT` | DEFAULT 0 | |
+| `created_at` | `TIMESTAMP` | | |
+| `updated_at` | `TIMESTAMP` | | |
+
+**Indexes**: `subject_id`, `parent_id`
+
+**Relationships**:
+- Belongs to `subject`
+- Belongs to `parent` (self-referencing)
+- Has many `children` folders
+- Has many `qa_papers`
+
+---
+
+#### Table: `qa_papers`
+
+**Purpose**: Stores question/answer papers (PDF, DOC). Each QA paper belongs to a subject and optionally a QA paper folder.
+
+| Column | Type | Constraints | Notes |
+|---|---|---|---|
+| `id` | `BIGINT UNSIGNED` | PK, AUTO_INCREMENT | |
+| `subject_id` | `BIGINT UNSIGNED` | FK → `subjects.id`, ON DELETE CASCADE | |
+| `folder_id` | `BIGINT UNSIGNED` | FK → `qa_paper_folders.id`, NULLABLE | NULL = root level |
+| `title` | `VARCHAR(255)` | NOT NULL | Display title |
+| `description` | `TEXT` | NULLABLE | |
+| `file_name` | `VARCHAR(255)` | NOT NULL | Original filename |
+| `file_path` | `VARCHAR(500)` | NOT NULL | Storage path (local or S3 key) |
+| `file_size` | `BIGINT` | NULLABLE | Size in bytes |
+| `mime_type` | `VARCHAR(100)` | NULLABLE | e.g. "application/pdf" |
+| `thumbnail_url` | `VARCHAR(500)` | NULLABLE | Optional custom thumbnail |
+| `is_free` | `BOOLEAN` | DEFAULT false | Free = accessible without purchase |
+| `sort_order` | `INT` | DEFAULT 0 | |
+| `status` | `ENUM('active','inactive')` | DEFAULT 'active' | |
+| `created_at` | `TIMESTAMP` | | |
+| `updated_at` | `TIMESTAMP` | | |
+
+**Indexes**: `subject_id`, `folder_id`, `is_free`, `status`
+
+**Relationships**:
+- Belongs to `subject`
+- Belongs to `qa_paper_folder` (optional)
+
+---
+
+### Quiz Module
+
+---
+
+#### Table: `quizzes`
+
+**Purpose**: Stores quiz metadata and settings. Quizzes belong to a subject.
+
+| Column | Type | Constraints | Notes |
+|---|---|---|---|
+| `id` | `BIGINT UNSIGNED` | PK, AUTO_INCREMENT | |
+| `subject_id` | `BIGINT UNSIGNED` | FK → `subjects.id`, ON DELETE CASCADE | |
+| `title` | `VARCHAR(255)` | NOT NULL | e.g. "Algebra Quiz - Chapter 1" |
+| `description` | `TEXT` | NULLABLE | |
+| `thumbnail_url` | `VARCHAR(500)` | NULLABLE | |
+| `difficulty` | `ENUM('beginner','intermediate','advanced')` | DEFAULT 'intermediate' | |
+| `time_limit_minutes` | `INT` | NULLABLE | Overall quiz time limit |
+| `total_marks` | `INT` | DEFAULT 100 | |
+| `pass_percentage` | `DECIMAL(5,2)` | DEFAULT 60.00 | |
+| `max_attempts` | `INT` | DEFAULT 0 | 0 = unlimited |
+| `shuffle_questions` | `BOOLEAN` | DEFAULT false | |
+| `show_results` | `BOOLEAN` | DEFAULT true | Show score after submission |
+| `is_free` | `BOOLEAN` | DEFAULT false | |
+| `status` | `ENUM('draft','active','inactive')` | DEFAULT 'draft' | |
+| `sort_order` | `INT` | DEFAULT 0 | |
+| `created_at` | `TIMESTAMP` | | |
+| `updated_at` | `TIMESTAMP` | | |
+
+**Indexes**: `subject_id`, `status`, `is_free`
+
+**Relationships**:
+- Belongs to `subject`
+- Has many `quiz_questions`
+- Has many `quiz_attempts`
+
+---
+
+#### Table: `quiz_questions`
+
+**Purpose**: Individual questions within a quiz.
+
+| Column | Type | Constraints | Notes |
+|---|---|---|---|
+| `id` | `BIGINT UNSIGNED` | PK, AUTO_INCREMENT | |
+| `quiz_id` | `BIGINT UNSIGNED` | FK → `quizzes.id`, ON DELETE CASCADE | |
+| `question_text` | `TEXT` | NOT NULL | The question itself |
+| `type` | `ENUM('mcq','true_false','short_answer')` | NOT NULL, DEFAULT 'mcq' | |
+| `marks` | `INT` | DEFAULT 5 | Points for this question |
+| `time_limit_seconds` | `INT` | NULLABLE | Per-question time limit |
+| `correct_answer_text` | `TEXT` | NULLABLE | For short_answer and true_false types |
+| `sort_order` | `INT` | DEFAULT 0 | |
+| `created_at` | `TIMESTAMP` | | |
+| `updated_at` | `TIMESTAMP` | | |
+
+**Indexes**: `quiz_id`, `type`
+
+**Relationships**:
+- Belongs to `quiz`
+- Has many `quiz_options` (for MCQ type)
+
+---
+
+#### Table: `quiz_options`
+
+**Purpose**: Answer options for MCQ-type questions.
+
+| Column | Type | Constraints | Notes |
+|---|---|---|---|
+| `id` | `BIGINT UNSIGNED` | PK, AUTO_INCREMENT | |
+| `question_id` | `BIGINT UNSIGNED` | FK → `quiz_questions.id`, ON DELETE CASCADE | |
+| `option_text` | `VARCHAR(500)` | NOT NULL | The option content |
+| `is_correct` | `BOOLEAN` | DEFAULT false | Marks the correct answer |
+| `sort_order` | `INT` | DEFAULT 0 | |
+
+**Indexes**: `question_id`
+
+---
+
+#### Table: `quiz_attempts`
+
+**Purpose**: Records each time a student takes a quiz.
+
+| Column | Type | Constraints | Notes |
+|---|---|---|---|
+| `id` | `BIGINT UNSIGNED` | PK, AUTO_INCREMENT | |
+| `quiz_id` | `BIGINT UNSIGNED` | FK → `quizzes.id`, ON DELETE CASCADE | |
+| `student_id` | `BIGINT UNSIGNED` | FK → `students.id`, ON DELETE CASCADE | |
+| `score` | `DECIMAL(5,2)` | NULLABLE | Calculated after submission |
+| `total_marks` | `INT` | NOT NULL | Snapshot of quiz total marks |
+| `percentage` | `DECIMAL(5,2)` | NULLABLE | |
+| `passed` | `BOOLEAN` | NULLABLE | Based on pass_percentage |
+| `time_taken_seconds` | `INT` | NULLABLE | Actual time spent |
+| `started_at` | `TIMESTAMP` | NOT NULL | |
+| `submitted_at` | `TIMESTAMP` | NULLABLE | NULL = in progress |
+| `created_at` | `TIMESTAMP` | | |
+
+**Indexes**: `quiz_id`, `student_id`, composite [(quiz_id, student_id)](file:///c:/Flutter/edustream/lib/features/home/presentation/screens/home_screen.dart#36-71)
+
+---
+
+#### Table: `quiz_answers`
+
+**Purpose**: Individual answers given by a student during a quiz attempt.
+
+| Column | Type | Constraints | Notes |
+|---|---|---|---|
+| `id` | `BIGINT UNSIGNED` | PK, AUTO_INCREMENT | |
+| `attempt_id` | `BIGINT UNSIGNED` | FK → `quiz_attempts.id`, ON DELETE CASCADE | |
+| `question_id` | `BIGINT UNSIGNED` | FK → `quiz_questions.id`, ON DELETE CASCADE | |
+| `selected_option_id` | `BIGINT UNSIGNED` | FK → `quiz_options.id`, NULLABLE | For MCQ |
+| `answer_text` | `TEXT` | NULLABLE | For short_answer type |
+| `is_correct` | `BOOLEAN` | NULLABLE | Evaluated on submission |
+| `marks_awarded` | `DECIMAL(5,2)` | DEFAULT 0 | |
+
+**Indexes**: `attempt_id`, `question_id`
+
+---
+
+### Commerce Module
+
+---
+
+#### Table: `enrollments`
+
+**Purpose**: Tracks what courses/subjects a student has purchased and has access to.
+
+| Column | Type | Constraints | Notes |
+|---|---|---|---|
+| `id` | `BIGINT UNSIGNED` | PK, AUTO_INCREMENT | |
+| `student_id` | `BIGINT UNSIGNED` | FK → `students.id`, ON DELETE CASCADE | |
+| `course_id` | `BIGINT UNSIGNED` | FK → `courses.id`, NULLABLE | NULL for individual subject purchases |
+| `subject_id` | `BIGINT UNSIGNED` | FK → `subjects.id`, NULLABLE | NULL for full course/bundle purchases |
+| `order_id` | `BIGINT UNSIGNED` | FK → `orders.id`, ON DELETE RESTRICT | Links access grant to the purchase |
+| `status` | `ENUM('active','expired','cancelled')` | DEFAULT 'active' | |
+| `expires_at` | `TIMESTAMP` | NULLABLE | For time-limited access |
+| `created_at` | `TIMESTAMP` | | |
+| `updated_at` | `TIMESTAMP` | | |
+
+**Indexes**: `student_id`, `course_id`, `subject_id`, `order_id`, `status`
+
+**Relationships**:
+- Belongs to `student`
+- Belongs to `course` (optional)
+- Belongs to `subject` (optional)
+- Belongs to `order`
+
+---
+
+#### Table: `orders`
+
+**Purpose**: Stores the main transaction records for checkout. Links cart intent to payment gateways.
+
+| Column | Type | Constraints | Notes |
+|---|---|---|---|
+| `id` | `BIGINT UNSIGNED` | PK, AUTO_INCREMENT | |
+| `student_id` | `BIGINT UNSIGNED` | FK → `students.id`, ON DELETE CASCADE | |
+| `order_number` | `VARCHAR(50)` | UNIQUE, NOT NULL | e.g. "ORD-123456" |
+| `total_amount` | `DECIMAL(10,2)` | NOT NULL | Amount in ₹ |
+| `payment_status` | `ENUM('pending','completed','failed','refunded')` | DEFAULT 'pending' | |
+| `payment_method` | `ENUM('upi','card','net_banking','wallet','manual')` | NULLABLE | |
+| `payment_id` | `VARCHAR(255)` | NULLABLE | Razorpay payment ID etc. |
+| `created_at` | `TIMESTAMP` | | |
+| `updated_at` | `TIMESTAMP` | | |
+
+**Indexes**: `student_id`, `order_number`, `payment_status`
+
+---
+
+#### Table: `order_items`
+
+**Purpose**: Individual items inside an order. Uses polymorphic relation to support courses or subjects.
+
+| Column | Type | Constraints | Notes |
+|---|---|---|---|
+| `id` | `BIGINT UNSIGNED` | PK, AUTO_INCREMENT | |
+| `order_id` | `BIGINT UNSIGNED` | FK → `orders.id`, ON DELETE CASCADE | |
+| `item_type` | `ENUM('course','subject')` | NOT NULL | Identifies the type of item purchased |
+| `item_id` | `BIGINT UNSIGNED` | NOT NULL | ID of the course or subject |
+| `price` | `DECIMAL(10,2)` | NOT NULL | Snapshot of price at checkout |
+| `created_at` | `TIMESTAMP` | | |
+| `updated_at` | `TIMESTAMP` | | |
+
+**Indexes**: `order_id`, composite [(item_type, item_id)](file:///c:/Flutter/edustream/lib/features/home/presentation/screens/home_screen.dart#36-71)
+
+---
+
+#### Table: `cart_items`
+
+**Purpose**: Stores items in a student's cart so it persists across app restarts.
+
+| Column | Type | Constraints | Notes |
+|---|---|---|---|
+| `id` | `BIGINT UNSIGNED` | PK, AUTO_INCREMENT | |
+| `student_id` | `BIGINT UNSIGNED` | FK → `students.id`, ON DELETE CASCADE | |
+| `item_type` | `ENUM('course','subject')` | NOT NULL | Identifies the type of item added |
+| `item_id` | `BIGINT UNSIGNED` | NOT NULL | ID of the course or subject |
+| `price` | `DECIMAL(10,2)` | NOT NULL | Stored price (updated on fetch) |
+| `created_at` | `TIMESTAMP` | | |
+| `updated_at` | `TIMESTAMP` | | |
+
+**Indexes**: `student_id`, composite [(item_type, item_id)](file:///c:/Flutter/edustream/lib/features/home/presentation/screens/home_screen.dart#36-71)
+
+---
+
+### System Module
+
+---
+
+#### Table: `activity_logs`
+
+**Purpose**: Audit trail for admin actions and system events (shown in dashboard activity feed).
+
+| Column | Type | Constraints | Notes |
+|---|---|---|---|
+| `id` | `BIGINT UNSIGNED` | PK, AUTO_INCREMENT | |
+| `admin_id` | `BIGINT UNSIGNED` | FK → `admins.id`, NULLABLE | NULL for system events |
+| `action` | `VARCHAR(100)` | NOT NULL | e.g. "enrollment.created", "content.uploaded" |
+| `description` | `TEXT` | NULLABLE | Human-readable description |
+| `model_type` | `VARCHAR(255)` | NULLABLE | e.g. "App\Models\Enrollment" |
+| `model_id` | `BIGINT UNSIGNED` | NULLABLE | ID of the affected record |
+| `metadata` | `JSON` | NULLABLE | Extra data |
+| `ip_address` | `VARCHAR(45)` | NULLABLE | |
+| `created_at` | `TIMESTAMP` | | |
+
+**Indexes**: `admin_id`, `action`, `model_type` + `model_id`, `created_at`
+
+---
+
+#### Table: `settings`
+
+**Purpose**: Key-value store for platform configuration.
+
+| Column | Type | Constraints | Notes |
+|---|---|---|---|
+| `id` | `BIGINT UNSIGNED` | PK, AUTO_INCREMENT | |
+| `key` | `VARCHAR(100)` | UNIQUE, NOT NULL | e.g. "app_name", "storage_limit_mb" |
+| `value` | `TEXT` | NULLABLE | |
+| `group` | `VARCHAR(50)` | DEFAULT 'general' | Group settings: "general", "payment", "storage" |
+| `created_at` | `TIMESTAMP` | | |
+| `updated_at` | `TIMESTAMP` | | |
+
+**Indexes**: `key` (unique), `group`
+
+---
+
+## 5. JWT Authentication Design
+
+### Token Structure
+
+| Token | Lifetime | Storage | Purpose |
+|---|---|---|---|
+| **Access Token** | 15–60 minutes | Flutter in-memory | API request authorization |
+| **Refresh Token** | 30 days | Flutter secure storage + DB `refresh_tokens` | Renew expired access tokens |
+
+### Login Flow (Mobile App — OTP Based)
+
+```
+Student opens app
+       │
+       ▼
+Enters mobile number
+       │
+       ▼
+POST /api/auth/send-otp  ──────────────────▶  Server generates OTP
+   { mobile: "9876543210" }                    Stores hashed OTP in `otp_verifications`
+                                               Sends SMS via gateway
+       │
+       ▼
+Student enters 6-digit OTP
+       │
+       ▼
+POST /api/auth/verify-otp  ─────────────────▶  Server verifies OTP
+   { mobile: "...", otp: "123456" }            Checks expiry + attempts
+                                               If new user → creates `students` record
+                                               Generates JWT access + refresh tokens
+                                               Stores refresh token in `refresh_tokens`
+       │
+       ▼
+App receives tokens ◀───────────────────────── Response:
+   { access_token, refresh_token,               { access_token: "eyJ...",
+     expires_in, user }                           refresh_token: "abc...",
+                                                  expires_in: 3600,
+       │                                          user: { id, name, ... } }
+       ▼
+Stores access_token in memory
+Stores refresh_token in secure storage
+```
+
+### Token Validation (Every API Request)
+
+```
+Flutter sends request
+   Authorization: Bearer <access_token>
+       │
+       ▼
+JWT Middleware validates token
+   - Checks signature (HS256/RS256)
+   - Checks expiration (`exp` claim)
+   - Extracts student_id from `sub` claim
+       │
+   ┌───┴───┐
+   │Valid  │Invalid/Expired
+   │       │
+   ▼       ▼
+Process    Return 401 Unauthorized
+request    Flutter triggers refresh flow
+```
+
+### Token Refresh Flow
+
+```
+Access token expired (401 response)
+       │
+       ▼
+POST /api/auth/refresh
+   { refresh_token: "abc..." }
+       │
+       ▼
+Server checks `refresh_tokens` table
+   - Token exists?
+   - Not revoked?  (revoked_at IS NULL)
+   - Not expired?  (expires_at > now)
+       │
+   ┌───┴───┐
+   │Valid  │Invalid
+   │       │
+   ▼       ▼
+Generate   Return 401
+new        → User must
+access     re-login
+token
+   │
+   ▼
+Return new access_token
+(Optionally rotate refresh_token)
+```
+
+### Admin Panel Auth (Separate)
+
+The admin panel uses **Laravel's standard session-based authentication** (email + password), not JWT. This keeps the admin panel secure with CSRF tokens and server-side sessions.
+
+---
+
+## 6. Admin Panel Data Flow
+
+### Example 1: Admin Creates a New Course
+
+```
+Admin fills course form (title, icon, color, category, price, description, thumbnail)
+       │
+       ▼
+Browser sends POST /content/course
+   - Multipart form data (includes thumbnail file)
+   - CSRF token in header
+       │
+       ▼
+CourseController@store validates input
+       │
+       ▼
+CourseService->createCourse()
+   - Generates slug from title
+   - Uploads thumbnail → file storage
+   - Creates record in `courses` table
+       │
+       ▼
+ActivityLogService->log('course.created', $course)
+       │
+       ▼
+Redirect back with success flash message
+```
+
+### Example 2: Admin Uploads Notes/Videos
+
+```
+Admin clicks "Upload Notes" → selects PDF files
+       │
+       ▼
+AJAX POST /api/admin/notes/upload
+   - Files in multipart
+   - subject_id, folder_id
+       │
+       ▼
+NoteController@upload
+       │
+       ▼
+NoteService->uploadFiles()
+   - For each file:
+     - Store file to disk/S3
+     - Create record in `notes` table
+     - Set is_free = false by default
+     - Set sort_order = next available
+       │
+       ▼
+Return JSON { success: true, notes: [...] }
+```
+
+### Example 3: Admin Edits Content Item Details
+
+```
+Admin clicks "Edit Details" icon on a note/video
+       │
+       ▼
+Modal opens with title, description, thumbnail, sort_order fields
+       │
+       ▼
+PUT /api/admin/notes/{id}  (or /videos/{id} or /qa-papers/{id})
+   { title, description, sort_order, thumbnail (optional file) }
+       │
+       ▼
+NoteService->update($id, $data)  (or VideoService / QaPaperService)
+   - Updates the record in the respective table
+   - Replaces thumbnail if new one uploaded
+       │
+       ▼
+Return success response
+```
+
+### Example 4: Admin Toggles Content Free/Paid
+
+```
+Admin toggles the free/paid switch on a note/video/QA paper
+       │
+       ▼
+PATCH /api/admin/notes/{id}/access  (or /videos/{id} or /qa-papers/{id})
+   { is_free: true }
+       │
+       ▼
+NoteService->toggleAccess($id, $isFree)  (or VideoService / QaPaperService)
+   - Updates `is_free` field in the respective table
+       │
+       ▼
+Return success response
+```
+
+### Example 5: Admin Deletes a Course
+
+```
+Admin clicks delete → confirms in SweetAlert
+       │
+       ▼
+DELETE /content/course/{id}
+       │
+       ▼
+CourseService->deleteCourse($id)
+   - Check for active enrollments (prevent if exists)
+   - Cascade delete: subjects → note_folders/video_folders/qa_paper_folders → notes/videos/qa_papers → quizzes
+   - Remove all uploaded files from storage
+   - Log activity
+       │
+       ▼
+Redirect with success or error message
+```
+
+---
+
+## 7. Flutter App Data Flow
+
+### Example 1: Student Login & Token Management
+
+```
+App opens → Splash Screen
+       │
+       ▼
+Check secure storage for refresh_token
+       │
+   ┌───┴───┐
+   │Exists │No token
+   │       │
+   ▼       ▼
+POST       Show Login
+/api/auth  Screen
+/refresh
+   │
+   ┌───┴───┐
+   │Valid  │Invalid
+   │       │
+   ▼       ▼
+Navigate   Show Login
+to Home    Screen
+```
+
+### Example 2: Student Browses and Purchases Content
+
+```
+Home Screen → Tap "Explore"
+       │
+       ▼
+GET /api/standards
+   Authorization: Bearer <token>
+       │
+       ▼
+API returns categories with standards:
+   { categories: [{ name: "Primary", standards: [...] }, ...] }
+       │
+       ▼
+Student taps "Standard 10"
+       │
+       ▼
+GET /api/standards/{id}/subjects
+       │
+       ▼
+API returns subjects with pricing:
+   { course: { name, price }, subjects: [{ name, price, content_counts }, ...] }
+       │
+       ▼
+Student selects "Full Course" or picks subjects → adds to cart
+       │
+       ▼
+Cart stored locally (Flutter state)
+       │
+       ▼
+Checkout → POST /api/orders
+   { course_id, type: "full_course", subjects: [...], payment_method: "upi" }
+       │
+       ▼
+Server creates `enrollment` (pending) + `enrollment_subjects` + initiates payment
+       │
+       ▼
+Payment gateway callback → Server updates `payments.status` + `enrollments.status`
+       │
+       ▼
+App polls or receives push → Enrollment confirmed → Content unlocked
+```
+
+### Example 3: Student Takes a Quiz
+
+```
+Student opens quiz list for a subject
+       │
+       ▼
+GET /api/subjects/{id}/quizzes
+       │
+       ▼
+Returns available quizzes with attempts info:
+   [{ id, title, difficulty, duration, totalQuestions, maxAttempts, usedAttempts, isFree }]
+       │
+       ▼
+Student taps quiz → checks access (enrolled or free)
+       │
+       ▼
+POST /api/quizzes/{id}/start
+   → Creates `quiz_attempts` record → Returns questions + options
+       │
+       ▼
+Student answers questions (state managed locally)
+       │
+       ▼
+POST /api/quizzes/{id}/submit
+   { attempt_id, answers: [{ question_id, selected_option_id }, ...] }
+       │
+       ▼
+Server evaluates answers → Updates `quiz_attempts` score → Creates `quiz_answers`
+       │
+       ▼
+Returns result: { score, total, percentage, passed, correctAnswers }
+```
+
+### Example 4: Student Watches a Video
+
+```
+Student navigates to subject content
+       │
+       ▼
+GET /api/subjects/{id}/videos
+   → Returns video_folders tree with video items
+       │
+       ▼
+Student taps a video
+       │
+       ▼
+Check access:
+   - is_free = true → play immediately
+   - is_free = false → check enrollment
+       │
+       ▼
+GET /api/videos/{id}/stream-url
+   → Returns signed/temporary video URL (if authorized)
+       │
+       ▼
+Flutter video player loads and plays the URL
+```
+
+---
+
+## 8. Table Relationships
+
+```
+categories
+  └── has many → courses
+                   ├── has many → subjects
+                   │                ├── has many → note_folders (self-ref parent_id)
+                   │                │                └── has many → notes
+                   │                ├── has many → video_folders (self-ref parent_id)
+                   │                │                └── has many → videos
+                   │                ├── has many → qa_paper_folders (self-ref parent_id)
+                   │                │                └── has many → qa_papers
+                   │                └── has many → quizzes
+                   │                                 ├── has many → quiz_questions
+                   │                                 │                └── has many → quiz_options
+                   │                                 └── has many → quiz_attempts
+                   │                                                  └── has many → quiz_answers
+                   ├── has many → order_items
+                   ├── has many → cart_items
+                   └── has many → enrollments
+
+admins
+  └── has many → activity_logs
+
+students
+  ├── has many → orders
+  │                └── has many → order_items
+  ├── has many → enrollments
+  ├── has many → cart_items
+  ├── has many → quiz_attempts
+  └── has many → refresh_tokens
+```
+
+---
+
+## 9. Module-Based Table Organization
+
+### Authentication Module (4 tables)
+
+| Table | Why It Exists |
+|---|---|
+| `admins` | Admin panel users — email + password login, session auth |
+| `students` | Mobile app users — mobile + OTP login, JWT auth |
+| `refresh_tokens` | JWT token lifecycle management for Flutter app |
+| `otp_verifications` | Temporary OTP codes for mobile-first passwordless auth |
+
+### Content Module (9 tables)
+
+| Table | Why It Exists |
+|---|---|
+| `categories` | Top-level organization (Primary School, High School, etc.) |
+| `courses` | The main educational unit — a standard or degree program |
+| `subjects` | Individual subjects within a course, each independently purchasable |
+| `note_folders` | Hierarchical folder structure for organizing notes within subjects |
+| `notes` | Study material files — PDF, DOC, TXT |
+| `video_folders` | Hierarchical folder structure for organizing videos within subjects |
+| `videos` | Video lecture files — MP4, with duration tracking |
+| `qa_paper_folders` | Hierarchical folder structure for organizing QA papers within subjects |
+| `qa_papers` | Question/answer papers — PDF, DOC |
+
+### Quiz Module (4 tables)
+
+| Table | Why It Exists |
+|---|---|
+| `quizzes` | Quiz metadata and settings (time, marks, attempts, etc.) |
+| `quiz_questions` | Individual questions with type (MCQ/TF/Short) |
+| `quiz_options` | MCQ answer choices with correct marking |
+| `quiz_attempts` | Student attempt records with scoring |
+| `quiz_answers` | Individual answers per attempt for review/analytics |
+
+### Commerce Module (4 tables)
+
+| Table | Why It Exists |
+|---|---|
+| `cart_items` | Student's transient shopping session |
+| `orders` | The checkout/payment transaction wrapper |
+| `order_items` | The individual courses/subjects bought in the order |
+| `enrollments` | Translates a completed order into content access |
+
+### System Module (2 tables)
+
+| Table | Why It Exists |
+|---|---|
+| `activity_logs` | Audit trail for dashboard feed and admin activity tracking |
+| `settings` | Key-value configuration store for platform settings |
+
+---
+
+## 10. Step-by-Step Implementation Plan
+
+> [!IMPORTANT]
+> This is a roadmap only. No code should be written until each step is reviewed and approved.
+
+### Phase 1 — Database Foundation
+
+| Step | Action | Details |
+|---|---|---|
+| 1.1 | Configure database connection | Set up MySQL/PostgreSQL in `.env` |
+| 1.2 | Create `admins` migration | Email, password, status |
+| 1.3 | Create `students` migration | Name, mobile, plan, status |
+| 1.4 | Create `otp_verifications` migration | Temporary OTP storage |
+| 1.5 | Create `refresh_tokens` migration | JWT refresh token management |
+| 1.6 | Seed admin user | Default admin credentials |
+
+### Phase 2 — Content Tables
+
+| Step | Action | Details |
+|---|---|---|
+| 2.1 | Create `categories` migration | Name, slug, sort_order |
+| 2.2 | Create `courses` migration | With FK to categories; all fields from UI |
+| 2.3 | Create `subjects` migration | With FK to courses |
+| 2.4 | Create `note_folders` migration | Self-referencing parent_id, FK to subjects |
+| 2.5 | Create `notes` migration | File fields, FK to subjects + note_folders |
+| 2.6 | Create `video_folders` migration | Self-referencing parent_id, FK to subjects |
+| 2.7 | Create `videos` migration | File fields + duration, FK to subjects + video_folders |
+| 2.8 | Create `qa_paper_folders` migration | Self-referencing parent_id, FK to subjects |
+| 2.9 | Create `qa_papers` migration | File fields, FK to subjects + qa_paper_folders |
+| 2.10 | Seed sample data | Categories + courses + subjects |
+
+### Phase 3 — Quiz Tables
+
+| Step | Action | Details |
+|---|---|---|
+| 3.1 | Create `quizzes` migration | With all settings fields |
+| 3.2 | Create `quiz_questions` migration | Question text, type, marks |
+| 3.3 | Create `quiz_options` migration | MCQ options with is_correct |
+| 3.4 | Create `quiz_attempts` migration | Student attempt tracking |
+| 3.5 | Create `quiz_answers` migration | Individual answer records |
+
+### Phase 4 — Commerce Tables
+
+| Step | Action | Details |
+|---|---|---|
+| 4.1 | Create `cart_items` migration | For Flutter persistent cart state |
+| 4.2 | Create `orders` migration | Order summaries and payment intents |
+| 4.3 | Create `order_items` migration | Links orders to courses/subjects |
+| 4.4 | Create `enrollments` migration | Content access after payment completion |
+
+### Phase 5 — System Tables
+
+| Step | Action | Details |
+|---|---|---|
+| 5.1 | Create `activity_logs` migration | Polymorphic audit trail |
+| 5.2 | Create `settings` migration | Key-value config |
+
+### Phase 6 — Eloquent Models & Relationships
+
+| Step | Action | Details |
+|---|---|---|
+| 6.1 | Create all Eloquent models | One per table |
+| 6.2 | Define relationships | belongsTo, hasMany, morphMany, etc. |
+| 6.3 | Add model scopes | Active, by type, by status |
+| 6.4 | Add accessors/mutators | Formatted prices, URLs, etc. |
+
+### Phase 7 — Authentication System
+
+| Step | Action | Details |
+|---|---|---|
+| 7.1 | Install JWT package | `tymon/jwt-auth` or `laravel/sanctum` |
+| 7.2 | Implement OTP service | Send + verify OTP |
+| 7.3 | Implement JWT auth service | Token generation, validation, refresh |
+| 7.4 | Create auth API endpoints | send-otp, verify-otp, refresh, logout |
+| 7.5 | Create auth middleware | JWT guard for API, session guard for admin |
+
+### Phase 8 — API Endpoints
+
+| Step | Action | Details |
+|---|---|---|
+| 8.1 | Create admin API controllers | CRUD for categories, courses, subjects, notes, videos, qa_papers |
+| 8.2 | Create student API controllers | Browse, enroll, quiz, notes/videos/qa_papers access |
+| 8.3 | Create service classes | Business logic layer |
+| 8.4 | Implement file upload service | Local + S3 storage with signed URLs |
+
+### Phase 9 — Indexes & Optimization
+
+| Step | Action | Details |
+|---|---|---|
+| 9.1 | Add composite indexes | Frequently queried combinations |
+| 9.2 | Add soft deletes where needed | Courses, subjects, content |
+| 9.3 | Review N+1 query risks | Eager loading strategy |
+| 9.4 | Plan caching strategy | Redis for frequently accessed data |
+
+---
+
+## 11. Storage Strategy
+
+To ensure scalable file management (whether Local or AWS S3), all physical files (videos, notes, PDFs, thumbnails) must follow a strict hierarchical folder structure tied to their parent entities.
+
+**Directory Structure Pattern**:
+```text
+storage/app/public/
+   └── courses/
+       └── {course_id}/
+           └── subjects/
+               └── {subject_id}/
+                   ├── videos/
+                   │   ├── intro.mp4
+                   │   └── lecture1.mp4
+                   ├── notes/
+                   │   ├── chapter1.pdf
+                   │   └── syllabus.pdf
+                   ├── qa_papers/
+                   │   └── 2024_board.pdf
+                   └── thumbnails/
+                       └── subject_cover.jpg
+```
+
+**Benefits of this approach**:
+1. **Easy Cleanup**: If a subject or course is deleted, one command deletes the entire subtree (`Storage::deleteDirectory("courses/{course_id}")`).
+2. **Organization**: Prevents reaching OS/bucket limits on single folders.
+3. **Database Mapping**: The `file_path` column in `notes`, `videos`, and `qa_papers` tables will store the relative path: `courses/10/subjects/5/videos/intro.mp4`.
+
+---
+
+> [!NOTE]
+> **Total Tables**: 23 tables across 5 modules
+> **Design Principles**: Normalized to 3NF, proper foreign keys, separate admin/student tables, dedicated tables per content type, separate order/enrollment flows.
