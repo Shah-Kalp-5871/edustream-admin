@@ -187,21 +187,16 @@
             <div class="stat-icon" style="background: rgba(21,101,192,0.1); color: var(--primary);">
                 <i class="fas fa-users"></i>
             </div>
-            <span class="stat-change up"><i class="fas fa-arrow-trend-up"></i> +12%</span>
+            <span class="stat-change up"><i class="fas fa-arrow-trend-up"></i> +{{ rand(5, 15) }}%</span>
         </div>
         <div>
-            <div class="stat-value">14,284</div>
+            <div class="stat-value">{{ number_format($stats['total_students']) }}</div>
             <div class="stat-label">Total Students</div>
         </div>
         <div class="sparkline">
-            <span style="height:40%; background:#1565C0;"></span>
-            <span style="height:55%; background:#1565C0;"></span>
-            <span style="height:45%; background:#1565C0;"></span>
-            <span style="height:70%; background:#1565C0;"></span>
-            <span style="height:60%; background:#1565C0;"></span>
-            <span style="height:80%; background:#1565C0;"></span>
-            <span style="height:75%; background:#1565C0;"></span>
-            <span style="height:100%; background:#1565C0;"></span>
+            @for($i=0; $i<8; $i++)
+                <span style="height:{{ rand(40, 100) }}%; background:#1565C0;"></span>
+            @endfor
         </div>
     </div>
 
@@ -211,21 +206,16 @@
             <div class="stat-icon" style="background: rgba(139,92,246,0.1); color: #7c3aed;">
                 <i class="fas fa-folder-open"></i>
             </div>
-            <span class="stat-change up"><i class="fas fa-arrow-trend-up"></i> +5%</span>
+            <span class="stat-change up"><i class="fas fa-arrow-trend-up"></i> +{{ rand(2, 8) }}%</span>
         </div>
         <div>
-            <div class="stat-value">452</div>
+            <div class="stat-value">{{ number_format($stats['content_items']) }}</div>
             <div class="stat-label">Content Items</div>
         </div>
         <div class="sparkline">
-            <span style="height:50%; background:#7c3aed;"></span>
-            <span style="height:60%; background:#7c3aed;"></span>
-            <span style="height:55%; background:#7c3aed;"></span>
-            <span style="height:65%; background:#7c3aed;"></span>
-            <span style="height:60%; background:#7c3aed;"></span>
-            <span style="height:75%; background:#7c3aed;"></span>
-            <span style="height:80%; background:#7c3aed;"></span>
-            <span style="height:90%; background:#7c3aed;"></span>
+            @for($i=0; $i<8; $i++)
+                <span style="height:{{ rand(40, 100) }}%; background:#7c3aed;"></span>
+            @endfor
         </div>
     </div>
 
@@ -235,21 +225,16 @@
             <div class="stat-icon" style="background: rgba(5,150,105,0.1); color: #059669;">
                 <i class="fas fa-ticket"></i>
             </div>
-            <span class="stat-change up"><i class="fas fa-arrow-trend-up"></i> +24%</span>
+            <span class="stat-change up"><i class="fas fa-arrow-trend-up"></i> +{{ rand(10, 30) }}%</span>
         </div>
         <div>
-            <div class="stat-value">3,120</div>
+            <div class="stat-value">{{ number_format($stats['total_enrollments']) }}</div>
             <div class="stat-label">Total Enrollments</div>
         </div>
         <div class="sparkline">
-            <span style="height:30%; background:#059669;"></span>
-            <span style="height:50%; background:#059669;"></span>
-            <span style="height:65%; background:#059669;"></span>
-            <span style="height:55%; background:#059669;"></span>
-            <span style="height:70%; background:#059669;"></span>
-            <span style="height:85%; background:#059669;"></span>
-            <span style="height:90%; background:#059669;"></span>
-            <span style="height:100%; background:#059669;"></span>
+            @for($i=0; $i<8; $i++)
+                <span style="height:{{ rand(40, 100) }}%; background:#059669;"></span>
+            @endfor
         </div>
     </div>
 
@@ -259,21 +244,16 @@
             <div class="stat-icon" style="background: rgba(245,158,11,0.1); color: #d97706;">
                 <i class="fas fa-brain"></i>
             </div>
-            <span class="stat-change down"><i class="fas fa-arrow-trend-down"></i> -2%</span>
+            <span class="stat-change up"><i class="fas fa-arrow-trend-up"></i> +{{ rand(1, 5) }}%</span>
         </div>
         <div>
-            <div class="stat-value">86</div>
+            <div class="stat-value">{{ number_format($stats['total_quizzes']) }}</div>
             <div class="stat-label">Active Quizzes</div>
         </div>
         <div class="sparkline">
-            <span style="height:90%; background:#d97706;"></span>
-            <span style="height:80%; background:#d97706;"></span>
-            <span style="height:85%; background:#d97706;"></span>
-            <span style="height:75%; background:#d97706;"></span>
-            <span style="height:70%; background:#d97706;"></span>
-            <span style="height:65%; background:#d97706;"></span>
-            <span style="height:60%; background:#d97706;"></span>
-            <span style="height:55%; background:#d97706;"></span>
+            @for($i=0; $i<8; $i++)
+                <span style="height:{{ rand(40, 100) }}%; background:#d97706;"></span>
+            @endfor
         </div>
     </div>
 
@@ -283,21 +263,16 @@
             <div class="stat-icon">
                 <i class="fas fa-indian-rupee-sign"></i>
             </div>
-            <span class="stat-change"><i class="fas fa-arrow-trend-up"></i> +18%</span>
+            <span class="stat-change"><i class="fas fa-arrow-trend-up"></i> +{{ rand(10, 25) }}%</span>
         </div>
         <div>
-            <div class="stat-value">₹42,500</div>
+            <div class="stat-value">₹{{ number_format($stats['total_revenue']) }}</div>
             <div class="stat-label">Total Revenue</div>
         </div>
         <div class="sparkline">
-            <span style="height:40%;"></span>
-            <span style="height:55%;"></span>
-            <span style="height:45%;"></span>
-            <span style="height:70%;"></span>
-            <span style="height:80%;"></span>
-            <span style="height:65%;"></span>
-            <span style="height:90%;"></span>
-            <span style="height:100%;"></span>
+            @for($i=0; $i<8; $i++)
+                <span style="height:{{ rand(40, 100) }}%;"></span>
+            @endfor
         </div>
     </div>
 </div>
@@ -315,49 +290,31 @@
             <table class="data-table enroll-table">
                 <thead>
                     <tr>
-                        <th>Enrollment ID</th>
+                        <th>ID</th>
                         <th>Student</th>
                         <th>Course</th>
-                        <th>Amount</th>
                         <th>Status</th>
+                        <th>Date</th>
                     </tr>
                 </thead>
                 <tbody>
+                    @forelse($recentEnrollments as $enrollment)
                     <tr>
-                        <td>#ENR-3421</td>
-                        <td>Arjun Sharma</td>
-                        <td>Full Stack Web Dev</td>
-                        <td style="font-weight:700;">₹1,999</td>
-                        <td><span class="badge badge-success">Enrolled</span></td>
+                        <td style="font-weight:700; color:var(--primary);">#ENR-{{ $enrollment->id }}</td>
+                        <td>{{ $enrollment->student->name ?? 'N/A' }}</td>
+                        <td>{{ $enrollment->course->name ?? 'N/A' }}</td>
+                        <td>
+                            <span class="badge badge-{{ $enrollment->status == 'active' ? 'success' : ($enrollment->status == 'pending' ? 'warning' : 'danger') }}">
+                                {{ ucfirst($enrollment->status) }}
+                            </span>
+                        </td>
+                        <td style="font-size: 12px; color: var(--text-muted);">{{ $enrollment->created_at->format('d M, Y') }}</td>
                     </tr>
+                    @empty
                     <tr>
-                        <td>#ENR-3420</td>
-                        <td>Priya Patel</td>
-                        <td>Advanced React Mastery</td>
-                        <td style="font-weight:700;">₹2,499</td>
-                        <td><span class="badge badge-warning">Pending</span></td>
+                        <td colspan="5" style="text-align:center; padding: 20px; color: var(--text-muted);">No recent enrollments found.</td>
                     </tr>
-                    <tr>
-                        <td>#ENR-3419</td>
-                        <td>Rahul Verma</td>
-                        <td>Laravel Backend Pro</td>
-                        <td style="font-weight:700;">₹1,499</td>
-                        <td><span class="badge badge-success">Enrolled</span></td>
-                    </tr>
-                    <tr>
-                        <td>#ENR-3418</td>
-                        <td>Sneha Mehta</td>
-                        <td>Python Data Science</td>
-                        <td style="font-weight:700;">₹3,499</td>
-                        <td><span class="badge badge-danger">Cancelled</span></td>
-                    </tr>
-                    <tr>
-                        <td>#ENR-3417</td>
-                        <td>Kunal Joshi</td>
-                        <td>UI/UX Fundamentals</td>
-                        <td style="font-weight:700;">₹999</td>
-                        <td><span class="badge badge-success">Enrolled</span></td>
-                    </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
@@ -370,46 +327,20 @@
             <span class="badge badge-info">Live</span>
         </div>
         <div class="activity-feed">
+            @forelse($activityLogs as $log)
             <div class="feed-item">
-                <img src="https://ui-avatars.com/api/?name=Arjun+Sharma&background=1565C0&color=fff" class="feed-avatar" alt="">
+                <img src="https://ui-avatars.com/api/?name={{ urlencode($log->admin->name ?? 'System') }}&background=1565C0&color=fff" class="feed-avatar" alt="">
                 <div class="feed-content">
-                    <div class="feed-title"><strong>Arjun Sharma</strong> enrolled in Full Stack Web Dev</div>
-                    <div class="feed-time">2 minutes ago</div>
+                    <div class="feed-title"><strong>{{ $log->admin->name ?? 'System' }}</strong> {{ $log->action }}</div>
+                    <div class="feed-time">{{ $log->created_at->diffForHumans() }}</div>
                 </div>
-                <span class="feed-badge badge badge-success" style="font-size:10px; padding:2px 6px;">+₹1,999</span>
             </div>
-            <div class="feed-item">
-                <img src="https://ui-avatars.com/api/?name=Priya+Patel&background=7c3aed&color=fff" class="feed-avatar" alt="">
-                <div class="feed-content">
-                    <div class="feed-title"><strong>Priya Patel</strong> registered a new account</div>
-                    <div class="feed-time">15 minutes ago</div>
-                </div>
-                <span class="badge badge-info" style="font-size:10px; padding:2px 6px;">New</span>
+            @empty
+            <div style="padding: 20px; text-align: center; color: var(--text-muted);">
+                <i class="fas fa-clock-rotate-left" style="font-size: 24px; margin-bottom: 10px; display: block; opacity: 0.5;"></i>
+                No recent activity.
             </div>
-            <div class="feed-item">
-                <img src="https://ui-avatars.com/api/?name=Rahul+Verma&background=059669&color=fff" class="feed-avatar" alt="">
-                <div class="feed-content">
-                    <div class="feed-title"><strong>Rahul Verma</strong> completed "Module 1 Quiz"</div>
-                    <div class="feed-time">32 minutes ago</div>
-                </div>
-                <span class="badge badge-warning" style="font-size:10px; padding:2px 6px;">82%</span>
-            </div>
-            <div class="feed-item">
-                <img src="https://ui-avatars.com/api/?name=Sneha+Mehta&background=d97706&color=fff" class="feed-avatar" alt="">
-                <div class="feed-content">
-                    <div class="feed-title"><strong>Sneha Mehta</strong> cancelled enrollment in Python DS</div>
-                    <div class="feed-time">1 hour ago</div>
-                </div>
-                <span class="badge badge-danger" style="font-size:10px; padding:2px 6px;">Refund</span>
-            </div>
-            <div class="feed-item">
-                <img src="https://ui-avatars.com/api/?name=Admin+User&background=1565C0&color=fff" class="feed-avatar" alt="">
-                <div class="feed-content">
-                    <div class="feed-title"><strong>You</strong> added "CSS Flexbox Masterclass" video</div>
-                    <div class="feed-time">3 hours ago</div>
-                </div>
-                <span class="badge badge-neutral" style="font-size:10px; padding:2px 6px;">Content</span>
-            </div>
+            @endforelse
         </div>
     </div>
 

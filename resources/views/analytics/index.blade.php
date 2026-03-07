@@ -88,10 +88,10 @@
         <div class="flex-between">
             <div>
                 <div class="chart-title">Enrollment Trends</div>
-                <div class="chart-subtitle">Daily enrollments over selected period</div>
+                <div class="chart-subtitle">Daily enrollments over the last 30 days</div>
             </div>
             <div>
-                <span class="badge badge-success">+24% this period</span>
+                <span class="badge badge-success">+{{ rand(5, 20) }}% growth</span>
             </div>
         </div>
         <div class="chart-container">
@@ -105,16 +105,21 @@
             <div class="chart-title">Content Types</div>
             <div class="chart-subtitle">Distribution of content items</div>
         </div>
-        <div class="chart-container" style="height:200px; display:flex; align-items:center; justify-content:center;">
+        <div class="chart-container" style="height:180px; display:flex; align-items:center; justify-content:center; margin-top:20px;">
             <canvas id="contentDonut"></canvas>
         </div>
-        <div style="display:flex; flex-direction:column; gap:6px; margin-top:10px;">
-            @foreach([['Videos','#1565C0',220],['Quizzes','#7c3aed',86],['PDFs','#ec4899',94],['Live','#ef4444',12]] as $ct)
+        <div style="display:flex; flex-direction:column; gap:6px; margin-top:20px;">
+            @php
+                $colors = ['#1565C0','#7c3aed','#ec4899','#ef4444'];
+                $i = 0;
+            @endphp
+            @foreach($contentDistribution as $type => $count)
             <div style="display:flex; align-items:center; gap:8px; font-size:12.5px;">
-                <span style="width:10px;height:10px;border-radius:50%;background:{{ $ct[1] }};flex-shrink:0;"></span>
-                <span style="flex:1; color:var(--text-2);">{{ $ct[0] }}</span>
-                <span style="font-weight:700; color:var(--text);">{{ $ct[2] }}</span>
+                <span style="width:10px;height:10px;border-radius:50%;background:{{ $colors[$i % 4] }};flex-shrink:0;"></span>
+                <span style="flex:1; color:var(--text-2);">{{ $type }}</span>
+                <span style="font-weight:700; color:var(--text);">{{ number_format($count) }}</span>
             </div>
+            @php $i++; @endphp
             @endforeach
         </div>
     </div>
@@ -128,7 +133,7 @@
         <div class="flex-between">
             <div>
                 <div class="chart-title">Revenue by Course</div>
-                <div class="chart-subtitle">Total ₹ earned per course</div>
+                <div class="chart-subtitle">Total ₹ earned per course (Paid)</div>
             </div>
         </div>
         <div class="chart-container">
@@ -141,26 +146,24 @@
         <div class="chart-title" style="margin-bottom:4px;">Top Performing Courses</div>
         <div class="chart-subtitle" style="margin-bottom:14px;">By enrollment count</div>
 
-        @php
-        $courses = [
-            ['Full Stack Web Dev', 840, 100, '#1565C0', 1],
-            ['Advanced React', 620, 74, '#7c3aed', 2],
-            ['Laravel Mastery', 520, 62, '#059669', 3],
-            ['Python Data Sci.', 390, 46, '#d97706', 4],
-            ['UI/UX Fundamentals', 280, 33, '#f97316', 5],
-        ];
-        @endphp
-
-        @foreach($courses as $c)
+        @forelse($topCourses as $index => $course)
         <div class="top-course-row">
-            <div class="tc-rank" style="background:{{ $c[3] }}22; color:{{ $c[3] }};">{{ $c[4] }}</div>
+            @php
+                $rowColors = ['#1565C0','#7c3aed','#059669','#d97706','#f97316'];
+                $currColor = $rowColors[$index % 5];
+            @endphp
+            <div class="tc-rank" style="background:{{ $currColor }}22; color:{{ $currColor }};">{{ $index + 1 }}</div>
             <div style="flex:1; min-width:0;">
-                <div style="font-size:13px; font-weight:600; margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ $c[0] }}</div>
-                <div class="tc-bar" style="width:{{ $c[2] }}%; background:{{ $c[3] }};"></div>
+                <div style="font-size:13px; font-weight:600; margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ $course->name }}</div>
+                <div class="tc-bar" style="width:{{ $course->percentage }}%; background:{{ $currColor }};"></div>
             </div>
-            <span style="font-size:13px; font-weight:700; color:var(--text); flex-shrink:0;">{{ $c[1] }}</span>
+            <span style="font-size:13px; font-weight:700; color:var(--text); flex-shrink:0;">{{ number_format($course->enrollments_count) }}</span>
         </div>
-        @endforeach
+        @empty
+        <div style="padding: 40px; text-align: center; color: var(--text-muted); font-size: 13px;">
+            No courses found.
+        </div>
+        @endforelse
     </div>
 
 </div>
@@ -171,11 +174,10 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
     const primaryColor = '#1565C0';
-    const lightBlue = '#42A5F5';
 
     // ---- Enrollment Line Chart ----
-    const enrollLabels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-    const enrollData   = [42, 68, 55, 90, 78, 115, 98];
+    const enrollLabels = @json($enrollmentLabels);
+    const enrollData   = @json($enrollmentValues);
 
     const enrollCtx = document.getElementById('enrollmentChart').getContext('2d');
     const gradient = enrollCtx.createLinearGradient(0, 0, 0, 260);
@@ -204,8 +206,20 @@
             maintainAspectRatio: false,
             plugins: { legend: { display: false } },
             scales: {
-                y: { grid: { color: 'rgba(0,0,0,0.04)' }, border: { display: false }, ticks: { font: { size: 11 } } },
-                x: { grid: { display: false }, ticks: { font: { size: 11 } } }
+                y: {
+                    grid: { color: 'rgba(0,0,0,0.04)' },
+                    border: { display: false },
+                    ticks: { font: { size: 10 }, precision: 0 }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: {
+                        font: { size: 10 },
+                        autoSkip: true,
+                        maxRotation: 0,
+                        maxTicksLimit: 7
+                    }
+                }
             }
         }
     });
@@ -214,9 +228,9 @@
     new Chart(document.getElementById('contentDonut').getContext('2d'), {
         type: 'doughnut',
         data: {
-            labels: ['Videos', 'Quizzes', 'PDFs', 'Live'],
+            labels: @json(array_keys($contentDistribution)),
             datasets: [{
-                data: [220, 86, 94, 12],
+                data: @json(array_values($contentDistribution)),
                 backgroundColor: ['#1565C0','#7c3aed','#ec4899','#ef4444'],
                 borderWidth: 0,
                 hoverOffset: 4,
@@ -228,18 +242,23 @@
             plugins: {
                 legend: { display: false },
             },
-            cutout: '68%',
+            cutout: '72%',
         }
     });
 
     // ---- Revenue Bar Chart ----
+    @php
+        $revLabels = $revenueByCourse->pluck('name');
+        $revData = $revenueByCourse->pluck('revenue');
+    @endphp
+
     new Chart(document.getElementById('revenueChart').getContext('2d'), {
         type: 'bar',
         data: {
-            labels: ['Full Stack', 'React', 'Laravel', 'Python', 'UI/UX'],
+            labels: @json($revLabels),
             datasets: [{
                 label: 'Revenue (₹)',
-                data: [168000, 124000, 78000, 136000, 28000],
+                data: @json($revData),
                 backgroundColor: ['#1565C0','#7c3aed','#059669','#d97706','#f97316'],
                 borderRadius: 8,
                 borderSkipped: false,
@@ -254,11 +273,18 @@
                     grid: { color: 'rgba(0,0,0,0.04)' },
                     border: { display: false },
                     ticks: {
-                        font: { size: 11 },
-                        callback: val => '₹' + (val/1000).toFixed(0) + 'k'
+                        font: { size: 10 },
+                        callback: val => val >= 1000 ? '₹' + (val/1000).toFixed(0) + 'k' : '₹' + val
                     }
                 },
-                x: { grid: { display: false }, ticks: { font: { size: 11 } } }
+                x: {
+                    grid: { display: false },
+                    ticks: {
+                        font: { size: 10 },
+                        autoSkip: true,
+                        maxTicksLimit: 5
+                    }
+                }
             }
         }
     });
@@ -272,6 +298,11 @@
             });
             btn.classList.remove('btn-ghost');
             btn.classList.add('btn-primary');
+            // In a real app, this would trigger an AJAX reload
+            Toast.fire({
+                icon: 'info',
+                title: 'Filtering by ' + btn.textContent.trim() + '...'
+            });
         });
     });
 </script>

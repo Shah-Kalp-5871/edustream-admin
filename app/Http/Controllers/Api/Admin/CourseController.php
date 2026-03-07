@@ -23,8 +23,8 @@ class CourseController extends BaseApiController
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'status' => 'required|in:active,inactive',
-            'icon' => 'nullable|string',
-            'color' => 'nullable|string',
+            'icon_url' => 'nullable|string',
+            'color_code' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -38,8 +38,8 @@ class CourseController extends BaseApiController
             'description' => $request->description,
             'price' => $request->price,
             'status' => $request->status,
-            'icon' => $request->icon ?? 'fa-solid fa-graduation-cap',
-            'color' => $request->color ?? '#1565C0',
+            'icon_url' => $request->icon_url ?? 'fa-solid fa-graduation-cap',
+            'color_code' => $request->color_code ?? '#1565C0',
             'sort_order' => Course::max('sort_order') + 1,
         ]);
 
@@ -62,8 +62,8 @@ class CourseController extends BaseApiController
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'status' => 'required|in:active,inactive',
-            'icon' => 'nullable|string',
-            'color' => 'nullable|string',
+            'icon_url' => 'nullable|string',
+            'color_code' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -77,8 +77,8 @@ class CourseController extends BaseApiController
             'description' => $request->description,
             'price' => $request->price,
             'status' => $request->status,
-            'icon' => $request->icon,
-            'color' => $request->color,
+            'icon_url' => $request->icon_url,
+            'color_code' => $request->color_code,
         ]);
 
         return $this->response(true, 'Course updated successfully', $course);

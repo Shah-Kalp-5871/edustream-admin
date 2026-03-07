@@ -16,12 +16,16 @@ Route::get('/', function () {
 });
 
 // Auth Routes
-Route::get('/login', [AuthController::class, 'login']);
+Route::get('/login', [AuthController::class, 'login'])->name('login');
+Route::post('/login', [AuthController::class, 'loginPost']);
 Route::get('/forgot-password', [AuthController::class, 'forgotPassword']);
 Route::get('/reset-password', [AuthController::class, 'resetPassword']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Dashboard
-Route::get('/dashboard', [DashboardController::class, 'index']);
+// Protected Admin Routes
+Route::middleware(['auth'])->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index']);
 
 // Category Routes
 Route::get('/content/categories', [CategoryController::class, 'index']);
@@ -106,7 +110,6 @@ Route::get('/orders/{id}', [OrderController::class, 'show']);
 Route::get('/orders/{id}/invoice', [OrderController::class, 'invoice']);
 
 // Analytics & Settings
-Route::get('/analytics', [AnalyticsController::class, 'index']);
-Route::get('/settings', [SettingsController::class, 'index']);
-
-
+    Route::get('/analytics', [AnalyticsController::class, 'index']);
+    Route::get('/settings', [SettingsController::class, 'index']);
+});

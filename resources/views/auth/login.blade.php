@@ -1,36 +1,61 @@
 @extends('layouts.auth')
 
 @section('content')
-<div class="auth-header">
-    <h1 class="auth-title">Welcome Back</h1>
-    <p class="auth-subtitle">Log in to manage your EdTech platform</p>
-</div>
+<div class="auth-form-box">
+    <h2 class="form-title">Welcome back 👋</h2>
+    <p class="form-subtitle">Sign in to your admin account to continue.</p>
 
-<form action="/dashboard" method="GET">
-    <div class="form-group">
-        <label class="form-label">Email Address</label>
-        <input type="email" class="form-control" value="admin@edustream.com" placeholder="name@company.com" required>
-    </div>
-
-    <div class="form-group">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-            <label class="form-label" style="margin-bottom: 0;">Password</label>
-            <a href="/forgot-password" class="auth-link" style="font-size: 0.75rem;">Forgot password?</a>
+    <form action="/login" method="POST">
+        @csrf
+        <div class="inp-group">
+            <label class="inp-label">Email Address</label>
+            <div class="inp-wrap">
+                <i class="fas fa-envelope inp-icon"></i>
+                <input type="email" class="inp" name="email"
+                       value="{{ old('email', 'admin@edustream.com') }}"
+                       placeholder="admin@edustream.com" required>
+            </div>
         </div>
-        <input type="password" class="form-control" value="password" placeholder="••••••••" required>
+
+        <div class="inp-group">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:7px;">
+                <label class="inp-label" style="margin-bottom:0;">Password</label>
+                <a href="/forgot-password" class="forgot-link">Forgot password?</a>
+            </div>
+            <div class="inp-wrap">
+                <i class="fas fa-lock inp-icon"></i>
+                <input type="password" class="inp" name="password" id="passwordInp"
+                       value="password" placeholder="••••••••" required>
+                <span class="inp-row-right" onclick="togglePwd()">
+                    <i class="fas fa-eye" id="pwdEyeIcon"></i>
+                </span>
+            </div>
+        </div>
+
+        <div class="meta-row">
+            <label class="remember-check">
+                <input type="checkbox" name="remember" checked>
+                Remember me for 30 days
+            </label>
+        </div>
+
+        <button type="submit" class="btn-submit">
+            <i class="fas fa-arrow-right-to-bracket"></i> Sign In to Dashboard
+        </button>
+    </form>
+
+    <div class="auth-divider">Demo credentials</div>
+
+    <div class="demo-hint">
+        <i class="fas fa-circle-info" style="color:var(--primary);"></i>
+        <span>
+            <strong>Email:</strong> admin@edustream.com &nbsp;·&nbsp;
+            <strong>Password:</strong> password
+        </span>
     </div>
 
-    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem;">
-        <input type="checkbox" id="remember" style="width: 16px; height: 16px; cursor: pointer;">
-        <label for="remember" style="font-size: 0.8125rem; color: var(--text-muted); cursor: pointer;">Remember me for 30 days</label>
+    <div class="auth-form-footer">
+        <p>© {{ date('Y') }} EduStream Admin Panel. All rights reserved.</p>
     </div>
-
-    <button type="submit" class="btn-auth">Sign In to Dashboard</button>
-</form>
-
-<div style="margin-top: 1.5rem; text-align: center;">
-    <p style="font-size: 0.8125rem; color: var(--text-muted);">
-        Need help? Contact <a href="#" class="auth-link">System Support</a>
-    </p>
 </div>
 @endsection

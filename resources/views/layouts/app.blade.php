@@ -447,6 +447,105 @@
             color: var(--text-muted);
         }
 
+        /* Dropdown styles */
+        .user-dropdown {
+            position: relative;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            width: 220px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--r);
+            box-shadow: var(--shadow-lg);
+            display: none;
+            flex-direction: column;
+            padding: 8px;
+            z-index: 1000;
+            animation: dropdownFade 0.2s var(--ease);
+        }
+
+        .dropdown-menu.show {
+            display: flex;
+        }
+
+        @keyframes dropdownFade {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dropdown-header {
+            padding: 12px 16px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dropdown-header strong {
+            font-size: 13.5px;
+            color: var(--text);
+        }
+
+        .dropdown-header span {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .dropdown-menu hr {
+            height: 1px;
+            border: none;
+            background: var(--border);
+            margin: 6px 0;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            color: var(--text-2);
+            text-decoration: none;
+            font-size: 13.5px;
+            border-radius: var(--r-sm);
+            transition: all var(--tr);
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .dropdown-item:hover {
+            background: var(--surface-2);
+            color: var(--primary);
+        }
+
+        .dropdown-item i {
+            width: 16px;
+            font-size: 14px;
+            color: var(--text-muted);
+            transition: color var(--tr);
+        }
+
+        .dropdown-item:hover i {
+            color: var(--primary);
+        }
+
+        .dropdown-item.logout-btn {
+            color: #ef4444;
+        }
+
+        .dropdown-item.logout-btn:hover {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .dropdown-item.logout-btn:hover i {
+            color: #dc2626;
+        }
+
         /* =============================================
            PAGE CONTENT
         ============================================= */
@@ -819,23 +918,35 @@
     <!-- jQuery -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
-        // Session Flash Messages (SweetAlert2)
+        // Global Toast Configuration
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        });
+
+        // Session Flash Messages
         @if(session('success'))
-            Swal.fire({
+            Toast.fire({
                 icon: 'success',
-                title: 'Success!',
-                text: '{{ session('success') }}',
-                timer: 3000,
-                timerProgressBar: true
+                title: '{{ session('success') }}'
             });
         @endif
 
         @if(session('error'))
-            Swal.fire({
+            Toast.fire({
                 icon: 'error',
-                title: 'Error!',
-                text: '{{ session('error') }}'
+                title: '{{ session('error') }}'
             });
         @endif
 

@@ -31,7 +31,6 @@
         <a href="/users" class="nav-link {{ request()->is('users*') ? 'active' : '' }}">
             <span class="nav-icon"><i class="fas fa-users"></i></span>
             Students
-            <span class="nav-badge">14k</span>
         </a>
 
         <span class="nav-section">Business</span>
@@ -63,8 +62,11 @@
             <span class="sf-name">Admin User</span>
             <span class="sf-role">Super Admin</span>
         </div>
-        <a href="/login" class="sf-logout" title="Logout">
+        <a href="#" class="sf-logout" title="Logout" onclick="event.preventDefault(); document.getElementById('logout-form-sidebar').submit();">
             <i class="fas fa-arrow-right-from-bracket"></i>
         </a>
+        <form id="logout-form-sidebar" action="{{ route('logout') }}" method="POST" style="display: none;">
+            @csrf
+        </form>
     </div>
 </aside>

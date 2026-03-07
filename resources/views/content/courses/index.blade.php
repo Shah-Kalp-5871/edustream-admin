@@ -273,7 +273,10 @@ function confirmDelete(id, courseName) {
 }
 
 document.querySelector('.filter-btn')?.addEventListener('click', function() {
-    alert('Filter functionality would open here');
+    Toast.fire({
+        icon: 'info',
+        title: 'Filter functionality is coming soon!'
+    });
 });
 </script>
 @endsection

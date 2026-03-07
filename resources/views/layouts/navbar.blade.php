@@ -39,14 +39,37 @@
 
         <div class="topnav-divider"></div>
 
-        <!-- User chip -->
-        <div class="user-chip">
-            <img src="https://ui-avatars.com/api/?name=Admin+User&background=1565C0&color=fff&size=64" alt="Admin">
-            <div class="user-chip-info">
-                <span>Admin User</span>
-                <small>Super Admin</small>
+        <!-- User dropdown -->
+        <div class="user-dropdown">
+            <div class="user-chip" id="userDropdownTrigger">
+                <img src="https://ui-avatars.com/api/?name=Admin+User&background=1565C0&color=fff&size=64" alt="Admin">
+                <div class="user-chip-info">
+                    <span>Admin User</span>
+                    <small>Super Admin</small>
+                </div>
+                <i class="fas fa-chevron-down" style="font-size: 9px; color: var(--text-muted); margin-left: 2px;"></i>
             </div>
-            <i class="fas fa-chevron-down" style="font-size: 9px; color: var(--text-muted); margin-left: 2px;"></i>
+            
+            <div class="dropdown-menu" id="userDropdownMenu">
+                <div class="dropdown-header">
+                    <strong>Admin User</strong>
+                    <span>admin@edustream.com</span>
+                </div>
+                <hr>
+                <a href="/settings" class="dropdown-item">
+                    <i class="fas fa-user-gear"></i> Account Settings
+                </a>
+                <a href="/settings" class="dropdown-item">
+                    <i class="fas fa-shield-halved"></i> Security
+                </a>
+                <hr>
+                <button class="dropdown-item logout-btn" onclick="document.getElementById('logout-form').submit();">
+                    <i class="fas fa-arrow-right-from-bracket"></i> Logout
+                </button>
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                    @csrf
+                </form>
+            </div>
         </div>
     </div>
 </nav>
@@ -71,5 +94,21 @@
         // Set correct icon on load
         const icon = themeToggleBtn.querySelector('i');
         if (savedTheme === 'dark') icon.className = 'fas fa-sun';
+    }
+    // User dropdown toggle
+    const userTrigger = document.getElementById('userDropdownTrigger');
+    const userMenu = document.getElementById('userDropdownMenu');
+
+    if (userTrigger && userMenu) {
+        userTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userMenu.classList.toggle('show');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!userMenu.contains(e.target)) {
+                userMenu.classList.remove('show');
+            }
+        });
     }
 </script>

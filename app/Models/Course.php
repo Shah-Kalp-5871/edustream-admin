@@ -57,12 +57,7 @@ class Course extends Model
         return $query->where('status', 'active');
     }
 
-    protected function iconUrl(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => $value ? Storage::url($value) : null,
-        );
-    }
+
 
     protected function thumbnailUrl(): Attribute
     {

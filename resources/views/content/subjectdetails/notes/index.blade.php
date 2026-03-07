@@ -112,7 +112,13 @@
                 <i class="fa-regular fa-file-pdf" style="color: #e74c3c; font-size: 18px;"></i>
                 <span>{{ $file->name }}</span>
             </div>
-            <div style="color: var(--text-muted);">{{ round(Storage::size($file->file_path) / 1024 / 1024, 2) }} MB</div>
+            @php
+                $fileSize = 'N/A';
+                if ($file->file_path && Storage::disk('public')->exists($file->file_path)) {
+                    $fileSize = round(Storage::disk('public')->size($file->file_path) / 1024 / 1024, 2) . ' MB';
+                }
+            @endphp
+            <div style="color: var(--text-muted);">{{ $fileSize }}</div>
             <div style="color: var(--text-muted);">{{ $file->updated_at->format('Y-m-d') }}</div>
             <div style="display: flex; align-items: center;" onclick="event.stopPropagation()">
                 <label class="toggle-switch">
