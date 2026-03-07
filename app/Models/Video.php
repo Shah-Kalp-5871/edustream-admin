@@ -13,6 +13,7 @@ class Video extends Model
         'subject_id',
         'folder_id',
         'name',
+        'file_path',
         'description',
         'video_url',
         'video_source',

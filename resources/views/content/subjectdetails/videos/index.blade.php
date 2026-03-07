@@ -8,8 +8,13 @@
 @endsection
 
 @section('actions')
-    <button class="action-btn" onclick="openModal('addVideoModal')">
-        <i class="fa-solid fa-plus-circle"></i> Add Video
+    <form id="uploadForm" action="{{ url('/content/videos/' . $id . '/upload') }}" method="POST" enctype="multipart/form-data" style="display: none;">
+        @csrf
+        <input type="hidden" name="folder_id" value="{{ $currentFolder->id ?? '' }}">
+        <input type="file" id="fileUpload" name="files[]" multiple accept="video/*" onchange="this.form.submit()">
+    </form>
+    <button class="action-btn" onclick="document.getElementById('fileUpload').click()">
+        <i class="fa-solid fa-cloud-arrow-up"></i> Add Video
     </button>
     <button class="action-btn" onclick="showNewFolderModal()">
         <i class="fa-solid fa-folder-plus"></i> New Folder
@@ -72,7 +77,7 @@
             <div style="color: var(--text-muted);">{{ $folder->created_at->format('Y-m-d') }}</div>
             <div></div>
             <div style="display: flex; gap: 4px;" onclick="event.stopPropagation()">
-                <button class="action-icon-btn" title="Rename"><i class="fa-solid fa-pen"></i></button>
+                <button class="action-icon-btn" onclick="openRenameModal('{{ $folder->name }}', '{{ $folder->id }}', 'folder')" title="Rename"><i class="fa-solid fa-pen"></i></button>
                 <button class="action-icon-btn" onclick="openDeleteModal('{{ $folder->name }}', '{{ $folder->id }}', 'folder')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
             </div>
         </div>
@@ -92,7 +97,7 @@
             <div style="color: var(--text-muted);">{{ $video->created_at->format('Y-m-d') }}</div>
             <div style="display: flex; align-items: center;" onclick="event.stopPropagation()">
                 <label class="toggle-switch">
-                    <input type="checkbox" {{ $video->is_free ? 'checked' : '' }}>
+                    <input type="checkbox" {{ $video->is_free ? 'checked' : '' }} onchange="toggleFree('{{ $video->name }}', this.checked, '{{ $video->id }}')">
                     <span class="slider round"></span>
                 </label>
                 <span style="font-size: 11px; margin-left: 8px; color: {{ $video->is_free ? 'var(--primary)' : 'var(--text-muted)' }}; font-weight: 600;">
@@ -100,7 +105,12 @@
                 </span>
             </div>
             <div style="display: flex; gap: 4px;">
-                <button class="action-icon-btn" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
+                <button class="action-icon-btn" onclick="event.stopPropagation(); openEditDetailsModal('{{ $video->name }}', '{{ $video->id }}', 'file', '{{ $video->description }}', '{{ $video->duration }}', '{{ $video->sort_order }}')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
+                @if($video->file_path)
+                <button class="action-icon-btn" onclick="event.stopPropagation(); window.open('{{ asset('storage/' . $video->file_path) }}')" title="Play/Download"><i class="fa-solid fa-play"></i></button>
+                @else
+                <button class="action-icon-btn" onclick="event.stopPropagation(); window.open('{{ $video->video_url }}')" title="View Link"><i class="fa-solid fa-link"></i></button>
+                @endif
                 <button class="action-icon-btn" onclick="openDeleteModal('{{ $video->name }}', '{{ $video->id }}', 'file')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
             </div>
         </div>
@@ -119,6 +129,58 @@
         @csrf
         @method('DELETE')
     </form>
+</div>
+
+<!-- Rename Modal -->
+<div class="modal-backdrop" id="renameModal" onclick="if(event.target===this) closeModal('renameModal')">
+    <div class="modal" style="max-width: 400px;">
+        <div class="modal-header">
+            <h3>Rename</h3>
+            <button class="modal-close" onclick="closeModal('renameModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">New Name</label>
+                <input type="text" class="form-control" id="renameInput">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('renameModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="renameItem()">Rename</button>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Details Modal -->
+<div class="modal-backdrop" id="editDetailsModal" onclick="if(event.target===this) closeModal('editDetailsModal')">
+    <div class="modal" style="max-width: 500px;">
+        <div class="modal-header">
+            <h3>Edit Details</h3>
+            <button class="modal-close" onclick="closeModal('editDetailsModal')">&times;</button>
+        </div>
+        <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Title</label>
+                <input type="text" class="form-control" id="editTitle" placeholder="Item title">
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Description</label>
+                <textarea class="form-control" id="editDescription" rows="3" placeholder="Add a description or instructions..."></textarea>
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Duration (e.g., 10:25)</label>
+                <input type="text" class="form-control" id="editDuration" placeholder="MM:SS">
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Sort Order</label>
+                <input type="number" class="form-control" id="editSortOrder" placeholder="e.g. 1" value="0">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('editDetailsModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveDetails()">Save Details</button>
+        </div>
+    </div>
 </div>
 
 <!-- New Folder Modal -->
@@ -145,48 +207,6 @@
     </div>
 </div>
 
-<!-- Add Video Modal -->
-<div class="modal-backdrop" id="addVideoModal" onclick="if(event.target===this) closeModal('addVideoModal')">
-    <div class="modal" style="max-width: 500px;">
-        <form action="{{ url('/content/videos/' . $id . '/upload') }}" method="POST">
-            @csrf
-            <input type="hidden" name="folder_id" value="{{ $currentFolder->id ?? '' }}">
-            <div class="modal-header">
-                <h3>Add New Video</h3>
-                <button type="button" class="modal-close" onclick="closeModal('addVideoModal')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div style="margin-bottom: 16px;">
-                    <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Video Title</label>
-                    <input type="text" name="name" class="form-control" placeholder="e.g., Introduction to Algebra" required>
-                </div>
-                <div style="margin-bottom: 16px;">
-                    <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Video URL</label>
-                    <input type="text" name="video_url" class="form-control" placeholder="https://youtube.com/..." required>
-                </div>
-                <div style="margin-bottom: 16px;">
-                    <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Source</label>
-                    <select name="video_source" class="form-control" required>
-                        <option value="youtube">YouTube</option>
-                        <option value="vimeo">Vimeo</option>
-                        <option value="mp4">Direct MP4 Link</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-                <div style="margin-bottom: 16px;">
-                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                        <input type="checkbox" name="is_free" value="1">
-                        <span style="font-size: 13px; font-weight: 500;">Mark as Free Video</span>
-                    </label>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('addVideoModal')">Cancel</button>
-                <button type="submit" class="btn btn-primary">Add Video</button>
-            </div>
-        </form>
-    </div>
-</div>
 
 <!-- Delete Confirmation Modal -->
 <div class="modal-backdrop" id="deleteModal" onclick="if(event.target===this) closeModal('deleteModal')">
@@ -212,6 +232,32 @@
 let currentActionItem = null;
 let currentActionType = null;
 
+function toggleFree(name, isFree, id) {
+    fetch('{{ url("/content/videos/file") }}/' + id + '/toggle-free', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ is_free: isFree })
+    }).then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: `${name} is now ${isFree ? 'Free' : 'Paid'}`,
+                showConfirmButton: false,
+                timer: 2000,
+                timerProgressBar: true
+            }).then(() => location.reload());
+        } else {
+            Swal.fire('Error', 'Something went wrong', 'error');
+        }
+    });
+}
+
 function showNewFolderModal() {
     openModal('newFolderModal');
 }
@@ -234,7 +280,78 @@ function confirmDelete() {
         form.submit();
     }
 }
+
+function openRenameModal(name, id, type) {
+    document.getElementById('renameInput').value = name;
+    currentActionItem = id;
+    currentActionType = type;
+    openModal('renameModal');
+}
+
+function renameItem() {
+    const newName = document.getElementById('renameInput').value;
+    const url = currentActionType === 'folder' 
+        ? '{{ url('/content/videos/folder') }}/' + currentActionItem + '/update'
+        : '{{ url('/content/videos/file') }}/' + currentActionItem + '/update';
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ name: newName })
+    }).then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire('Success', data.message, 'success').then(() => location.reload());
+        } else {
+            Swal.fire('Error', 'Something went wrong', 'error');
+        }
+    });
+}
+
+function openEditDetailsModal(name, id, type, description = '', duration = '', sortOrder = 0) {
+    document.getElementById('editTitle').value = name;
+    document.getElementById('editDescription').value = description;
+    document.getElementById('editDuration').value = duration;
+    document.getElementById('editSortOrder').value = sortOrder;
+    currentActionItem = id;
+    currentActionType = type;
+    openModal('editDetailsModal');
+}
+
+function saveDetails() {
+    const name = document.getElementById('editTitle').value;
+    const description = document.getElementById('editDescription').value;
+    const duration = document.getElementById('editDuration').value;
+    const sortOrder = document.getElementById('editSortOrder').value;
+    
+    const url = currentActionType === 'folder' 
+        ? '{{ url('/content/videos/folder') }}/' + currentActionItem + '/update'
+        : '{{ url('/content/videos/file') }}/' + currentActionItem + '/update';
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ 
+            name: name,
+            description: description,
+            duration: duration,
+            sort_order: sortOrder
+        })
+    }).then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire('Success', data.message, 'success').then(() => location.reload());
+        } else {
+            Swal.fire('Error', 'Something went wrong', 'error');
+        }
+    });
+}
 </script>
 <script src="{{ asset('js/content-manager.js') }}"></script>
-@endsection
 @endsection

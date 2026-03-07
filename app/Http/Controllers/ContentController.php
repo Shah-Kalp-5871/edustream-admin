@@ -22,7 +22,11 @@ class ContentController extends Controller
     public function index()
     {
         $courses = Course::with('category')->withCount('subjects')->orderBy('sort_order')->get();
-        return view('content.courses.index', compact('courses'));
+        $totalSubjects = Subject::count();
+        $totalStudents = \App\Models\Student::count();
+        $totalEnrollments = \App\Models\Enrollment::count();
+        
+        return view('content.courses.index', compact('courses', 'totalSubjects', 'totalStudents', 'totalEnrollments'));
     }
 
     public function create()
@@ -102,148 +106,20 @@ class ContentController extends Controller
 
     public function courseSubjects($id)
     {
-        $course = Course::with('subjects.noteFolders', 'subjects.videoFolders')->findOrFail($id);
+        $course = Course::with(['subjects' => function($q) {
+            $q->withCount(['notes', 'videos', 'quizzes', 'qaPapers'])->orderBy('sort_order');
+        }])->findOrFail($id);
+        
         $subjects = $course->subjects;
         $courseName = $course->name;
-        return view('content.subjects.index', compact('id', 'course', 'courseName', 'subjects'));
-    }
-
-    // Existing methods for subject details (to be updated later)
-    public function subjectContent($id)
-    {
-        $subject = Subject::withCount(['notes', 'videos', 'quizzes', 'qaPapers'])->findOrFail($id);
-        $course = $subject->course;
         
-        $subjectName = $subject->name;
-        $courseName = $course->name;
-        $courseId = $course->id;
-        
-        // Mock data for content structure until folders are fully integrated
-        $contentData = [
-            'notes' => ['count' => $subject->notes_count, 'items' => $subject->notes->pluck('name')],
-            'videos' => ['count' => $subject->videos_count, 'items' => $subject->videos->pluck('name')],
-            'qa_papers' => ['count' => $subject->qa_papers_count, 'items' => $subject->qaPapers->pluck('name')],
-            'quiz' => ['count' => $subject->quizzes_count, 'items' => $subject->quizzes->pluck('title')],
-        ];
-
-        return view('content.subjectdetails.index', compact('id', 'subject', 'subjectName', 'course', 'courseName', 'courseId', 'contentData'));
+        return view('content.subjects.index', compact('course', 'courseName', 'subjects', 'id'));
     }
 
     public function createSubject($courseId)
     {
         $course = Course::findOrFail($courseId);
         return view('content.subjects.create', compact('course'));
-    }
-
-    public function manageNotes(Request $request, $id)
-    {
-        $subject = Subject::findOrFail($id);
-        $folderId = $request->query('folder_id');
-        
-        $folders = NoteFolder::where('subject_id', $id)
-            ->where('parent_id', $folderId)
-            ->orderBy('sort_order')
-            ->get();
-            
-        $files = Note::where('subject_id', $id)
-            ->where('folder_id', $folderId)
-            ->orderBy('sort_order')
-            ->get();
-            
-        $currentFolder = $folderId ? NoteFolder::find($folderId) : null;
-        
-        // Breadcrumbs
-        $breadcrumbs = [];
-        $tempFolder = $currentFolder;
-        while ($tempFolder) {
-            array_unshift($breadcrumbs, [
-                'name' => $tempFolder->name,
-                'id' => $tempFolder->id
-            ]);
-            $tempFolder = $tempFolder->parent;
-        }
-        
-        $subjectName = $subject->name;
-        return view('content.subjectdetails.notes.index', compact('id', 'subject', 'subjectName', 'folders', 'files', 'currentFolder', 'breadcrumbs'));
-    }
-
-    public function storeNoteFolder(Request $request, $subjectId)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'parent_id' => 'nullable|exists:note_folders,id',
-        ]);
-
-        NoteFolder::create([
-            'subject_id' => $subjectId,
-            'parent_id' => $request->parent_id,
-            'name' => $request->name,
-            'sort_order' => NoteFolder::where('subject_id', $subjectId)->where('parent_id', $request->parent_id)->max('sort_order') + 1,
-        ]);
-
-        return back()->with('success', 'Folder created successfully!');
-    }
-
-    public function manageVideos(Request $request, $id)
-    {
-        $subject = Subject::findOrFail($id);
-        $folderId = $request->query('folder_id');
-        
-        $folders = VideoFolder::where('subject_id', $id)
-            ->where('parent_id', $folderId)
-            ->orderBy('sort_order')
-            ->get();
-            
-        $files = Video::where('subject_id', $id)
-            ->where('folder_id', $folderId)
-            ->orderBy('sort_order')
-            ->get();
-            
-        $currentFolder = $folderId ? VideoFolder::find($folderId) : null;
-        
-        $breadcrumbs = [];
-        $tempFolder = $currentFolder;
-        while ($tempFolder) {
-            array_unshift($breadcrumbs, [
-                'name' => $tempFolder->name,
-                'id' => $tempFolder->id
-            ]);
-            $tempFolder = $tempFolder->parent;
-        }
-        
-        $subjectName = $subject->name;
-        return view('content.subjectdetails.videos.index', compact('id', 'subject', 'subjectName', 'folders', 'files', 'currentFolder', 'breadcrumbs'));
-    }
-
-    public function manageQAPapers(Request $request, $id)
-    {
-        $subject = Subject::findOrFail($id);
-        $folderId = $request->query('folder_id');
-        
-        $folders = QaPaperFolder::where('subject_id', $id)
-            ->where('parent_id', $folderId)
-            ->orderBy('sort_order')
-            ->get();
-            
-        $files = QaPaper::where('subject_id', $id)
-            ->where('folder_id', $folderId)
-            ->orderBy('sort_order')
-            ->get();
-            
-        $currentFolder = $folderId ? QaPaperFolder::find($folderId) : null;
-        
-        $breadcrumbs = [];
-        $tempFolder = $currentFolder;
-        while ($tempFolder) {
-            array_unshift($breadcrumbs, [
-                'name' => $tempFolder->name,
-                'id' => $tempFolder->id
-            ]);
-            $tempFolder = $tempFolder->parent;
-        }
-        
-        $subjectName = $subject->name;
-        return view('content.subjectdetails.papers.index', compact('id', 'subject', 'subjectName', 'folders', 'files', 'currentFolder', 'breadcrumbs'));
     }
 
     public function storeSubject(Request $request, $courseId)
@@ -270,6 +146,85 @@ class ContentController extends Controller
         ]);
 
         return redirect('/content/course/' . $courseId)->with('success', 'Subject created successfully!');
+    }
+
+    public function subjectContent($id)
+    {
+        $subject = Subject::withCount(['notes', 'videos', 'quizzes', 'qaPapers'])->findOrFail($id);
+        $course = $subject->course;
+        $subjectName = $subject->name;
+        $courseName = $course->name;
+        $courseId = $course->id;
+
+        // Mock data for content structure until folders are fully integrated
+        $contentData = [
+            'notes'     => ['count' => $subject->notes_count,  'items' => $subject->notes->pluck('name')],
+            'videos'    => ['count' => $subject->videos_count, 'items' => $subject->videos->pluck('name')],
+            'qa_papers' => ['count' => $subject->qa_papers_count, 'items' => $subject->qaPapers->pluck('name')],
+            'quiz'      => ['count' => $subject->quizzes_count,   'items' => $subject->quizzes->pluck('title')],
+        ];
+
+        return view('content.subjectdetails.index', compact('id', 'subject', 'subjectName', 'course', 'courseName', 'courseId', 'contentData'));
+    }
+
+    public function manageNotes(Request $request, $id)
+    {
+        $subject = Subject::findOrFail($id);
+        $folderId = $request->query('folder_id');
+        $folders = NoteFolder::where('subject_id', $id)->where('parent_id', $folderId)->orderBy('sort_order')->get();
+        $files = Note::where('subject_id', $id)->where('folder_id', $folderId)->orderBy('sort_order')->get();
+        
+        $currentFolder = $folderId ? NoteFolder::find($folderId) : null;
+        
+        $breadcrumbs = [];
+        $tempFolder = $currentFolder;
+        while ($tempFolder) {
+            array_unshift($breadcrumbs, ['name' => $tempFolder->name, 'id' => $tempFolder->id]);
+            $tempFolder = $tempFolder->parent;
+        }
+
+        $subjectName = $subject->name;
+        return view('content.subjectdetails.notes.index', compact('id', 'subject', 'subjectName', 'folders', 'files', 'currentFolder', 'breadcrumbs'));
+    }
+
+    public function manageVideos(Request $request, $id)
+    {
+        $subject = Subject::findOrFail($id);
+        $folderId = $request->query('folder_id');
+        $folders = VideoFolder::where('subject_id', $id)->where('parent_id', $folderId)->orderBy('sort_order')->get();
+        $files = Video::where('subject_id', $id)->where('folder_id', $folderId)->orderBy('sort_order')->get();
+        
+        $currentFolder = $folderId ? VideoFolder::find($folderId) : null;
+        
+        $breadcrumbs = [];
+        $tempFolder = $currentFolder;
+        while ($tempFolder) {
+            array_unshift($breadcrumbs, ['name' => $tempFolder->name, 'id' => $tempFolder->id]);
+            $tempFolder = $tempFolder->parent;
+        }
+
+        $subjectName = $subject->name;
+        return view('content.subjectdetails.videos.index', compact('id', 'subject', 'subjectName', 'folders', 'files', 'currentFolder', 'breadcrumbs'));
+    }
+
+    public function manageQAPapers(Request $request, $id)
+    {
+        $subject = Subject::findOrFail($id);
+        $folderId = $request->query('folder_id');
+        $folders = QaPaperFolder::where('subject_id', $id)->where('parent_id', $folderId)->orderBy('sort_order')->get();
+        $files = QaPaper::where('subject_id', $id)->where('folder_id', $folderId)->orderBy('sort_order')->get();
+        
+        $currentFolder = $folderId ? QaPaperFolder::find($folderId) : null;
+        
+        $breadcrumbs = [];
+        $tempFolder = $currentFolder;
+        while ($tempFolder) {
+            array_unshift($breadcrumbs, ['name' => $tempFolder->name, 'id' => $tempFolder->id]);
+            $tempFolder = $tempFolder->parent;
+        }
+
+        $subjectName = $subject->name;
+        return view('content.subjectdetails.papers.index', compact('id', 'subject', 'subjectName', 'folders', 'files', 'currentFolder', 'breadcrumbs'));
     }
 
     public function editSubject($id)
@@ -312,31 +267,72 @@ class ContentController extends Controller
 
         return redirect('/content/course/' . $courseId)->with('success', 'Subject deleted successfully!');
     }
-    public function storeNote(Request $request, $subjectId)
+
+    public function manageQuiz($id)
+    {
+        $subject = Subject::findOrFail($id);
+        $quizzes = Quiz::where('subject_id', $id)->orderBy('created_at', 'desc')->get();
+        $subjectName = $subject->name;
+        return view('content.subjectdetails.quiz.index', compact('id', 'subject', 'quizzes', 'subjectName'));
+    }
+
+    public function quizBuilder($id)
+    {
+        $subject = Subject::findOrFail($id);
+        $course = $subject->course;
+        $subjectName = $subject->name;
+        return view('content.subjectdetails.quiz.builder', compact('id', 'subject', 'course', 'subjectName'));
+    }
+
+    // Folder & File Management for Notes
+    public function storeNoteFolder(Request $request, $id)
+    {
+        $request->validate(['name' => 'required|string|max:255']);
+        NoteFolder::create([
+            'subject_id' => $id,
+            'parent_id' => $request->parent_id,
+            'name' => $request->name,
+            'sort_order' => NoteFolder::where('subject_id', $id)->where('parent_id', $request->parent_id)->max('sort_order') + 1,
+        ]);
+        return back()->with('success', 'Folder created successfully');
+    }
+
+    public function deleteNoteFolder($id)
+    {
+        $folder = NoteFolder::findOrFail($id);
+        $folder->delete();
+        return back()->with('success', 'Folder deleted successfully');
+    }
+
+    public function updateNoteFolder(Request $request, $id)
+    {
+        $request->validate(['name' => 'required|string|max:255']);
+        $folder = NoteFolder::findOrFail($id);
+        $folder->update(['name' => $request->name]);
+        return response()->json(['success' => true, 'message' => 'Folder renamed successfully']);
+    }
+
+    public function storeNote(Request $request, $id)
     {
         $request->validate([
-            'files.*' => 'required|file|mimes:pdf,doc,docx,txt|max:10240',
-            'folder_id' => 'nullable|exists:note_folders,id',
+            'files.*' => 'required|file|mimes:pdf,doc,docx,ppt,pptx,txt|max:10240',
         ]);
 
         if ($request->hasFile('files')) {
             foreach ($request->file('files') as $file) {
-                $path = $file->store('notes/' . $subjectId, 'public');
-                
+                $path = $file->store('notes', 'public');
                 Note::create([
-                    'subject_id' => $subjectId,
+                    'subject_id' => $id,
                     'folder_id' => $request->folder_id,
                     'name' => $file->getClientOriginalName(),
                     'file_path' => $path,
                     'file_type' => $file->getClientOriginalExtension(),
-                    'is_free' => false,
-                    'status' => 'active',
-                    'sort_order' => Note::where('subject_id', $subjectId)->where('folder_id', $request->folder_id)->max('sort_order') + 1,
+                    'sort_order' => Note::where('subject_id', $id)->where('folder_id', $request->folder_id)->max('sort_order') + 1,
                 ]);
             }
         }
 
-        return back()->with('success', 'Files uploaded successfully!');
+        return back()->with('success', 'Notes uploaded successfully');
     }
 
     public function deleteNote($id)
@@ -344,121 +340,160 @@ class ContentController extends Controller
         $note = Note::findOrFail($id);
         Storage::disk('public')->delete($note->file_path);
         $note->delete();
-        return back()->with('success', 'Note deleted successfully!');
+        return back()->with('success', 'Note deleted successfully');
     }
 
-    public function deleteNoteFolder($id)
+    public function toggleNoteFree(Request $request, $id)
     {
-        $folder = NoteFolder::findOrFail($id);
-        if ($folder->children()->count() > 0 || $folder->notes()->count() > 0) {
-            return back()->with('error', 'Folder is not empty!');
-        }
-        $folder->delete();
-        return back()->with('success', 'Folder deleted successfully!');
+        $note = Note::findOrFail($id);
+        $note->update(['is_free' => $request->is_free]);
+        return response()->json(['success' => true, 'message' => 'Status updated successfully']);
     }
 
-    // Video Management Methods
-    public function storeVideoFolder(Request $request, $subjectId)
+    public function updateNote(Request $request, $id)
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'parent_id' => 'nullable|exists:video_folders,id',
+            'description' => 'nullable|string',
+            'sort_order' => 'nullable|integer',
         ]);
+        $note = Note::findOrFail($id);
+        $note->update($request->only(['name', 'description', 'sort_order']));
+        return response()->json(['success' => true, 'message' => 'Note updated successfully']);
+    }
 
+    // Folder & File Management for Videos
+    public function storeVideoFolder(Request $request, $id)
+    {
+        $request->validate(['name' => 'required|string|max:255']);
         VideoFolder::create([
-            'subject_id' => $subjectId,
+            'subject_id' => $id,
             'parent_id' => $request->parent_id,
             'name' => $request->name,
-            'sort_order' => VideoFolder::where('subject_id', $subjectId)->where('parent_id', $request->parent_id)->max('sort_order') + 1,
+            'sort_order' => VideoFolder::where('subject_id', $id)->where('parent_id', $request->parent_id)->max('sort_order') + 1,
         ]);
-
-        return back()->with('success', 'Folder created successfully!');
-    }
-
-    public function storeVideo(Request $request, $subjectId)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'video_url' => 'required|string',
-            'video_source' => 'required|in:youtube,vimeo,mp4,other',
-            'folder_id' => 'nullable|exists:video_folders,id',
-            'is_free' => 'boolean',
-        ]);
-
-        Video::create([
-            'subject_id' => $subjectId,
-            'folder_id' => $request->folder_id,
-            'name' => $request->name,
-            'video_url' => $request->video_url,
-            'video_source' => $request->video_source,
-            'is_free' => $request->is_free ?? false,
-            'status' => 'active',
-            'sort_order' => Video::where('subject_id', $subjectId)->where('folder_id', $request->folder_id)->max('sort_order') + 1,
-        ]);
-
-        return back()->with('success', 'Video added successfully!');
-    }
-
-    public function deleteVideo($id)
-    {
-        $video = Video::findOrFail($id);
-        $video->delete();
-        return back()->with('success', 'Video deleted successfully!');
+        return back()->with('success', 'Folder created successfully');
     }
 
     public function deleteVideoFolder($id)
     {
         $folder = VideoFolder::findOrFail($id);
-        if ($folder->children()->count() > 0 || $folder->videos()->count() > 0) {
-            return back()->with('error', 'Folder is not empty!');
-        }
         $folder->delete();
-        return back()->with('success', 'Folder deleted successfully!');
+        return back()->with('success', 'Folder deleted successfully');
     }
 
-    // QA Papers Management Methods
-    public function storeQAPaperFolder(Request $request, $subjectId)
+    public function updateVideoFolder(Request $request, $id)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'parent_id' => 'nullable|exists:qa_paper_folders,id',
-        ]);
-
-        QaPaperFolder::create([
-            'subject_id' => $subjectId,
-            'parent_id' => $request->parent_id,
-            'name' => $request->name,
-            'sort_order' => QaPaperFolder::where('subject_id', $subjectId)->where('parent_id', $request->parent_id)->max('sort_order') + 1,
-        ]);
-
-        return back()->with('success', 'Folder created successfully!');
+        $request->validate(['name' => 'required|string|max:255']);
+        $folder = VideoFolder::findOrFail($id);
+        $folder->update(['name' => $request->name]);
+        return response()->json(['success' => true, 'message' => 'Folder renamed successfully']);
     }
 
-    public function storeQAPaper(Request $request, $subjectId)
+    public function toggleVideoFree(Request $request, $id)
+    {
+        $video = Video::findOrFail($id);
+        $video->update(['is_free' => $request->is_free]);
+        return response()->json(['success' => true, 'message' => 'Status updated successfully']);
+    }
+
+    public function storeVideo(Request $request, $id)
     {
         $request->validate([
-            'files.*' => 'required|file|mimes:pdf,doc,docx,txt|max:10240',
-            'folder_id' => 'nullable|exists:qa_paper_folders,id',
+            'files.*' => 'required|mimetypes:video/mp4,video/quicktime,video/x-msvideo,video/x-flv,video/x-matroska|max:512000',
         ]);
 
         if ($request->hasFile('files')) {
             foreach ($request->file('files') as $file) {
-                $path = $file->store('papers/' . $subjectId, 'public');
-                
-                QaPaper::create([
-                    'subject_id' => $subjectId,
+                $fileName = $file->getClientOriginalName();
+                $filePath = $file->store('videos', 'public');
+
+                Video::create([
+                    'subject_id' => $id,
                     'folder_id' => $request->folder_id,
-                    'name' => $file->getClientOriginalName(),
-                    'file_path' => $path,
-                    'file_type' => $file->getClientOriginalExtension(),
-                    'is_free' => false,
-                    'status' => 'active',
-                    'sort_order' => QaPaper::where('subject_id', $subjectId)->where('folder_id', $request->folder_id)->max('sort_order') + 1,
+                    'name' => $fileName,
+                    'file_path' => $filePath,
+                    'video_source' => 'local',
+                    'sort_order' => Video::where('subject_id', $id)->where('folder_id', $request->folder_id)->max('sort_order') + 1,
                 ]);
             }
         }
 
-        return back()->with('success', 'Papers uploaded successfully!');
+        return back()->with('success', 'Video(s) uploaded successfully');
+    }
+
+    public function deleteVideo($id)
+    {
+        $video = Video::findOrFail($id);
+        if ($video->file_path) {
+            Storage::disk('public')->delete($video->file_path);
+        }
+        $video->delete();
+        return back()->with('success', 'Video deleted successfully');
+    }
+
+    public function updateVideo(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'duration' => 'nullable|string',
+            'sort_order' => 'nullable|integer',
+        ]);
+        $video = Video::findOrFail($id);
+        $video->update($request->only(['name', 'description', 'duration', 'sort_order']));
+        return response()->json(['success' => true, 'message' => 'Video updated successfully']);
+    }
+
+    // Folder & File Management for QA Papers
+    public function storeQAPaperFolder(Request $request, $id)
+    {
+        $request->validate(['name' => 'required|string|max:255']);
+        QaPaperFolder::create([
+            'subject_id' => $id,
+            'parent_id' => $request->parent_id,
+            'name' => $request->name,
+            'sort_order' => QaPaperFolder::where('subject_id', $id)->where('parent_id', $request->parent_id)->max('sort_order') + 1,
+        ]);
+        return back()->with('success', 'Folder created successfully');
+    }
+
+    public function deleteQAPaperFolder($id)
+    {
+        $folder = QaPaperFolder::findOrFail($id);
+        $folder->delete();
+        return back()->with('success', 'Folder deleted successfully');
+    }
+
+    public function updateQAPaperFolder(Request $request, $id)
+    {
+        $request->validate(['name' => 'required|string|max:255']);
+        $folder = QaPaperFolder::findOrFail($id);
+        $folder->update(['name' => $request->name]);
+        return response()->json(['success' => true, 'message' => 'Folder renamed successfully']);
+    }
+
+    public function storeQAPaper(Request $request, $id)
+    {
+        $request->validate([
+            'files.*' => 'required|file|mimes:pdf,doc,docx,txt|max:10240',
+        ]);
+
+        if ($request->hasFile('files')) {
+            foreach ($request->file('files') as $file) {
+                $path = $file->store('qa_papers', 'public');
+                QaPaper::create([
+                    'subject_id' => $id,
+                    'folder_id' => $request->folder_id,
+                    'name' => $file->getClientOriginalName(),
+                    'file_path' => $path,
+                    'file_type' => $file->getClientOriginalExtension(),
+                    'sort_order' => QaPaper::where('subject_id', $id)->where('folder_id', $request->folder_id)->max('sort_order') + 1,
+                ]);
+            }
+        }
+
+        return back()->with('success', 'QA Papers uploaded successfully');
     }
 
     public function deleteQAPaper($id)
@@ -466,25 +501,25 @@ class ContentController extends Controller
         $paper = QaPaper::findOrFail($id);
         Storage::disk('public')->delete($paper->file_path);
         $paper->delete();
-        return back()->with('success', 'Paper deleted successfully!');
+        return back()->with('success', 'QA Paper deleted successfully');
     }
 
-    public function deleteQAPaperFolder($id)
+    public function toggleQAPaperFree(Request $request, $id)
     {
-        $folder = QaPaperFolder::findOrFail($id);
-        if ($folder->children()->count() > 0 || $folder->qaPapers()->count() > 0) {
-            return back()->with('error', 'Folder is not empty!');
-        }
-        $folder->delete();
-        return back()->with('success', 'Folder deleted successfully!');
+        $paper = QaPaper::findOrFail($id);
+        $paper->update(['is_free' => $request->is_free]);
+        return response()->json(['success' => true, 'message' => 'Status updated successfully']);
     }
 
-    // Quiz Management Method
-    public function manageQuiz($id)
+    public function updateQAPaper(Request $request, $id)
     {
-        $subject = Subject::findOrFail($id);
-        $subjectName = $subject->name;
-        $quizzes = $subject->quizzes()->orderBy('sort_order')->get();
-        return view('content.subjectdetails.quiz.index', compact('id', 'subject', 'subjectName', 'quizzes'));
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'sort_order' => 'nullable|integer',
+        ]);
+        $paper = QaPaper::findOrFail($id);
+        $paper->update($request->only(['name', 'description', 'sort_order']));
+        return response()->json(['success' => true, 'message' => 'QA Paper updated successfully']);
     }
 }

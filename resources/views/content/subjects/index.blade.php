@@ -132,9 +132,9 @@
             </div>
 
             <div class="subject-stats">
-                <span class="subject-stat"><i class="fa-regular fa-file-lines"></i> {{ $subject->notes()->count() }} Notes</span>
-                <span class="subject-stat"><i class="fa-solid fa-video"></i> {{ $subject->videos()->count() }} Videos</span>
-                <span class="subject-stat"><i class="fa-regular fa-circle-question"></i> {{ $subject->quizzes()->count() }} Quiz</span>
+                <span class="subject-stat"><i class="fa-regular fa-file-lines"></i> {{ $subject->notes_count }} Notes</span>
+                <span class="subject-stat"><i class="fa-solid fa-video"></i> {{ $subject->videos_count }} Videos</span>
+                <span class="subject-stat"><i class="fa-regular fa-circle-question"></i> {{ $subject->quizzes_count }} Quiz</span>
             </div>
             <button class="btn-view-subject" onclick="event.stopPropagation(); window.location.href='{{ url('/content/subject/' . $subject->id) }}'">
                 Manage Content <i class="fa-solid fa-arrow-right"></i>

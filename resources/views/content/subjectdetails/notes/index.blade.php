@@ -98,9 +98,9 @@
             <div style="color: var(--text-muted);">{{ $folder->updated_at->format('Y-m-d') }}</div>
             <div></div>
             <div style="display: flex; gap: 4px;">
-                <button class="action-icon-btn" onclick="event.stopPropagation(); openEditDetailsModal('{{ $folder->name }}', '{{ $folder->id }}')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
-                <button class="action-icon-btn" onclick="event.stopPropagation(); openRenameModal('{{ $folder->name }}', '{{ $folder->id }}')" title="Rename"><i class="fa-solid fa-pen"></i></button>
-                <button class="action-icon-btn" onclick="event.stopPropagation(); openDeleteModal('{{ $folder->name }}', '{{ $folder->id }}')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
+                <button class="action-icon-btn" onclick="event.stopPropagation(); openEditDetailsModal('{{ $folder->name }}', '{{ $folder->id }}', 'folder')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
+                <button class="action-icon-btn" onclick="event.stopPropagation(); openRenameModal('{{ $folder->name }}', '{{ $folder->id }}', 'folder')" title="Rename"><i class="fa-solid fa-pen"></i></button>
+                <button class="action-icon-btn" onclick="event.stopPropagation(); openDeleteModal('{{ $folder->name }}', '{{ $folder->id }}', 'folder')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
             </div>
         </div>
         @endforeach
@@ -115,15 +115,19 @@
             <div style="color: var(--text-muted);">{{ round(Storage::size($file->file_path) / 1024 / 1024, 2) }} MB</div>
             <div style="color: var(--text-muted);">{{ $file->updated_at->format('Y-m-d') }}</div>
             <div style="display: flex; align-items: center;" onclick="event.stopPropagation()">
-                <div class="status-badge {{ $file->is_free ? 'status-active' : 'status-pending' }}" style="font-size: 10px;">
+                <label class="toggle-switch">
+                    <input type="checkbox" {{ $file->is_free ? 'checked' : '' }} onchange="toggleFree('{{ $file->name }}', this.checked, '{{ $file->id }}')">
+                    <span class="slider round"></span>
+                </label>
+                <span style="font-size: 11px; margin-left: 8px; color: {{ $file->is_free ? 'var(--primary)' : 'var(--text-muted)' }}; font-weight: 600;">
                     {{ $file->is_free ? 'Free' : 'Paid' }}
-                </div>
+                </span>
             </div>
             <div style="display: flex; gap: 4px;">
-                <button class="action-icon-btn" onclick="event.stopPropagation(); openEditDetailsModal('{{ $file->name }}', '{{ $file->id }}')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
-                <button class="action-icon-btn" onclick="event.stopPropagation(); openRenameModal('{{ $file->name }}', '{{ $file->id }}')" title="Rename"><i class="fa-solid fa-pen"></i></button>
+                <button class="action-icon-btn" onclick="event.stopPropagation(); openEditDetailsModal('{{ $file->name }}', '{{ $file->id }}', 'file', '{{ $file->description }}', '{{ $file->sort_order }}')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
+                <button class="action-icon-btn" onclick="event.stopPropagation(); openRenameModal('{{ $file->name }}', '{{ $file->id }}', 'file')" title="Rename"><i class="fa-solid fa-pen"></i></button>
                 <button class="action-icon-btn" onclick="event.stopPropagation(); window.open('{{ asset('storage/' . $file->file_path) }}')" title="Download"><i class="fa-solid fa-download"></i></button>
-                <button class="action-icon-btn" onclick="event.stopPropagation(); openDeleteModal('{{ $file->name }}', '{{ $file->id }}')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
+                <button class="action-icon-btn" onclick="event.stopPropagation(); openDeleteModal('{{ $file->name }}', '{{ $file->id }}', 'file')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
             </div>
         </div>
         @endforeach
@@ -179,7 +183,7 @@
         <div class="modal-body">
             <div style="margin-bottom: 20px;">
                 <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">New Name</label>
-                <input type="text" class="form-control" id="renameInput" value="Algebra_Basics.pdf">
+                <input type="text" class="form-control" id="renameInput">
             </div>
         </div>
         <div class="modal-footer">
@@ -198,7 +202,6 @@
         @csrf
         @method('DELETE')
     </form>
-</div>
 
 <!-- Delete Confirmation Modal -->
 <div class="modal-backdrop" id="deleteModal" onclick="if(event.target===this) closeModal('deleteModal')">
@@ -264,6 +267,101 @@ let selectedItems = new Set();
 let currentActionItem = null;
 let currentActionType = null; // 'folder' or 'file'
 
+function toggleFree(name, isFree, id) {
+    fetch('{{ url("/content/notes/file") }}/' + id + '/toggle-free', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ is_free: isFree })
+    }).then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: `${name} is now ${isFree ? 'Free' : 'Paid'}`,
+                showConfirmButton: false,
+                timer: 2000,
+                timerProgressBar: true
+            }).then(() => location.reload());
+        } else {
+            Swal.fire('Error', 'Something went wrong', 'error');
+        }
+    });
+}
+
+function openRenameModal(name, id, type) {
+    document.getElementById('renameInput').value = name;
+    currentActionItem = id;
+    currentActionType = type;
+    openModal('renameModal');
+}
+
+function renameItem() {
+    const newName = document.getElementById('renameInput').value;
+    const url = currentActionType === 'folder' 
+        ? '{{ url('/content/notes/folder') }}/' + currentActionItem + '/update'
+        : '{{ url('/content/notes/file') }}/' + currentActionItem + '/update';
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ name: newName })
+    }).then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire('Success', data.message, 'success').then(() => location.reload());
+        } else {
+            Swal.fire('Error', 'Something went wrong', 'error');
+        }
+    });
+}
+
+function openEditDetailsModal(name, id, type, description = '', sortOrder = 0) {
+    document.getElementById('editTitle').value = name;
+    document.getElementById('editDescription').value = description;
+    document.getElementById('editSortOrder').value = sortOrder;
+    currentActionItem = id;
+    currentActionType = type;
+    openModal('editDetailsModal');
+}
+
+function saveDetails() {
+    const name = document.getElementById('editTitle').value;
+    const description = document.getElementById('editDescription').value;
+    const sortOrder = document.getElementById('editSortOrder').value;
+    
+    const url = currentActionType === 'folder' 
+        ? '{{ url('/content/notes/folder') }}/' + currentActionItem + '/update'
+        : '{{ url('/content/notes/file') }}/' + currentActionItem + '/update';
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ 
+            name: name,
+            description: description,
+            sort_order: sortOrder
+        })
+    }).then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire('Success', data.message, 'success').then(() => location.reload());
+        } else {
+            Swal.fire('Error', 'Something went wrong', 'error');
+        }
+    });
+}
+
 function openDeleteModal(name, id, type) {
     document.getElementById('deleteItemName').textContent = name;
     currentActionItem = id;
@@ -285,7 +383,7 @@ function confirmDelete() {
 
 function uploadFiles(files) {
     if (!files.length) return;
-    setTimeout(() => { alert(files.length + ' file(s) uploaded successfully'); }, 1500);
+    setTimeout(() => { Swal.fire('Success', files.length + ' file(s) uploaded successfully', 'success'); }, 1500);
 }
 
 function showNewFolderModal() {
@@ -293,51 +391,7 @@ function showNewFolderModal() {
     openModal('newFolderModal');
 }
 
-function createFolder() {
-    const folderName = document.getElementById('folderName').value;
-    if (!folderName) { alert('Please enter a folder name'); return; }
-    
-    // Simulate folder creation by adding it to the UI
-    const fileList = document.getElementById('fileList');
-    const folderId = 'folder-' + Date.now();
-    
-    const newRow = document.createElement('div');
-    newRow.className = 'file-row folder-row';
-    newRow.ondblclick = () => navigateTo(folderId);
-    newRow.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <i class="fa-regular fa-folder" style="color: var(--primary); font-size: 18px;"></i>
-            <span style="font-weight: 500;">${folderName}</span>
-        </div>
-        <div style="color: var(--text-muted);">—</div>
-        <div style="color: var(--text-muted);">${new Date().toISOString().split('T')[0]}</div>
-        <div></div> <!-- Folders have no toggle -->
-            <div style="display: flex; gap: 4px;">
-                <button class="action-icon-btn" onclick="openEditDetailsModal('${folderName}', '${folderId}')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
-                <button class="action-icon-btn" onclick="openRenameModal('${folderName}', '${folderId}')" title="Rename"><i class="fa-solid fa-pen"></i></button>
-                <button class="action-icon-btn" onclick="openDeleteModal('${folderName}', '${folderId}')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
-            </div>
-    `;
-    
-    // Insert after the header or at the top of the list
-    const header = fileList.firstElementChild;
-    if (header && header.textContent.includes('Name')) {
-        header.after(newRow);
-    } else {
-        fileList.prepend(newRow);
-    }
-    
-    // Add selection listener to new row
-    newRow.addEventListener('click', function(e) {
-        if (e.ctrlKey || e.metaKey) { toggleSelect(this, folderId); }
-        else if (!e.target.closest('button')) {
-            document.querySelectorAll('.file-row').forEach(r => r.classList.remove('selected'));
-            selectedItems.clear(); toggleSelect(this, folderId);
-        }
-    });
-
     closeModal('newFolderModal');
-    setTimeout(() => { alert('Folder "' + folderName + '" created'); }, 300);
 }
 
 function navigateTo(path) { currentPath = path; }
@@ -363,13 +417,23 @@ function updateSelectionUI() {
     document.getElementById('deleteBtn').style.display = count > 0 ? 'inline-flex' : 'none';
 }
 
-function downloadSelected() { alert('Downloading ' + selectedItems.size + ' items'); }
+function downloadSelected() { Swal.fire('Info', 'Downloading ' + selectedItems.size + ' items', 'info'); }
 function deleteSelected() {
-    if (confirm('Delete ' + selectedItems.size + ' selected items?')) {
-        selectedItems.clear(); updateSelectionUI();
-        document.querySelectorAll('.file-row.selected').forEach(r => r.classList.remove('selected'));
-        alert('Selected items deleted');
-    }
+    Swal.fire({
+        title: 'Are you sure?',
+        text: 'Delete ' + selectedItems.size + ' selected items?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#e74c3c',
+        confirmButtonText: 'Yes, delete them!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            selectedItems.clear(); 
+            updateSelectionUI();
+            document.querySelectorAll('.file-row.selected').forEach(r => r.classList.remove('selected'));
+            Swal.fire('Deleted!', 'Selected items have been deleted.', 'success');
+        }
+    });
 }
 
 document.addEventListener('DOMContentLoaded', function() {

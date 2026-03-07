@@ -5,12 +5,11 @@ namespace App\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Laravel\Sanctum\HasApiTokens;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
 class Student extends Authenticatable implements JWTSubject
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasFactory, Notifiable;
 
     protected $fillable = [
         'name',

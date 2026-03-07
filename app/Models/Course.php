@@ -14,6 +14,8 @@ class Course extends Model
         'name',
         'slug',
         'description',
+        'icon_url',
+        'color_code',
         'thumbnail_url',
         'price',
         'status',

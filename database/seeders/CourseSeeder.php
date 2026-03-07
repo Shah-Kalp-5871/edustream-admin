@@ -22,7 +22,9 @@ class CourseSeeder extends Seeder
                 'slug' => 'class-10th-standard',
                 'description' => 'Complete preparation for 10th Board Exams.',
                 'price' => 2000.00,
-                'status' => 'active'
+                'status' => 'active',
+                'icon_url' => 'fa-solid fa-graduation-cap',
+                'color_code' => '#1565C0',
             ],
             [
                 'category_id' => $boardId,
@@ -30,7 +32,9 @@ class CourseSeeder extends Seeder
                 'slug' => 'class-12th-standard',
                 'description' => 'Complete preparation for 12th Board Exams.',
                 'price' => 2500.00,
-                'status' => 'active'
+                'status' => 'active',
+                'icon_url' => 'fa-solid fa-graduation-cap',
+                'color_code' => '#C2185B',
             ],
             [
                 'category_id' => $engId,
@@ -38,7 +42,9 @@ class CourseSeeder extends Seeder
                 'slug' => 'jee-main-foundation',
                 'description' => 'Comprehensive JEE Main Foundation course.',
                 'price' => 5000.00,
-                'status' => 'active'
+                'status' => 'active',
+                'icon_url' => 'fa-solid fa-flask',
+                'color_code' => '#2E7D32',
             ],
         ];
 

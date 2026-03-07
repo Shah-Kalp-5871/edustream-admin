@@ -13,6 +13,9 @@
 
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         /* =============================================
@@ -817,6 +820,25 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
     <script>
+        // Session Flash Messages (SweetAlert2)
+        @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: '{{ session('success') }}',
+                timer: 3000,
+                timerProgressBar: true
+            });
+        @endif
+
+        @if(session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: '{{ session('error') }}'
+            });
+        @endif
+
         // Sidebar toggle (mobile)
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebarOverlay');

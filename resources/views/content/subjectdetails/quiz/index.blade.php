@@ -80,7 +80,7 @@
             </div>
             <div style="display: flex; align-items: center;" onclick="event.stopPropagation()">
                 <label class="toggle-switch">
-                    <input type="checkbox" {{ $quiz->is_free ? 'checked' : '' }}>
+                    <input type="checkbox" {{ $quiz->is_free ? 'checked' : '' }} onchange="toggleFree('{{ $quiz->title }}', this.checked, '{{ $quiz->id }}')">
                     <span class="slider round"></span>
                 </label>
                 <span style="font-size: 11px; margin-left: 8px; color: {{ $quiz->is_free ? 'var(--primary)' : 'var(--text-muted)' }}; font-weight: 600;">
@@ -88,9 +88,9 @@
                 </span>
             </div>
             <div style="display: flex; gap: 4px;">
-                <button class="action-icon-btn" onclick="openEditDetailsModal('{{ $quiz->title }}', '{{ $quiz->id }}')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
+                <button class="action-icon-btn" onclick="openEditDetailsModal('{{ $quiz->title }}', '{{ $quiz->id }}', '{{ $quiz->description }}', '{{ $quiz->sort_order }}')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
                 <button class="action-icon-btn" onclick="window.location.href='{{ url('/content/quiz/' . $quiz->id . '/manage') }}'" title="Manage Questions"><i class="fa-solid fa-list-check"></i></button>
-                <button class="action-icon-btn" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
+                <button class="action-icon-btn" onclick="openDeleteModal('{{ $quiz->title }}', '{{ $quiz->id }}', 'quiz')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
             </div>
         </div>
         @empty
@@ -102,6 +102,12 @@
     </div>
 
     <div style="margin-top: 20px; font-size: 12px; color: var(--text-muted);">{{ $quizzes->count() }} quizzes shown</div>
+
+    <!-- Hidden form for deletion -->
+    <form id="deleteQuizForm" action="" method="POST" style="display: none;">
+        @csrf
+        @method('DELETE')
+    </form>
 </div>
 
 <!-- Add Quiz Modal -->
@@ -144,6 +150,24 @@
                 <button type="submit" class="btn btn-primary">Create & Start Building</button>
             </div>
         </form>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal-backdrop" id="deleteModal" onclick="if(event.target===this) closeModal('deleteModal')">
+    <div class="modal" style="max-width: 400px;">
+        <div class="modal-header" style="border-bottom-color: #fee2e2;">
+            <h3 style="color: #e74c3c;">Delete Quiz</h3>
+            <button class="modal-close" onclick="closeModal('deleteModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p style="margin-bottom: 8px;">Are you sure you want to delete <span id="deleteItemName" style="font-weight: 600;"></span>?</p>
+            <p style="font-size: 12px; color: var(--text-muted);">This action cannot be undone and all questions will be lost.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('deleteModal')">Cancel</button>
+            <button class="btn" style="background: #e74c3c; color: white;" onclick="confirmDelete()">Delete</button>
+        </div>
     </div>
 </div>
 
@@ -204,16 +228,76 @@ function toggleStatus(name, active, id) {
     });
 }
 
-function openEditDetailsModal(name, id) {
-    document.getElementById('editTitle').value = name;
-    document.getElementById('editDescription').value = '';
-    document.getElementById('editSortOrder').value = '0';
+function toggleFree(name, isFree, id) {
+    fetch('{{ url("/quiz/toggle-free") }}/' + id, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ is_free: isFree })
+    }).then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: `${name} is now ${isFree ? 'Free' : 'Paid'}`,
+                showConfirmButton: false,
+                timer: 2000,
+                timerProgressBar: true
+            }).then(() => location.reload());
+        } else {
+            Swal.fire('Error', 'Something went wrong', 'error');
+        }
+    });
+}
+
+function openEditDetailsModal(title, id, description = '', sortOrder = 0) {
+    document.getElementById('editTitle').value = title;
+    document.getElementById('editDescription').value = description;
+    document.getElementById('editSortOrder').value = sortOrder;
+    currentActionItem = id;
     openModal('editDetailsModal');
 }
 
 function saveDetails() {
-    closeModal('editDetailsModal');
-    alert('Details saved successfully for ' + document.getElementById('editTitle').value);
+    const title = document.getElementById('editTitle').value;
+    const description = document.getElementById('editDescription').value;
+    const sortOrder = document.getElementById('editSortOrder').value;
+
+    fetch('{{ url("/quiz") }}/' + currentActionItem + '/update', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ 
+            title: title,
+            description: description,
+            sort_order: sortOrder
+        })
+    }).then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire('Success', data.message, 'success').then(() => location.reload());
+        } else {
+            Swal.fire('Error', 'Something went wrong', 'error');
+        }
+    });
+}
+
+function openDeleteModal(name, id) {
+    document.getElementById('deleteItemName').textContent = name;
+    currentActionItem = id;
+    openModal('deleteModal');
+}
+
+function confirmDelete() {
+    const form = document.getElementById('deleteQuizForm');
+    form.action = '{{ url('/quiz') }}/' + currentActionItem;
+    form.submit();
 }
 </script>
 <script src="{{ asset('js/content-manager.js') }}"></script>

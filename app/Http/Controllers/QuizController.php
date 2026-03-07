@@ -37,6 +37,25 @@ class QuizController extends Controller
         return response()->json(['success' => true]);
     }
 
+    public function toggleFree(Request $request, $id)
+    {
+        $quiz = Quiz::findOrFail($id);
+        $quiz->update(['is_free' => $request->is_free]);
+        return response()->json(['success' => true, 'message' => 'Access status updated successfully']);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'sort_order' => 'nullable|integer',
+        ]);
+        $quiz = Quiz::findOrFail($id);
+        $quiz->update($request->only(['title', 'description', 'sort_order']));
+        return response()->json(['success' => true, 'message' => 'Quiz updated successfully']);
+    }
+
     public function manage($id)
     {
         $quiz = Quiz::with('questions.options')->findOrFail($id);
