@@ -90,7 +90,7 @@
             <i class="fas fa-ticket"></i>
         </div>
         <div>
-            <div class="es-val">3,120</div>
+            <div class="es-val">{{ number_format($totalEnrollments) }}</div>
             <div class="es-label">Total Enrollments</div>
         </div>
     </div>
@@ -99,7 +99,7 @@
             <i class="fas fa-indian-rupee-sign"></i>
         </div>
         <div>
-            <div class="es-val" style="color:#059669;">₹4,25,000</div>
+            <div class="es-val" style="color:#059669;">₹{{ number_format($totalRevenue) }}</div>
             <div class="es-label">Revenue Generated</div>
         </div>
     </div>
@@ -108,7 +108,7 @@
             <i class="fas fa-clock"></i>
         </div>
         <div>
-            <div class="es-val" style="color:#d97706;">23</div>
+            <div class="es-val" style="color:#d97706;">{{ $pendingPayments }}</div>
             <div class="es-label">Pending Payments</div>
         </div>
     </div>
@@ -167,47 +167,37 @@
                 </tr>
             </thead>
             <tbody>
-                @php
-                $enrollments = [
-                    ['id'=>'#ENR-7821','name'=>'Arjun Sharma','email'=>'arjun@example.com','course'=>'Full Stack Bundle','date'=>'Mar 01, 2026','amount'=>'₹1,999','payment'=>'UPI','status'=>'enrolled'],
-                    ['id'=>'#ENR-7820','name'=>'Priya Patel','email'=>'priya@example.com','course'=>'Advanced React','date'=>'Mar 01, 2026','amount'=>'₹2,499','payment'=>'Card','status'=>'pending'],
-                    ['id'=>'#ENR-7819','name'=>'Rahul Verma','email'=>'rahul@example.com','course'=>'Laravel Mastery','date'=>'Feb 28, 2026','amount'=>'₹1,499','payment'=>'UPI','status'=>'enrolled'],
-                    ['id'=>'#ENR-7818','name'=>'Sneha Mehta','email'=>'sneha@example.com','course'=>'Python Data Science','date'=>'Feb 27, 2026','amount'=>'₹3,499','payment'=>'Card','status'=>'cancelled'],
-                    ['id'=>'#ENR-7817','name'=>'Kunal Joshi','email'=>'kunal@example.com','course'=>'UI/UX Fundamentals','date'=>'Feb 26, 2026','amount'=>'₹999','payment'=>'UPI','status'=>'enrolled'],
-                    ['id'=>'#ENR-7816','name'=>'Ananya Singh','email'=>'ananya@example.com','course'=>'Full Stack Bundle','date'=>'Feb 25, 2026','amount'=>'₹1,999','payment'=>'Net Banking','status'=>'refunded'],
-                ];
-                @endphp
-
                 @foreach($enrollments as $e)
                 @php
-                    $badgeClass = match($e['status']) {
-                        'enrolled' => 'badge-success',
+                    $badgeClass = match($e->status) {
+                        'active' => 'badge-success',
                         'pending'  => 'badge-warning',
                         'cancelled' => 'badge-danger',
-                        'refunded' => 'badge-neutral',
+                        'expired' => 'badge-neutral',
                         default => 'badge-info',
                     };
-                    $label = ucfirst($e['status']);
+                    $label = ucfirst($e->status);
+                    $order = $e->order;
                 @endphp
                 <tr>
-                    <td style="font-weight:700; color:var(--primary);">{{ $e['id'] }}</td>
+                    <td style="font-weight:700; color:var(--primary);">#ENR-{{ $e->id }}</td>
                     <td>
                         <div class="student-cell">
-                            <img src="https://ui-avatars.com/api/?name={{ urlencode($e['name']) }}&background=1565C0&color=fff" alt="">
+                            <img src="{{ $e->student->avatar_url ?? 'https://ui-avatars.com/api/?name='.urlencode($e->student->name).'&background=1565C0&color=fff' }}" alt="">
                             <div>
-                                <span style="display:block; font-weight:600; font-size:13.5px;">{{ $e['name'] }}</span>
-                                <small style="color:var(--text-muted);">{{ $e['email'] }}</small>
+                                <span style="display:block; font-weight:600; font-size:13.5px;">{{ $e->student->name }}</span>
+                                <small style="color:var(--text-muted);">{{ $e->student->email }}</small>
                             </div>
                         </div>
                     </td>
-                    <td style="font-weight:500;">{{ $e['course'] }}</td>
-                    <td style="color:var(--text-muted);">{{ $e['date'] }}</td>
-                    <td style="font-weight:700;">{{ $e['amount'] }}</td>
+                    <td style="font-weight:500;">{{ $e->course->title ?? $e->subject->name }}</td>
+                    <td style="color:var(--text-muted);">{{ $e->created_at->format('M d, Y') }}</td>
+                    <td style="font-weight:700;">₹{{ number_format($order->total_amount ?? 0) }}</td>
                     <td>
-                        <span class="badge badge-neutral">{{ $e['payment'] }}</span>
+                        <span class="badge badge-neutral">{{ $order->payment_method ?? 'N/A' }}</span>
                     </td>
                     <td>
-                        <span class="badge {{ $badgeClass }}">{{ $label }}</span>
+                        <span class="badge {{ $badgeClass }}">{{ $label === 'Active' ? 'Enrolled' : $label }}</span>
                     </td>
                     <td style="text-align:right;">
                         <button class="btn btn-ghost btn-sm">
@@ -222,15 +212,9 @@
 
     <!-- Pagination -->
     <div class="flex-between" style="padding:14px 20px; border-top: 1px solid var(--border);">
-        <p style="font-size:13px; color:var(--text-muted);">Showing 1–6 of 3,120 enrollments</p>
+        <p style="font-size:13px; color:var(--text-muted);">Showing {{ $enrollments->firstItem() ?? 0 }}–{{ $enrollments->lastItem() ?? 0 }} of {{ $enrollments->total() }} enrollments</p>
         <div style="display:flex; gap:6px;">
-            <button class="btn btn-ghost btn-sm"><i class="fas fa-chevron-left"></i></button>
-            <button class="btn btn-primary btn-sm">1</button>
-            <button class="btn btn-ghost btn-sm">2</button>
-            <button class="btn btn-ghost btn-sm">3</button>
-            <span style="display:flex;align-items:center;padding:0 4px;color:var(--text-muted);">…</span>
-            <button class="btn btn-ghost btn-sm">312</button>
-            <button class="btn btn-ghost btn-sm"><i class="fas fa-chevron-right"></i></button>
+            {{ $enrollments->links('pagination::bootstrap-4') }}
         </div>
     </div>
 </div>

@@ -26,12 +26,18 @@ Route::get('/dashboard', [DashboardController::class, 'index']);
 // Category Routes
 Route::get('/content/categories', [CategoryController::class, 'index']);
 Route::get('/content/categories/create', [CategoryController::class, 'create']);
+Route::post('/content/categories', [CategoryController::class, 'store']);
 Route::get('/content/categories/{id}/edit', [CategoryController::class, 'edit']);
+Route::put('/content/categories/{id}', [CategoryController::class, 'update']);
+Route::delete('/content/categories/{id}', [CategoryController::class, 'destroy']);
 
 // Content Routes
 Route::get('/content', [ContentController::class, 'index']);
 Route::get('/content/course/create', [ContentController::class, 'create']);
+Route::post('/content/course', [ContentController::class, 'store']);
 Route::get('/content/course/{id}/edit', [ContentController::class, 'edit']);
+Route::put('/content/course/{id}', [ContentController::class, 'update']);
+Route::delete('/content/course/{id}', [ContentController::class, 'destroy']);
 Route::get('/content/course/{id}', [ContentController::class, 'courseSubjects']);
 // Subject Routes
 Route::get('/content/course/{id}/subject/create', [ContentController::class, 'createSubject']);
@@ -41,19 +47,42 @@ Route::put('/content/subject/{id}', [ContentController::class, 'updateSubject'])
 Route::delete('/content/subject/{id}', [ContentController::class, 'destroySubject']);
 Route::get('/content/subject/{id}', [ContentController::class, 'subjectContent']);
 Route::get('/content/notes/{id}', [ContentController::class, 'manageNotes']);
+Route::post('/content/notes/{id}/folder', [ContentController::class, 'storeNoteFolder']);
+Route::delete('/content/notes/folder/{id}', [ContentController::class, 'deleteNoteFolder']);
+Route::post('/content/notes/{id}/upload', [ContentController::class, 'storeNote']);
+Route::delete('/content/notes/file/{id}', [ContentController::class, 'deleteNote']);
+
 Route::get('/content/videos/{id}', [ContentController::class, 'manageVideos']);
+Route::post('/content/videos/{id}/folder', [ContentController::class, 'storeVideoFolder']);
+Route::delete('/content/videos/folder/{id}', [ContentController::class, 'deleteVideoFolder']);
+Route::post('/content/videos/{id}/upload', [ContentController::class, 'storeVideo']);
+Route::delete('/content/videos/file/{id}', [ContentController::class, 'deleteVideo']);
+
+Route::get('/content/qa-papers/{id}', [ContentController::class, 'manageQAPapers']);
+Route::post('/content/qa-papers/{id}/folder', [ContentController::class, 'storeQAPaperFolder']);
+Route::delete('/content/qa-papers/folder/{id}', [ContentController::class, 'deleteQAPaperFolder']);
+Route::post('/content/qa-papers/{id}/upload', [ContentController::class, 'storeQAPaper']);
+Route::delete('/content/qa-papers/file/{id}', [ContentController::class, 'deleteQAPaper']);
+
 Route::get('/content/quiz/{id}', [ContentController::class, 'manageQuiz']);
 Route::get('/content/quiz/{id}/builder', [ContentController::class, 'quizBuilder']);
-Route::get('/content/qa-papers/{id}', [ContentController::class, 'manageQAPapers']);
+
 
 // Quiz Routes
-Route::get('/quizzes', [QuizController::class, 'index']);
-Route::get('/quizzes/create', [QuizController::class, 'create']);
-Route::get('/quizzes/{id}/edit', [QuizController::class, 'edit']);
-Route::get('/quizzes/{id}/questions', [QuizController::class, 'questions']);
+Route::get('/content/quiz/{id}', [ContentController::class, 'manageQuiz']);
+Route::post('/content/quiz/{id}/store', [QuizController::class, 'store']);
+Route::get('/content/quiz/{id}/manage', [QuizController::class, 'manage']);
+Route::post('/quiz/toggle-status/{id}', [QuizController::class, 'toggleStatus']);
+Route::delete('/quiz/{id}', [QuizController::class, 'destroy']);
+Route::post('/quiz/{id}/question/store', [QuizController::class, 'storeQuestion']);
+Route::post('/quiz/question/{id}/update', [QuizController::class, 'updateQuestion']);
+Route::delete('/quiz/question/{id}', [QuizController::class, 'deleteQuestion']);
+Route::post('/quiz/question/{id}/option/store', [QuizController::class, 'storeOption']);
+Route::delete('/quiz/option/{id}', [QuizController::class, 'deleteOption']);
 
 // User Routes
 Route::get('/users', [UserController::class, 'index']);
+Route::post('/users/{id}/toggle-status', [UserController::class, 'toggleStatus']);
 Route::get('/users/{id}', [UserController::class, 'show']);
 Route::get('/users/{id}/edit', [UserController::class, 'edit']);
 

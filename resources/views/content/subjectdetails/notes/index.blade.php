@@ -7,13 +7,20 @@
 @endsection
 
 @section('actions')
+    <form id="uploadForm" action="{{ url('/content/notes/' . $id . '/upload') }}" method="POST" enctype="multipart/form-data" style="display: none;">
+        @csrf
+        <input type="hidden" name="folder_id" value="{{ $currentFolder->id ?? '' }}">
+        <input type="file" id="fileUpload" name="files[]" multiple accept=".pdf,.doc,.docx,.txt" onchange="this.form.submit()">
+    </form>
+@endsection
+
+@section('actions')
     <button class="action-btn" onclick="document.getElementById('fileUpload').click()">
         <i class="fa-solid fa-cloud-arrow-up"></i> Upload Notes
     </button>
     <button class="action-btn" onclick="showNewFolderModal()">
         <i class="fa-solid fa-folder-plus"></i> New Folder
     </button>
-    <input type="file" id="fileUpload" multiple accept=".pdf,.doc,.docx,.txt" style="display: none;" onchange="uploadFiles(this.files)">
 @endsection
 
 @section('content')
@@ -22,48 +29,44 @@
     <!-- Simple Header -->
     <div style="margin-bottom: 24px;">
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-            <a href="javascript:history.back()" style="color: var(--text-muted); text-decoration: none; font-size: 13px;">
-                <i class="fa-solid fa-arrow-left"></i> Back
+            <a href="{{ url('/content/subject/' . $id) }}" style="color: var(--text-muted); text-decoration: none; font-size: 13px;">
+                <i class="fa-solid fa-arrow-left"></i> Back to Subject
             </a>
             <span style="color: var(--border-strong);">|</span>
             <span style="color: var(--text-muted); font-size: 13px;">Content Manager</span>
         </div>
         <h1 class="page-title" style="margin-bottom: 4px;">
             <i class="fa-regular fa-file-lines" style="color: var(--primary); margin-right: 12px;"></i>
-            Notes
+            Notes: {{ $subjectName }}
         </h1>
-        <p class="page-subtitle">Manage all PDF notes, documents, and study materials</p>
+        <p class="page-subtitle">{{ isset($currentFolder) ? 'Folder: ' . $currentFolder->name : 'Root Directory' }}</p>
     </div>
 
     <!-- Action Bar -->
     <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 16px 20px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
         <div style="display: flex; align-items: center; gap: 12px;">
-            <button class="action-btn" onclick="document.getElementById('fileUpload2').click()">
+            <button class="action-btn" onclick="document.getElementById('fileUpload').click()">
                 <i class="fa-solid fa-cloud-arrow-up"></i> Upload Notes
             </button>
             <button class="action-btn" onclick="showNewFolderModal()">
                 <i class="fa-solid fa-folder-plus"></i> New Folder
             </button>
-            <input type="file" id="fileUpload2" multiple accept=".pdf,.doc,.docx,.txt" style="display: none;" onchange="uploadFiles(this.files)">
         </div>
         <div style="display: flex; align-items: center; gap: 16px;">
             <div style="display: flex; align-items: center; gap: 8px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 30px; padding: 6px 16px;">
                 <i class="fa-solid fa-magnifying-glass" style="color: var(--text-muted); font-size: 13px;"></i>
                 <input type="text" id="searchInput" placeholder="Search notes..." style="border: none; background: transparent; outline: none; font-size: 13px; width: 200px;" onkeyup="searchNotes(this.value)">
             </div>
-            <span class="storage-info">
-                <i class="fa-regular fa-hard-drive"></i> 45 MB / 500 MB used
-            </span>
         </div>
     </div>
 
     <!-- Breadcrumb Navigation -->
     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px; padding: 8px 0; border-bottom: 1px solid var(--border);">
-        <span class="breadcrumb-item active" onclick="navigateTo('root')">Root Folder</span>
-        <span class="breadcrumb-sep"><i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i></span>
-        <span class="breadcrumb-item" onclick="navigateTo('chapter1')">Chapter 1</span>
-        <span class="breadcrumb-sep"><i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i></span>
-        <span class="breadcrumb-item" onclick="navigateTo('chapter1/algebra')">Algebra</span>
+        <span class="breadcrumb-item {{ !isset($currentFolder) ? 'active' : '' }}" onclick="window.location.href='{{ url('/content/notes/' . $id) }}'">Root Folder</span>
+        @foreach($breadcrumbs as $bc)
+            <span class="breadcrumb-sep"><i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i></span>
+            <span class="breadcrumb-item {{ $loop->last ? 'active' : '' }}" onclick="window.location.href='{{ url('/content/notes/' . $id . '?folder_id=' . $bc['id']) }}'">{{ $bc['name'] }}</span>
+        @endforeach
     </div>
 
     <!-- Files List -->
@@ -77,125 +80,53 @@
             <div>Actions</div>
         </div>
 
+        @if($folders->isEmpty() && $files->isEmpty())
+            <div style="padding: 40px; text-align: center; color: var(--text-muted);">
+                <i class="fa-regular fa-folder-open" style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;"></i>
+                <p>This folder is empty</p>
+            </div>
+        @endif
+
         <!-- Folders -->
-        <div class="file-row folder-row" ondblclick="navigateTo('chapter2')">
+        @foreach($folders as $folder)
+        <div class="file-row folder-row" onclick="window.location.href='{{ url('/content/notes/' . $id . '?folder_id=' . $folder->id) }}'">
             <div style="display: flex; align-items: center; gap: 12px;">
                 <i class="fa-regular fa-folder" style="color: #1565C0; font-size: 18px;"></i>
-                <span style="font-weight: 500;">Chapter 2 - Quadratic Equations</span>
+                <span style="font-weight: 500;">{{ $folder->name }}</span>
             </div>
             <div style="color: var(--text-muted);">—</div>
-            <div style="color: var(--text-muted);">2026-03-04</div>
-            <div></div> <!-- Folders have no toggle -->
+            <div style="color: var(--text-muted);">{{ $folder->updated_at->format('Y-m-d') }}</div>
+            <div></div>
             <div style="display: flex; gap: 4px;">
-                <button class="action-icon-btn" onclick="openEditDetailsModal('Chapter 2 - Quadratic Equations', 'chapter2')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
-                <button class="action-icon-btn" onclick="openRenameModal('Chapter 2 - Quadratic Equations', 'chapter2')" title="Rename"><i class="fa-solid fa-pen"></i></button>
-                <button class="action-icon-btn" onclick="openDeleteModal('Chapter 2 - Quadratic Equations', 'chapter2')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
+                <button class="action-icon-btn" onclick="event.stopPropagation(); openEditDetailsModal('{{ $folder->name }}', '{{ $folder->id }}')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
+                <button class="action-icon-btn" onclick="event.stopPropagation(); openRenameModal('{{ $folder->name }}', '{{ $folder->id }}')" title="Rename"><i class="fa-solid fa-pen"></i></button>
+                <button class="action-icon-btn" onclick="event.stopPropagation(); openDeleteModal('{{ $folder->name }}', '{{ $folder->id }}')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
             </div>
         </div>
+        @endforeach
 
-        <div class="file-row folder-row" ondblclick="navigateTo('chapter3')">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <i class="fa-regular fa-folder" style="color: #1565C0; font-size: 18px;"></i>
-                <span style="font-weight: 500;">Chapter 3 - Polynomials</span>
-            </div>
-            <div style="color: var(--text-muted);">—</div>
-            <div style="color: var(--text-muted);">2026-03-03</div>
-            <div></div> <!-- Folders have no toggle -->
-            <div style="display: flex; gap: 4px;">
-                <button class="action-icon-btn" onclick="openEditDetailsModal('Chapter 3 - Polynomials', 'chapter3')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
-                <button class="action-icon-btn" onclick="openRenameModal('Chapter 3 - Polynomials', 'chapter3')" title="Rename"><i class="fa-solid fa-pen"></i></button>
-                <button class="action-icon-btn" onclick="openDeleteModal('Chapter 3 - Polynomials', 'chapter3')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
-            </div>
-        </div>
-
-        <!-- PDF Files -->
-        <div class="file-row" ondblclick="previewFile('algebra_basics.pdf')">
+        <!-- Files -->
+        @foreach($files as $file)
+        <div class="file-row" ondblclick="window.open('{{ asset('storage/' . $file->file_path) }}')">
             <div style="display: flex; align-items: center; gap: 12px;">
                 <i class="fa-regular fa-file-pdf" style="color: #e74c3c; font-size: 18px;"></i>
-                <span>Algebra_Basics_Chapter_1.pdf</span>
+                <span>{{ $file->name }}</span>
             </div>
-            <div style="color: var(--text-muted);">2.4 MB</div>
-            <div style="color: var(--text-muted);">2026-03-04</div>
+            <div style="color: var(--text-muted);">{{ round(Storage::size($file->file_path) / 1024 / 1024, 2) }} MB</div>
+            <div style="color: var(--text-muted);">{{ $file->updated_at->format('Y-m-d') }}</div>
             <div style="display: flex; align-items: center;" onclick="event.stopPropagation()">
-                <label class="toggle-switch" style="position: relative; display: inline-block; width: 36px; height: 20px; margin: 0;">
-                    <input type="checkbox" style="opacity: 0; width: 0; height: 0; cursor: pointer;" onchange="this.parentElement.nextElementSibling.textContent = this.checked ? 'Free' : 'Paid'; this.parentElement.nextElementSibling.style.color = this.checked ? 'var(--primary)' : 'var(--text-muted)';">
-                    <span class="slider round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; transition: .4s; border-radius: 34px;"></span>
-                </label>
-                <span style="font-size: 11px; margin-left: 8px; color: var(--text-muted); font-weight: 600;">Paid</span>
+                <div class="status-badge {{ $file->is_free ? 'status-active' : 'status-pending' }}" style="font-size: 10px;">
+                    {{ $file->is_free ? 'Free' : 'Paid' }}
+                </div>
             </div>
             <div style="display: flex; gap: 4px;">
-                <button class="action-icon-btn" onclick="openEditDetailsModal('Algebra_Basics_Chapter_1.pdf', 'file1')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
-                <button class="action-icon-btn" onclick="openRenameModal('Algebra_Basics_Chapter_1.pdf', 'file1')" title="Rename"><i class="fa-solid fa-pen"></i></button>
-                <button class="action-icon-btn" onclick="downloadFile('file1')" title="Download"><i class="fa-solid fa-download"></i></button>
-                <button class="action-icon-btn" onclick="openDeleteModal('Algebra_Basics_Chapter_1.pdf', 'file1')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
+                <button class="action-icon-btn" onclick="event.stopPropagation(); openEditDetailsModal('{{ $file->name }}', '{{ $file->id }}')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
+                <button class="action-icon-btn" onclick="event.stopPropagation(); openRenameModal('{{ $file->name }}', '{{ $file->id }}')" title="Rename"><i class="fa-solid fa-pen"></i></button>
+                <button class="action-icon-btn" onclick="event.stopPropagation(); window.open('{{ asset('storage/' . $file->file_path) }}')" title="Download"><i class="fa-solid fa-download"></i></button>
+                <button class="action-icon-btn" onclick="event.stopPropagation(); openDeleteModal('{{ $file->name }}', '{{ $file->id }}')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
             </div>
         </div>
-
-        <div class="file-row" ondblclick="previewFile('linear_equations.pdf')">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <i class="fa-regular fa-file-pdf" style="color: #e74c3c; font-size: 18px;"></i>
-                <span>Linear_Equations_Complete.pdf</span>
-            </div>
-            <div style="color: var(--text-muted);">1.8 MB</div>
-            <div style="color: var(--text-muted);">2026-03-03</div>
-            <div style="display: flex; align-items: center;" onclick="event.stopPropagation()">
-                <label class="toggle-switch" style="position: relative; display: inline-block; width: 36px; height: 20px; margin: 0;">
-                    <input type="checkbox" style="opacity: 0; width: 0; height: 0; cursor: pointer;" onchange="this.parentElement.nextElementSibling.textContent = this.checked ? 'Free' : 'Paid'; this.parentElement.nextElementSibling.style.color = this.checked ? 'var(--primary)' : 'var(--text-muted)';">
-                    <span class="slider round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; transition: .4s; border-radius: 34px;"></span>
-                </label>
-                <span style="font-size: 11px; margin-left: 8px; color: var(--text-muted); font-weight: 600;">Paid</span>
-            </div>
-            <div style="display: flex; gap: 4px;">
-                <button class="action-icon-btn" onclick="openEditDetailsModal('Linear_Equations_Complete.pdf', 'file2')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
-                <button class="action-icon-btn" onclick="openRenameModal('Linear_Equations_Complete.pdf', 'file2')" title="Rename"><i class="fa-solid fa-pen"></i></button>
-                <button class="action-icon-btn" onclick="downloadFile('file2')" title="Download"><i class="fa-solid fa-download"></i></button>
-                <button class="action-icon-btn" onclick="openDeleteModal('Linear_Equations_Complete.pdf', 'file2')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
-            </div>
-        </div>
-
-        <div class="file-row" ondblclick="previewFile('quadratic_formula.docx')">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <i class="fa-regular fa-file-word" style="color: #2b5797; font-size: 18px;"></i>
-                <span>Quadratic_Formula_Notes.docx</span>
-            </div>
-            <div style="color: var(--text-muted);">856 KB</div>
-            <div style="color: var(--text-muted);">2026-03-02</div>
-            <div style="display: flex; align-items: center;" onclick="event.stopPropagation()">
-                <label class="toggle-switch" style="position: relative; display: inline-block; width: 36px; height: 20px; margin: 0;">
-                    <input type="checkbox" style="opacity: 0; width: 0; height: 0; cursor: pointer;" onchange="this.parentElement.nextElementSibling.textContent = this.checked ? 'Free' : 'Paid'; this.parentElement.nextElementSibling.style.color = this.checked ? 'var(--primary)' : 'var(--text-muted)';">
-                    <span class="slider round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; transition: .4s; border-radius: 34px;"></span>
-                </label>
-                <span style="font-size: 11px; margin-left: 8px; color: var(--text-muted); font-weight: 600;">Paid</span>
-            </div>
-            <div style="display: flex; gap: 4px;">
-                <button class="action-icon-btn" onclick="openEditDetailsModal('Quadratic_Formula_Notes.docx', 'file3')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
-                <button class="action-icon-btn" onclick="openRenameModal('Quadratic_Formula_Notes.docx', 'file3')" title="Rename"><i class="fa-solid fa-pen"></i></button>
-                <button class="action-icon-btn" onclick="downloadFile('file3')" title="Download"><i class="fa-solid fa-download"></i></button>
-                <button class="action-icon-btn" onclick="openDeleteModal('Quadratic_Formula_Notes.docx', 'file3')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
-            </div>
-        </div>
-
-        <div class="file-row" ondblclick="previewFile('practice_problems.pdf')">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <i class="fa-regular fa-file-pdf" style="color: #e74c3c; font-size: 18px;"></i>
-                <span>Practice_Problems_Set_1.pdf</span>
-            </div>
-            <div style="color: var(--text-muted);">1.2 MB</div>
-            <div style="color: var(--text-muted);">2026-03-01</div>
-            <div style="display: flex; align-items: center;" onclick="event.stopPropagation()">
-                <label class="toggle-switch" style="position: relative; display: inline-block; width: 36px; height: 20px; margin: 0;">
-                    <input type="checkbox" style="opacity: 0; width: 0; height: 0; cursor: pointer;" onchange="this.parentElement.nextElementSibling.textContent = this.checked ? 'Free' : 'Paid'; this.parentElement.nextElementSibling.style.color = this.checked ? 'var(--primary)' : 'var(--text-muted)';">
-                    <span class="slider round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; transition: .4s; border-radius: 34px;"></span>
-                </label>
-                <span style="font-size: 11px; margin-left: 8px; color: var(--text-muted); font-weight: 600;">Paid</span>
-            </div>
-            <div style="display: flex; gap: 4px;">
-                <button class="action-icon-btn" onclick="openEditDetailsModal('Practice_Problems_Set_1.pdf', 'file4')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
-                <button class="action-icon-btn" onclick="openRenameModal('Practice_Problems_Set_1.pdf', 'file4')" title="Rename"><i class="fa-solid fa-pen"></i></button>
-                <button class="action-icon-btn" onclick="downloadFile('file4')" title="Download"><i class="fa-solid fa-download"></i></button>
-                <button class="action-icon-btn" onclick="openDeleteModal('Practice_Problems_Set_1.pdf', 'file4')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
-            </div>
-        </div>
+        @endforeach
     </div>
 
     <!-- Bottom Status Bar -->
@@ -217,20 +148,24 @@
 <!-- New Folder Modal -->
 <div class="modal-backdrop" id="newFolderModal" onclick="if(event.target===this) closeModal('newFolderModal')">
     <div class="modal" style="max-width: 400px;">
-        <div class="modal-header">
-            <h3>Create New Folder</h3>
-            <button class="modal-close" onclick="closeModal('newFolderModal')">&times;</button>
-        </div>
-        <div class="modal-body">
-            <div style="margin-bottom: 20px;">
-                <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Folder Name</label>
-                <input type="text" class="form-control" id="folderName" placeholder="e.g., Chapter 4" autofocus>
+        <form action="{{ url('/content/notes/' . $id . '/folder') }}" method="POST">
+            @csrf
+            <input type="hidden" name="parent_id" value="{{ $currentFolder->id ?? '' }}">
+            <div class="modal-header">
+                <h3>Create New Folder</h3>
+                <button type="button" class="modal-close" onclick="closeModal('newFolderModal')">&times;</button>
             </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-secondary" onclick="closeModal('newFolderModal')">Cancel</button>
-            <button class="btn btn-primary" onclick="createFolder()">Create Folder</button>
-        </div>
+            <div class="modal-body">
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Folder Name</label>
+                    <input type="text" name="name" class="form-control" id="folderName" placeholder="e.g., Chapter 4" required autofocus>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('newFolderModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Create Folder</button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -254,6 +189,17 @@
     </div>
 </div>
 
+    <!-- Hidden forms for deletion -->
+    <form id="deleteFolderForm" action="" method="POST" style="display: none;">
+        @csrf
+        @method('DELETE')
+    </form>
+    <form id="deleteFileForm" action="" method="POST" style="display: none;">
+        @csrf
+        @method('DELETE')
+    </form>
+</div>
+
 <!-- Delete Confirmation Modal -->
 <div class="modal-backdrop" id="deleteModal" onclick="if(event.target===this) closeModal('deleteModal')">
     <div class="modal" style="max-width: 400px;">
@@ -262,7 +208,7 @@
             <button class="modal-close" onclick="closeModal('deleteModal')">&times;</button>
         </div>
         <div class="modal-body">
-            <p style="margin-bottom: 8px;">Are you sure you want to delete <span id="deleteItemName" style="font-weight: 600;">Algebra_Basics.pdf</span>?</p>
+            <p style="margin-bottom: 8px;">Are you sure you want to delete <span id="deleteItemName" style="font-weight: 600;"></span>?</p>
             <p style="font-size: 12px; color: var(--text-muted);">This action cannot be undone.</p>
         </div>
         <div class="modal-footer">
@@ -316,6 +262,26 @@
 let currentPath = 'root';
 let selectedItems = new Set();
 let currentActionItem = null;
+let currentActionType = null; // 'folder' or 'file'
+
+function openDeleteModal(name, id, type) {
+    document.getElementById('deleteItemName').textContent = name;
+    currentActionItem = id;
+    currentActionType = type;
+    openModal('deleteModal');
+}
+
+function confirmDelete() {
+    if (currentActionType === 'folder') {
+        const form = document.getElementById('deleteFolderForm');
+        form.action = '{{ url('/content/notes/folder') }}/' + currentActionItem;
+        form.submit();
+    } else {
+        const form = document.getElementById('deleteFileForm');
+        form.action = '{{ url('/content/notes/file') }}/' + currentActionItem;
+        form.submit();
+    }
+}
 
 function uploadFiles(files) {
     if (!files.length) return;

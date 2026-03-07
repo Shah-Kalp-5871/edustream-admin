@@ -144,7 +144,7 @@
 @endsection
 
 @section('actions')
-    <a href="{{ url('/content/course/' . $course['id']) }}" class="quick-action-btn" style="text-decoration: none;">
+    <a href="{{ url('/content/course/' . $course->id) }}" class="quick-action-btn" style="text-decoration: none;">
         <i class="fa-solid fa-arrow-left"></i> Back to Subjects
     </a>
 @endsection
@@ -152,7 +152,7 @@
 @section('content')
 <div class="form-container animate-fade-up">
     <div class="card">
-        <form action="{{ url('/content/course/' . $course['id'] . '/subject') }}" method="POST">
+        <form action="{{ url('/content/course/' . $course->id . '/subject') }}" method="POST">
             @csrf
             <div class="form-grid">
                 <div class="form-group" style="grid-column: span 2;">
@@ -182,7 +182,7 @@
                             </div>
                         @endforeach
                     </div>
-                    <input type="hidden" name="icon" id="selectedIcon" value="fa-solid fa-calculator">
+                    <input type="hidden" name="icon_url" id="selectedIcon" value="fa-solid fa-calculator">
                 </div>
 
                 <div class="form-group" style="grid-column: span 2;">
@@ -191,15 +191,14 @@
                         @php
                             $presetColors = [
                                 '#1565C0', '#C2185B', '#7B1FA2', '#2E7D32',
-                                '#E64A19', '#4A148C', '#B71C1C', '#00838F',
-                                '#283593', '#F9A825'
+                                '#E64A19', '#4A148C', '#B71C1C'
                             ];
                         @endphp
                         @foreach($presetColors as $index => $color)
                             <div class="color-opt {{ $index == 0 ? 'selected' : '' }}" data-color="{{ $color }}" style="background: {{ $color }};"></div>
                         @endforeach
                     </div>
-                    <input type="hidden" name="color" id="selectedColor" value="#1565C0">
+                    <input type="hidden" name="color_code" id="selectedColor" value="#1565C0">
                 </div>
 
                 <div class="form-group">
@@ -210,15 +209,15 @@
                 <div class="form-group">
                     <label class="form-label">Status</label>
                     <select name="status" class="form-control">
-                        <option value="Active">Active</option>
-                        <option value="Inactive">Inactive</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
                     </select>
                 </div>
             </div>
 
             <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 32px; border-top: 1px solid var(--border); padding-top: 24px;">
-                <a href="{{ url('/content/course/' . $course['id']) }}" class="btn-submit" style="background: var(--surface-2); color: var(--text); text-decoration: none; display: flex; align-items: center;">Cancel</a>
-                <button type="submit" class="btn-submit">Create Subject</button>
+                <a href="{{ url('/content/course/' . $course->id) }}" class="btn-submit" style="background: var(--surface-2); color: var(--text); text-decoration: none; display: flex; align-items: center; justify-content: center; height: 44px; margin-top: 0;">Cancel</a>
+                <button type="submit" class="btn-submit" style="margin-top: 0;">Create Subject</button>
             </div>
         </form>
     </div>

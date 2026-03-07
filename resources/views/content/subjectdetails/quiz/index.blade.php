@@ -10,8 +10,7 @@
 @endsection
 
 @section('actions')
-
-    <button class="action-btn" style="background: var(--primary); color: white; border-color: var(--primary);" onclick="window.location.href='{{ url('/content/quiz/' . $id . '/builder') }}'">
+    <button class="action-btn" style="background: var(--primary); color: white; border-color: var(--primary);" onclick="openModal('addQuizModal')">
         <i class="fa-solid fa-plus"></i> Create New Quiz
     </button>
 @endsection
@@ -22,46 +21,31 @@
     <!-- Header -->
     <div style="margin-bottom: 24px;">
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-            <a href="javascript:history.back()" style="color: var(--text-muted); text-decoration: none; font-size: 13px;">
-                <i class="fa-solid fa-arrow-left"></i> Back
+            <a href="{{ url('/content/subject/' . $id) }}" style="color: var(--text-muted); text-decoration: none; font-size: 13px;">
+                <i class="fa-solid fa-arrow-left"></i> Back to Subject
             </a>
             <span style="color: var(--border-strong);">|</span>
             <span style="color: var(--text-muted); font-size: 13px;">Content Manager</span>
         </div>
         <h1 class="page-title" style="margin-bottom: 4px;">
             <i class="fa-regular fa-circle-question" style="color: #2E7D32; margin-right: 12px;"></i>
-            Quiz - {{ $subjectName ?? 'Subject' }}
+            Quizzes: {{ $subjectName }}
         </h1>
         <p class="page-subtitle">Manage online quizzes, MCQs and question banks</p>
-    </div>
-
-    <!-- Action Bar -->
-    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 16px 20px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <button class="action-btn" style="background: var(--primary); color: white; border-color: var(--primary);" onclick="window.location.href='{{ url('/content/quiz/' . $id . '/builder') }}'">
-                <i class="fa-solid fa-plus"></i> Create New Quiz
-            </button>
-        </div>
-        <div>
-            <div style="display: flex; align-items: center; gap: 8px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 30px; padding: 6px 16px;">
-                <i class="fa-solid fa-magnifying-glass" style="color: var(--text-muted); font-size: 13px;"></i>
-                <input type="text" placeholder="Search quizzes..." style="border: none; background: transparent; outline: none; font-size: 13px; width: 200px;" onkeyup="searchRows(this.value)">
-            </div>
-        </div>
     </div>
 
     <!-- Quick Stats -->
     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px;">
         <div class="card" style="padding: 16px; text-align: center;">
-            <div style="font-size: 28px; font-weight: 700; color: #2E7D32;">15</div>
+            <div style="font-size: 28px; font-weight: 700; color: #2E7D32;">{{ $quizzes->count() }}</div>
             <div style="font-size: 12px; color: var(--text-muted);">Total Quizzes</div>
         </div>
         <div class="card" style="padding: 16px; text-align: center;">
-            <div style="font-size: 28px; font-weight: 700; color: #1565C0;">248</div>
+            <div style="font-size: 28px; font-weight: 700; color: #1565C0;">{{ $quizzes->sum(fn($q) => $q->questions->count()) }}</div>
             <div style="font-size: 12px; color: var(--text-muted);">Total Questions</div>
         </div>
         <div class="card" style="padding: 16px; text-align: center;">
-            <div style="font-size: 28px; font-weight: 700; color: #E65100;">1,284</div>
+            <div style="font-size: 28px; font-weight: 700; color: #E65100;">--</div>
             <div style="font-size: 12px; color: var(--text-muted);">Attempts</div>
         </div>
     </div>
@@ -76,99 +60,91 @@
             <div>Actions</div>
         </div>
 
+        @forelse($quizzes as $quiz)
         <div class="file-row quiz-row">
             <div style="display: flex; align-items: center; gap: 12px;">
                 <div style="width: 36px; height: 36px; border-radius: 10px; background: #E8F5E9; color: #2E7D32; display: flex; align-items: center; justify-content: center; font-size: 16px;">
                     <i class="fa-regular fa-circle-question"></i>
                 </div>
                 <div>
-                    <div style="font-weight: 500;">Algebra Quiz - Chapter 1</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">MCQ • Added 2 days ago</div>
+                    <div style="font-weight: 500;">{{ $quiz->title }}</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">MCQ • Added {{ $quiz->created_at->diffForHumans() }}</div>
                 </div>
             </div>
-            <div style="color: var(--text-muted);">25 Qs</div>
+            <div style="color: var(--text-muted);">{{ $quiz->questions->count() }} Qs</div>
             <div>
                 <label class="switch">
-                    <input type="checkbox" checked onchange="toggleStatus('Algebra Quiz - Chapter 1', this.checked)">
+                    <input type="checkbox" {{ $quiz->status == 'active' ? 'checked' : '' }} onchange="toggleStatus('{{ $quiz->title }}', this.checked, '{{ $quiz->id }}')">
                     <span class="slider"></span>
                 </label>
             </div>
             <div style="display: flex; align-items: center;" onclick="event.stopPropagation()">
-                <label class="toggle-switch" style="position: relative; display: inline-block; width: 36px; height: 20px; margin: 0;">
-                    <input type="checkbox" style="opacity: 0; width: 0; height: 0; cursor: pointer;" onchange="this.parentElement.nextElementSibling.textContent = this.checked ? 'Free' : 'Paid'; this.parentElement.nextElementSibling.style.color = this.checked ? 'var(--primary)' : 'var(--text-muted)';">
-                    <span class="slider round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px;"></span>
+                <label class="toggle-switch">
+                    <input type="checkbox" {{ $quiz->is_free ? 'checked' : '' }}>
+                    <span class="slider round"></span>
                 </label>
-                <span style="font-size: 11px; margin-left: 8px; color: var(--text-muted); font-weight: 600;">Paid</span>
+                <span style="font-size: 11px; margin-left: 8px; color: {{ $quiz->is_free ? 'var(--primary)' : 'var(--text-muted)' }}; font-weight: 600;">
+                    {{ $quiz->is_free ? 'Free' : 'Paid' }}
+                </span>
             </div>
             <div style="display: flex; gap: 4px;">
-                <button class="action-icon-btn" onclick="openEditDetailsModal('Algebra Quiz - Chapter 1', 'q1')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
-                <button class="action-icon-btn" onclick="window.location.href='{{ url('/content/quiz/' . $id . '/builder') }}'" title="Manage Questions"><i class="fa-solid fa-list-check"></i></button>
+                <button class="action-icon-btn" onclick="openEditDetailsModal('{{ $quiz->title }}', '{{ $quiz->id }}')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
+                <button class="action-icon-btn" onclick="window.location.href='{{ url('/content/quiz/' . $quiz->id . '/manage') }}'" title="Manage Questions"><i class="fa-solid fa-list-check"></i></button>
+                <button class="action-icon-btn" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
             </div>
         </div>
-
-        <div class="file-row quiz-row">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <div style="width: 36px; height: 36px; border-radius: 10px; background: #E8F5E9; color: #2E7D32; display: flex; align-items: center; justify-content: center; font-size: 16px;">
-                    <i class="fa-regular fa-circle-question"></i>
-                </div>
-                <div>
-                    <div style="font-weight: 500;">Geometry Quiz - Shapes</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">MCQ + Fill In • Added 3 days ago</div>
-                </div>
+        @empty
+            <div style="padding: 40px; text-align: center; color: var(--text-muted);">
+                <i class="fa-regular fa-face-meh" style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;"></i>
+                <p>No quizzes found for this subject.</p>
             </div>
-            <div style="color: var(--text-muted);">20 Qs</div>
-            <div>
-                <label class="switch">
-                    <input type="checkbox" checked onchange="toggleStatus('Geometry Quiz - Shapes', this.checked)">
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div style="display: flex; align-items: center;" onclick="event.stopPropagation()">
-                <label class="toggle-switch" style="position: relative; display: inline-block; width: 36px; height: 20px; margin: 0;">
-                    <input type="checkbox" style="opacity: 0; width: 0; height: 0; cursor: pointer;" onchange="this.parentElement.nextElementSibling.textContent = this.checked ? 'Free' : 'Paid'; this.parentElement.nextElementSibling.style.color = this.checked ? 'var(--primary)' : 'var(--text-muted)';">
-                    <span class="slider round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; transition: .4s; border-radius: 34px;"></span>
-                </label>
-                <span style="font-size: 11px; margin-left: 8px; color: var(--text-muted); font-weight: 600;">Paid</span>
-            </div>
-            <div style="display: flex; gap: 4px;">
-                <button class="action-icon-btn" onclick="openEditDetailsModal('Geometry Quiz - Shapes', 'q2')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
-                <button class="action-icon-btn" onclick="window.location.href='{{ url('/content/quiz/' . $id . '/builder') }}'" title="Manage Questions"><i class="fa-solid fa-list-check"></i></button>
-            </div>
-        </div>
-
-        <div class="file-row quiz-row">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <div style="width: 36px; height: 36px; border-radius: 10px; background: #FFF3E0; color: #E65100; display: flex; align-items: center; justify-content: center; font-size: 16px;">
-                    <i class="fa-regular fa-circle-question"></i>
-                </div>
-                <div>
-                    <div style="font-weight: 500;">Mensuration Quiz - Draft</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">MCQ • Created 1 day ago</div>
-                </div>
-            </div>
-            <div style="color: var(--text-muted);">18 Qs</div>
-
-            <div>
-                <label class="switch">
-                    <input type="checkbox" onchange="toggleStatus('Mensuration Quiz - Draft', this.checked)">
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div style="display: flex; align-items: center;" onclick="event.stopPropagation()">
-                <label class="toggle-switch" style="position: relative; display: inline-block; width: 36px; height: 20px; margin: 0;">
-                    <input type="checkbox" style="opacity: 0; width: 0; height: 0; cursor: pointer;" onchange="this.parentElement.nextElementSibling.textContent = this.checked ? 'Free' : 'Paid'; this.parentElement.nextElementSibling.style.color = this.checked ? 'var(--primary)' : 'var(--text-muted)';">
-                    <span class="slider round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; transition: .4s; border-radius: 34px;"></span>
-                </label>
-                <span style="font-size: 11px; margin-left: 8px; color: var(--text-muted); font-weight: 600;">Paid</span>
-            </div>
-            <div style="display: flex; gap: 4px;">
-                <button class="action-icon-btn" onclick="openEditDetailsModal('Mensuration Quiz - Draft', 'q3')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
-                <button class="action-icon-btn" onclick="window.location.href='{{ url('/content/quiz/' . $id . '/builder') }}'" title="Manage Questions"><i class="fa-solid fa-list-check"></i></button>
-            </div>
-        </div>
+        @endforelse
     </div>
 
-    <div style="margin-top: 20px; font-size: 12px; color: var(--text-muted);">3 quizzes shown</div>
+    <div style="margin-top: 20px; font-size: 12px; color: var(--text-muted);">{{ $quizzes->count() }} quizzes shown</div>
+</div>
+
+<!-- Add Quiz Modal -->
+<div class="modal-backdrop" id="addQuizModal" onclick="if(event.target===this) closeModal('addQuizModal')">
+    <div class="modal" style="max-width: 500px;">
+        <form action="{{ url('/content/quiz/' . $id . '/store') }}" method="POST">
+            @csrf
+            <div class="modal-header">
+                <h3>Create New Quiz</h3>
+                <button type="button" class="modal-close" onclick="closeModal('addQuizModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Quiz Title</label>
+                    <input type="text" name="title" class="form-control" placeholder="e.g., Algebra Mid-term" required>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Description (Optional)</label>
+                    <textarea name="description" class="form-control" rows="3" placeholder="Briefly describe the quiz content..."></textarea>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Time Limit (Mins)</label>
+                        <input type="number" name="time_limit_minutes" class="form-control" value="30">
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Passing %</label>
+                        <input type="number" name="passing_percentage" class="form-control" value="40">
+                    </div>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" name="is_free" value="1">
+                        <span style="font-size: 13px; font-weight: 500;">Mark as Free Quiz</span>
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('addQuizModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Create & Start Building</button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <!-- Edit Details Modal -->
@@ -188,11 +164,6 @@
                 <textarea class="form-control" id="editDescription" rows="3" placeholder="Add a description or instructions..."></textarea>
             </div>
             <div style="margin-bottom: 16px;">
-                <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Thumbnail (Optional)</label>
-                <input type="file" class="form-control" id="editThumbnail" accept="image/*">
-                <small style="color: var(--text-muted); font-size: 11px;">Leave empty to use default auto-generated thumbnail.</small>
-            </div>
-            <div style="margin-bottom: 16px;">
                 <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Sort Order</label>
                 <input type="number" class="form-control" id="editSortOrder" placeholder="e.g. 1" value="0">
             </div>
@@ -208,56 +179,42 @@
 
 @section('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Toggle scripts moved inline
-    });
-</script>
-<script src="{{ asset('js/content-manager.js') }}"></script>
-<script>
-function searchRows(q) {
-    document.querySelectorAll('.file-row').forEach(r => {
-        const t = r.querySelector('div:nth-child(1)')?.textContent.toLowerCase() || '';
-        r.style.display = t.includes(q.toLowerCase()) ? 'grid' : 'none';
-    });
-}
-function showQuizOptions(e, id) {
-    e.stopPropagation();
-    const a = prompt('Options:\n1. Edit Quiz\n2. Delete\n\nEnter (1-2):');
-    if (a === '2' && confirm('Delete this quiz?')) alert('Quiz deleted (demo)');
-}
-function toggleStatus(name, active) {
-    const status = active ? 'Active' : 'Inactive';
-    const color = active ? 'var(--primary)' : '#6c757d';
-    Swal.fire({
-        toast: true,
-        position: 'top-end',
-        icon: 'success',
-        title: `${name} is now ${status}`,
-        showConfirmButton: false,
-        timer: 1500,
-        timerProgressBar: true
+function toggleStatus(name, active, id) {
+    const status = active ? 'active' : 'inactive';
+    
+    fetch('{{ url("/quiz/toggle-status") }}/' + id, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ status: status })
+    }).then(response => {
+        if(response.ok) {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: `${name} is now ${status}`,
+                showConfirmButton: false,
+                timer: 1500,
+                timerProgressBar: true
+            });
+        }
     });
 }
+
 function openEditDetailsModal(name, id) {
     document.getElementById('editTitle').value = name;
     document.getElementById('editDescription').value = '';
     document.getElementById('editSortOrder').value = '0';
-    document.getElementById('editThumbnail').value = '';
-    
-    const isFreeCheckbox = document.getElementById('editIsFree');
-    const accessLabel = document.getElementById('accessLabel');
-    isFreeCheckbox.checked = false;
-    accessLabel.textContent = 'Requires Purchase';
-    accessLabel.style.color = 'var(--text-muted)';
-    
-    document.getElementById('editDetailsModal').classList.add('show');
+    openModal('editDetailsModal');
 }
-function closeModal(id) {
-    document.getElementById(id).classList.remove('show');
-}
+
 function saveDetails() {
     closeModal('editDetailsModal');
     alert('Details saved successfully for ' + document.getElementById('editTitle').value);
 }
 </script>
+<script src="{{ asset('js/content-manager.js') }}"></script>
 @endsection

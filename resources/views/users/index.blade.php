@@ -87,7 +87,7 @@
             <i class="fas fa-users"></i>
         </div>
         <div>
-            <div class="us-val">14,250</div>
+            <div class="us-val">{{ number_format($totalStudents) }}</div>
             <div class="us-label">Total Students</div>
         </div>
     </div>
@@ -96,7 +96,7 @@
             <i class="fas fa-circle-dot"></i>
         </div>
         <div>
-            <div class="us-val" style="color:#059669;">142</div>
+            <div class="us-val" style="color:#059669;">{{ number_format($activeNow) }}</div>
             <div class="us-label">Active Now</div>
         </div>
     </div>
@@ -105,7 +105,7 @@
             <i class="fas fa-user-check"></i>
         </div>
         <div>
-            <div class="us-val" style="color:#6366f1;">+42</div>
+            <div class="us-val" style="color:#6366f1;">{{ $newToday > 0 ? '+' . $newToday : '0' }}</div>
             <div class="us-label">New Today</div>
         </div>
     </div>
@@ -114,7 +114,7 @@
             <i class="fas fa-crown"></i>
         </div>
         <div>
-            <div class="us-val" style="color:#d97706;">2,840</div>
+            <div class="us-val" style="color:#d97706;">{{ number_format($premiumStudents) }}</div>
             <div class="us-label">Premium Students</div>
         </div>
     </div>
@@ -148,54 +148,46 @@
                     <th>Student</th>
                     <th>Plan</th>
                     <th>Status</th>
-                    <th>Enrolled</th>
+                    <th>Joined</th>
                     <th>Courses</th>
                     <th style="text-align:right;">Actions</th>
                 </tr>
             </thead>
             <tbody>
-                @php
-                $students = [
-                    ['name'=>'Arjun Sharma','email'=>'arjun@example.com','plan'=>'premium','status'=>'active','date'=>'Oct 12, 2025','courses'=>12,'color'=>'1565C0'],
-                    ['name'=>'Priya Patel','email'=>'priya@example.com','plan'=>'free','status'=>'active','date'=>'Nov 03, 2025','courses'=>4,'color'=>'7c3aed'],
-                    ['name'=>'Rahul Verma','email'=>'rahul@example.com','plan'=>'premium','status'=>'active','date'=>'Oct 28, 2025','courses'=>8,'color'=>'059669'],
-                    ['name'=>'Sneha Mehta','email'=>'sneha@example.com','plan'=>'free','status'=>'blocked','date'=>'Sep 15, 2025','courses'=>2,'color'=>'ef4444'],
-                    ['name'=>'Kunal Joshi','email'=>'kunal@example.com','plan'=>'free','status'=>'active','date'=>'Dec 01, 2025','courses'=>6,'color'=>'d97706'],
-                    ['name'=>'Ananya Singh','email'=>'ananya@example.com','plan'=>'premium','status'=>'active','date'=>'Jan 10, 2026','courses'=>15,'color'=>'f97316'],
-                ];
-                @endphp
-
                 @foreach($students as $s)
                 <tr>
                     <td>
                         <div class="avatar-group">
-                            <img src="https://ui-avatars.com/api/?name={{ urlencode($s['name']) }}&background={{ $s['color'] }}&color=fff" alt="">
+                            <img src="{{ $s->avatar_url ?? 'https://ui-avatars.com/api/?name='.urlencode($s->name).'&background=1565C0&color=fff' }}" alt="">
                             <div>
-                                <span style="display:block; font-weight:600; font-size:13.5px;">{{ $s['name'] }}</span>
-                                <small style="color:var(--text-muted);">{{ $s['email'] }}</small>
+                                <span style="display:block; font-weight:600; font-size:13.5px;">{{ $s->name }}</span>
+                                <small style="color:var(--text-muted);">{{ $s->email }}</small>
                             </div>
                         </div>
                     </td>
                     <td>
-                        <span class="role-badge {{ $s['plan']==='premium' ? 'rb-premium' : 'rb-free' }}">
-                            {{ ucfirst($s['plan']) }}
+                        <span class="role-badge {{ $s->plan === 'premium' ? 'rb-premium' : 'rb-free' }}">
+                            {{ ucfirst($s->plan) }}
                         </span>
                     </td>
                     <td>
-                        <span class="badge {{ $s['status']==='active' ? 'badge-success' : 'badge-danger' }}">
-                            {{ ucfirst($s['status']) }}
+                        <span class="badge {{ $s->status === 'active' ? 'badge-success' : 'badge-danger' }}">
+                            {{ ucfirst($s->status) }}
                         </span>
                     </td>
-                    <td style="color:var(--text-muted); font-size:13px;">{{ $s['date'] }}</td>
-                    <td style="font-weight:700;">{{ $s['courses'] }}</td>
+                    <td style="color:var(--text-muted); font-size:13px;">{{ $s->created_at->format('M d, Y') }}</td>
+                    <td style="font-weight:700;">{{ $s->enrollments->count() }}</td>
                     <td style="text-align:right;">
                         <div style="display:flex; gap:6px; justify-content:flex-end;">
-                            <button class="btn btn-ghost btn-sm" title="View Profile">
+                            <a href="{{ url('/users/'.$s->id) }}" class="btn btn-ghost btn-sm" title="View Profile">
                                 <i class="fas fa-eye"></i>
-                            </button>
-                            <button class="btn btn-ghost btn-sm" style="color:{{ $s['status']==='active' ? '#ef4444' : '#059669' }};" title="{{ $s['status']==='active' ? 'Block' : 'Unblock' }}">
-                                <i class="fas fa-{{ $s['status']==='active' ? 'ban' : 'check-circle' }}"></i>
-                            </button>
+                            </a>
+                            <form action="{{ url('/users/'.$s->id.'/toggle-status') }}" method="POST">
+                                @csrf
+                                <button type="submit" class="btn btn-ghost btn-sm" style="color:{{ $s->status==='active' ? '#ef4444' : '#059669' }};" title="{{ $s->status==='active' ? 'Block' : 'Unblock' }}">
+                                    <i class="fas fa-{{ $s->status==='active' ? 'ban' : 'check-circle' }}"></i>
+                                </button>
+                            </form>
                         </div>
                     </td>
                 </tr>
@@ -206,15 +198,9 @@
 
     <!-- Pagination -->
     <div class="flex-between" style="padding:14px 20px; border-top:1px solid var(--border);">
-        <p style="font-size:13px; color:var(--text-muted);">Showing 1–6 of 14,250 students</p>
+        <p style="font-size:13px; color:var(--text-muted);">Showing {{ $students->firstItem() ?? 0 }}–{{ $students->lastItem() ?? 0 }} of {{ $students->total() }} students</p>
         <div style="display:flex; gap:6px;">
-            <button class="btn btn-ghost btn-sm"><i class="fas fa-chevron-left"></i></button>
-            <button class="btn btn-primary btn-sm">1</button>
-            <button class="btn btn-ghost btn-sm">2</button>
-            <button class="btn btn-ghost btn-sm">3</button>
-            <span style="align-self:center; color:var(--text-muted);">…</span>
-            <button class="btn btn-ghost btn-sm">1425</button>
-            <button class="btn btn-ghost btn-sm"><i class="fas fa-chevron-right"></i></button>
+            {{ $students->links('pagination::bootstrap-4') }}
         </div>
     </div>
 </div>

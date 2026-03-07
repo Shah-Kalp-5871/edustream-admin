@@ -1,0 +1,79 @@
+# EduStream Systematic Implementation Roadmap
+
+This roadmap follows a **Layered Implementation** strategy. We will build the entire database layer first (Migrations), then the logic layer (Models & Relationships), and finally the API/UI layers.
+
+## Phase 1: Database Layer (All Migrations)
+**Goal:** Define the complete structure of all 23 tables.
+
+1. **Authentication Module**
+    - [ ] `admins`, `students`, `otp_verifications`, `refresh_tokens`.
+2. **Content Module**
+    - [ ] `categories`, `courses`, `subjects`.
+    - [ ] `note_folders`, `notes`.
+    - [ ] `video_folders`, `videos`.
+    - [ ] `qa_paper_folders`, `qa_papers`.
+3. **Quiz Module**
+    - [ ] `quizzes`, `quiz_questions`, `quiz_options`.
+    - [ ] `quiz_attempts`, `quiz_answers`.
+4. **Commerce Module**
+    - [ ] `cart_items`, `orders`, `order_items`, `enrollments`.
+5. **System Module**
+    - [ ] `activity_logs`, `settings`.
+
+## Phase 2: Eloquent Layer (All Models & Relationships)
+**Goal:** Create Laravel models for every table and define all relationships.
+
+1. **Model Generation**
+    - [ ] Create 23 Models corresponding to the tables.
+2. **Relationship Definition**
+    - [ ] Define `hasMany`, `belongsTo`, and `manyToMany` (if any).
+    - [ ] Implement Polymorphic relations for `order_items` and `cart_items`.
+3. **Data Integrity**
+    - [ ] Add `$fillable` arrays and `$casts`.
+    - [ ] Add model-level scopes (e.g., `scopeActive`).
+
+## Phase 3: Seeding & Foundation (Initial Data)
+**Goal:** Populate the database so we can test the UI/API.
+
+1. **Seeders**
+    - [ ] Create Admin user seeder.
+    - [ ] Create Category & Course sample seeders.
+2. **Settings**
+    - [ ] Populate initial site settings (site_name, etc.).
+
+## Phase 4: Backend Infrastructure (Services & Auth)
+**Goal:** Implement the "Engine" of the application.
+
+1. **Auth Services**
+    - [ ] Implement JWT for students.
+    - [ ] Implement Session Auth for admins.
+2. **Common Services**
+    - [ ] File Upload Service (following Storage Strategy).
+    - [ ] Activity Logging Service.
+
+## Phase 5: Admin Panel Development (Management UI)
+**Goal:** Connect the existing Admin UI to the new backend models.
+
+1. **Content Management**
+    - [ ] Course/Subject CRUDs.
+    - [ ] Folder-based File Managers.
+2. **Quiz Management**
+    - [ ] Quiz Builder logic.
+3. **Order/User Management**
+    - [ ] View Orders, Enrollments, and Students.
+
+## Phase 6: API Layer (Student Experience)
+**Goal:** Expose endpoints for the Flutter app.
+
+1. **Public APIs**
+    - [ ] Browse Courses/Subjects.
+2. **Protected Student APIs**
+    - [ ] Cart management.
+    - [ ] Checkout & Enrollment.
+    - [ ] Content Viewing (signed URLs/stream).
+    - [ ] Quiz Attempting.
+
+---
+
+> [!NOTE]
+> **Total Implementation Strategy**: This systematic approach ensures the database is 100% ready and validated before any business logic is written, preventing "circular dependency" issues during development.

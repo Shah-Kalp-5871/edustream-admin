@@ -91,15 +91,29 @@
         <div class="card card-pad">
             <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 24px; display: flex; align-items: center; gap: 12px;">
                 <i class="fa-solid fa-pen-to-square" style="color: var(--primary);"></i>
-                Edit Category: {{ $category['name'] ?? 'Category' }}
+                Edit Category: {{ $category->name }}
             </h2>
 
-            <form action="{{ url('/content/categories') }}" method="GET" onsubmit="event.preventDefault(); alert('Static demo: Category updated!'); window.location.href='{{ url('/content/categories') }}';">
+            <form action="{{ url('/content/categories/' . $category->id) }}" method="POST">
+                @csrf
+                @method('PUT')
                 <div class="form-group">
                     <label class="form-label">Category Name</label>
-                    <input type="text" class="form-control" value="{{ $category['name'] ?? 'High School' }}" required>
+                    <input type="text" name="name" class="form-control" value="{{ $category->name }}" required>
                 </div>
 
+                <div class="form-group">
+                    <label class="form-label">Icon Class (FontAwesome)</label>
+                    <input type="text" name="icon_url" class="form-control" value="{{ $category->icon_url }}" placeholder="e.g. fa-solid fa-graduation-cap">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select name="status" class="form-control">
+                        <option value="active" {{ $category->status == 'active' ? 'selected' : '' }}>Active</option>
+                        <option value="inactive" {{ $category->status == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                    </select>
+                </div>
 
                 <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border);">
                     <button type="button" class="btn-manage" style="width: auto; padding: 12px 24px;" onclick="window.location.href='{{ url('/content/categories') }}'">Cancel</button>

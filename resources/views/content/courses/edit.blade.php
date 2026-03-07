@@ -154,14 +154,16 @@ document.querySelectorAll('.color-opt').forEach(opt => {
         <div class="card card-pad">
             <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 24px; display: flex; align-items: center; gap: 12px;">
                 <i class="fa-solid fa-pen-to-square" style="color: var(--primary);"></i>
-                Edit Course: {{ $course['name'] ?? 'Course Name' }}
+                Edit Course: {{ $course->name }}
             </h2>
 
-            <form action="{{ url('/content') }}" method="GET" onsubmit="event.preventDefault(); alert('Static demo: Course updated!'); window.location.href='{{ url('/content') }}';">
+            <form action="{{ url('/content/course/' . $course->id) }}" method="POST">
+                @csrf
+                @method('PUT')
                 <div class="form-grid">
                     <div class="form-group" style="grid-column: span 2;">
                         <label class="form-label">Course Title</label>
-                        <input type="text" class="form-control" value="{{ $course['name'] ?? 'Standard 10 - Science' }}" required>
+                        <input type="text" name="name" class="form-control" value="{{ $course->name }}" required>
                     </div>
 
                     <div class="form-group" style="grid-column: span 2;">
@@ -171,10 +173,10 @@ document.querySelectorAll('.color-opt').forEach(opt => {
                                 $presetIcons = [
                                     'fa-solid fa-graduation-cap', 'fa-solid fa-flask', 'fa-solid fa-calculator',
                                     'fa-solid fa-atom', 'fa-solid fa-microscope', 'fa-solid fa-code',
-                                    'fa-solid fa-laptop-code', 'fa-solid fa-chart-simple', 'fa-solid fa-briefcase',
-                                    'fa-solid fa-microchip', 'fa-solid fa-book', 'fa-solid fa-dna'
+                                    'fa-solid fa-laptop-code', 'fa-solid fa-chart-simple',
+                                    'fa-solid fa-book', 'fa-solid fa-dna'
                                 ];
-                                $currentIcon = $course['icon'] ?? 'fa-solid fa-graduation-cap';
+                                $currentIcon = $course->icon_url ?? 'fa-solid fa-graduation-cap';
                             @endphp
                             @foreach($presetIcons as $icon)
                                 <div class="icon-opt {{ $currentIcon == $icon ? 'selected' : '' }}" data-icon="{{ $icon }}">
@@ -182,7 +184,7 @@ document.querySelectorAll('.color-opt').forEach(opt => {
                                 </div>
                             @endforeach
                         </div>
-                        <input type="hidden" name="icon" id="selectedIcon" value="{{ $currentIcon }}">
+                        <input type="hidden" name="icon_url" id="selectedIcon" value="{{ $currentIcon }}">
                     </div>
 
                     <div class="form-group" style="grid-column: span 2;">
@@ -191,57 +193,44 @@ document.querySelectorAll('.color-opt').forEach(opt => {
                             @php
                                 $presetColors = [
                                     '#1565C0', '#C2185B', '#7B1FA2', '#2E7D32',
-                                    '#E64A19', '#4A148C', '#B71C1C', '#00838F',
-                                    '#283593', '#F9A825'
+                                    '#E64A19', '#4A148C', '#B71C1C'
                                 ];
-                                $currentColor = $course['color'] ?? '#1565C0';
+                                $currentColor = $course->color_code ?? '#1565C0';
                             @endphp
                             @foreach($presetColors as $color)
                                 <div class="color-opt {{ $currentColor == $color ? 'selected' : '' }}" data-color="{{ $color }}" style="background: {{ $color }};"></div>
                             @endforeach
                         </div>
-                        <input type="hidden" name="color" id="selectedColor" value="{{ $currentColor }}">
+                        <input type="hidden" name="color_code" id="selectedColor" value="{{ $currentColor }}">
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">Course Category</label>
-                        <select class="form-control">
-                            <option {{ ($course['category'] ?? '') == 'Primary School' ? 'selected' : '' }}>Primary School</option>
-                            <option {{ ($course['category'] ?? '') == 'Secondary School' ? 'selected' : '' }}>Secondary School</option>
-                            <option {{ ($course['category'] ?? '') == 'High School' ? 'selected' : '' }}>High School</option>
-                            <option {{ ($course['category'] ?? '') == 'Higher Secondary' ? 'selected' : '' }}>Higher Secondary</option>
-                            <option {{ ($course['category'] ?? '') == 'Undergraduate' ? 'selected' : '' }}>Undergraduate</option>
-                            <option {{ ($course['category'] ?? '') == 'Postgraduate' ? 'selected' : '' }}>Postgraduate</option>
+                        <select name="category_id" class="form-control" required>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}" {{ $course->category_id == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                            @endforeach
                         </select>
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">Full Course Price (₹)</label>
-                        <input type="number" class="form-control" value="{{ $course['price'] ?? 5000 }}" required>
+                        <input type="number" name="price" class="form-control" value="{{ $course->price }}" required>
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">Course Status</label>
-                        <select class="form-control">
-                            <option {{ ($course['status'] ?? '') == 'Active' ? 'selected' : '' }}>Active</option>
-                            <option {{ ($course['status'] ?? '') == 'Inactive' ? 'selected' : '' }}>Inactive</option>
+                        <select name="status" class="form-control">
+                            <option value="active" {{ $course->status == 'active' ? 'selected' : '' }}>Active</option>
+                            <option value="inactive" {{ $course->status == 'inactive' ? 'selected' : '' }}>Inactive</option>
                         </select>
                     </div>
 
                     <div class="form-group" style="grid-column: span 2;">
                         <label class="form-label">Description</label>
-                        <textarea class="form-control textarea" placeholder="Enter course overview and objectives...">Comprehensive curriculum covering Physics, Chemistry, and Biology for 10th-grade students.</textarea>
+                        <textarea name="description" class="form-control textarea" placeholder="Enter course overview and objectives...">{{ $course->description }}</textarea>
                     </div>
 
-                    <div class="form-group" style="grid-column: span 2;">
-                        <label class="form-label">Course Thumbnail</label>
-                        <div class="image-upload-preview" onclick="alert('File upload dialog would open here')">
-                            <!-- Placeholder image if available -->
-                            <i class="fa-solid fa-cloud-arrow-up"></i>
-                            <span>Click to change thumbnail</span>
-                            <small>PNG, JPG up to 5MB</small>
-                        </div>
-                    </div>
                 </div>
 
                 <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border);">

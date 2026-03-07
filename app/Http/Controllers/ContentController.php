@@ -2,226 +2,489 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Course;
+use App\Models\Category;
+use App\Models\Subject;
+use App\Models\Note;
+use App\Models\NoteFolder;
+use App\Models\Video;
+use App\Models\VideoFolder;
+use App\Models\QaPaper;
+use App\Models\QaPaperFolder;
+use App\Models\Quiz;
+use App\Models\QuizQuestion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class ContentController extends Controller
 {
-    private function getCourses()
-    {
-        return [
-            [
-                'id' => 1,
-                'name' => 'Standard 10 - Science',
-                'description' => 'Complete science curriculum for Standard 10 students.',
-                'price' => 5000,
-                'status' => 'Active',
-                'category' => 'High School',
-                'icon' => 'fa-solid fa-flask',
-                'color' => '#1565C0',
-                'subjects_count' => 6
-            ],
-            [
-                'id' => 2,
-                'name' => 'Standard 12 - Physics',
-                'description' => 'In-depth physics concepts and problem-solving for Standard 12.',
-                'price' => 7500,
-                'status' => 'Active',
-                'category' => 'Higher Secondary',
-                'icon' => 'fa-solid fa-atom',
-                'color' => '#C2185B',
-                'subjects_count' => 8
-            ],
-            [
-                'id' => 3,
-                'name' => 'BCA - Programming in C',
-                'description' => 'Foundational programming course for BCA first-year students.',
-                'price' => 4500,
-                'status' => 'Inactive',
-                'category' => 'Undergraduate',
-                'icon' => 'fa-solid fa-code',
-                'color' => '#2E7D32',
-                'subjects_count' => 10
-            ],
-        ];
-    }
-
-    private function getSubjects($courseId)
-    {
-        $data = [
-            1 => [
-                ['id' => 101, 'name' => 'Mathematics',   'notes_count' => 24, 'videos_count' => 32, 'quiz_count' => 15, 'icon' => 'fa-solid fa-calculator', 'price' => 500, 'status' => 'Active', 'color' => '#1565C0'],
-                ['id' => 102, 'name' => 'Science',       'notes_count' => 28, 'videos_count' => 45, 'quiz_count' => 18, 'icon' => 'fa-solid fa-flask', 'price' => 600, 'status' => 'Active', 'color' => '#C2185B'],
-                ['id' => 103, 'name' => 'English',       'notes_count' => 18, 'videos_count' => 22, 'quiz_count' => 12, 'icon' => 'fa-solid fa-book-open', 'price' => 400, 'status' => 'Active', 'color' => '#7B1FA2'],
-                ['id' => 104, 'name' => 'Social Studies','notes_count' => 22, 'videos_count' => 28, 'quiz_count' => 14, 'icon' => 'fa-solid fa-globe', 'price' => 450, 'status' => 'Inactive', 'color' => '#2E7D32'],
-                ['id' => 105, 'name' => 'Hindi',         'notes_count' => 16, 'videos_count' => 20, 'quiz_count' => 10, 'icon' => 'fa-solid fa-language', 'price' => 300, 'status' => 'Active', 'color' => '#E64A19'],
-                ['id' => 106, 'name' => 'Sanskrit',      'notes_count' => 12, 'videos_count' => 15, 'quiz_count' => 8,  'icon' => 'fa-solid fa-om', 'price' => 350, 'status' => 'Active', 'color' => '#4A148C'],
-            ],
-            2 => [
-                ['id' => 201, 'name' => 'Mathematics', 'notes_count' => 32, 'videos_count' => 48, 'quiz_count' => 22, 'icon' => 'fa-solid fa-calculator', 'price' => 800, 'status' => 'Active', 'color' => '#1565C0'],
-                ['id' => 202, 'name' => 'Physics',     'notes_count' => 28, 'videos_count' => 42, 'quiz_count' => 18, 'icon' => 'fa-solid fa-atom', 'price' => 900, 'status' => 'Active', 'color' => '#C2185B'],
-                ['id' => 203, 'name' => 'Chemistry',   'notes_count' => 26, 'videos_count' => 38, 'quiz_count' => 16, 'icon' => 'fa-solid fa-flask', 'price' => 850, 'status' => 'Active', 'color' => '#7B1FA2'],
-                ['id' => 204, 'name' => 'Biology',     'notes_count' => 24, 'videos_count' => 36, 'quiz_count' => 15, 'icon' => 'fa-solid fa-dna', 'price' => 850, 'status' => 'Inactive', 'color' => '#2E7D32'],
-                ['id' => 205, 'name' => 'English',     'notes_count' => 20, 'videos_count' => 28, 'quiz_count' => 14, 'icon' => 'fa-solid fa-book-open', 'price' => 500, 'status' => 'Active', 'color' => '#E64A19'],
-                ['id' => 206, 'name' => 'History',     'notes_count' => 18, 'videos_count' => 24, 'quiz_count' => 12, 'icon' => 'fa-solid fa-landmark', 'price' => 600, 'status' => 'Active', 'color' => '#4A148C'],
-                ['id' => 207, 'name' => 'Geography',   'notes_count' => 18, 'videos_count' => 26, 'quiz_count' => 12, 'icon' => 'fa-solid fa-map', 'price' => 600, 'status' => 'Active', 'color' => '#B71C1C'],
-            ],
-            3 => [
-                ['id' => 301, 'name' => 'Mathematics',      'notes_count' => 36, 'videos_count' => 52, 'quiz_count' => 28, 'icon' => 'fa-solid fa-calculator', 'price' => 1200, 'status' => 'Active', 'color' => '#1565C0'],
-                ['id' => 302, 'name' => 'Science',          'notes_count' => 42, 'videos_count' => 58, 'quiz_count' => 32, 'icon' => 'fa-solid fa-flask', 'price' => 1300, 'status' => 'Active', 'color' => '#C2185B'],
-                ['id' => 303, 'name' => 'English',          'notes_count' => 22, 'videos_count' => 32, 'quiz_count' => 18, 'icon' => 'fa-solid fa-book-open', 'price' => 700, 'status' => 'Active', 'color' => '#7B1FA2'],
-                ['id' => 304, 'name' => 'Social Science',   'notes_count' => 28, 'videos_count' => 38, 'quiz_count' => 20, 'icon' => 'fa-solid fa-globe', 'price' => 800, 'status' => 'Inactive', 'color' => '#2E7D32'],
-                ['id' => 305, 'name' => 'Hindi',            'notes_count' => 18, 'videos_count' => 24, 'quiz_count' => 14, 'icon' => 'fa-solid fa-language', 'price' => 600, 'status' => 'Active', 'color' => '#E64A19'],
-                ['id' => 306, 'name' => 'Computer Science', 'notes_count' => 20, 'videos_count' => 28, 'quiz_count' => 16, 'icon' => 'fa-solid fa-computer', 'price' => 1500, 'status' => 'Active', 'color' => '#4A148C'],
-                ['id' => 307, 'name' => 'Sanskrit',         'notes_count' => 14, 'videos_count' => 18, 'quiz_count' => 10, 'icon' => 'fa-solid fa-om', 'price' => 650, 'status' => 'Active', 'color' => '#B71C1C'],
-            ],
-        ];
-        return $data[$courseId] ?? $data[1];
-    }
-
-    private function getSubjectContent($subjectId)
-    {
-        $data = [
-            101 => [
-                'notes'     => ['count' => 24, 'items' => ['Algebra Basics', 'Geometry Fundamentals', 'Mensuration', 'Statistics']],
-                'videos'    => ['count' => 32, 'items' => ['Introduction to Algebra', 'Linear Equations', 'Quadrilaterals', 'Data Handling']],
-                'qa_papers' => ['count' => 18, 'items' => ['Practice Set 1', 'Sample Paper 1', 'Model Test', 'Previous Year']],
-                'quiz'      => ['count' => 15, 'items' => ['Algebra Quiz', 'Geometry Quiz', 'Mensuration Quiz', 'Statistics Quiz']],
-            ],
-            102 => [
-                'notes'     => ['count' => 28, 'items' => ['Crop Production', 'Microorganisms', 'Materials', 'Light']],
-                'videos'    => ['count' => 45, 'items' => ['Cell Structure', 'Force & Pressure', 'Sound', 'Chemical Effects']],
-                'qa_papers' => ['count' => 22, 'items' => ['Chapter 1 Q&A', 'Chapter 2 Q&A', 'Model Test', 'Practice Set']],
-                'quiz'      => ['count' => 18, 'items' => ['Biology Quiz', 'Physics Quiz', 'Chemistry Quiz', 'Mixed Quiz']],
-            ],
-        ];
-
-        // If subject not in data, build generic one
-        if (!isset($data[$subjectId])) {
-            // Find from subjects
-            foreach ($this->getAllSubjects() as $s) {
-                if ($s['id'] == $subjectId) {
-                    return [
-                        'notes'     => ['count' => $s['notes_count'],  'items' => ['Chapter 1 Notes', 'Chapter 2 Notes', 'Chapter 3 Notes', 'Chapter 4 Notes']],
-                        'videos'    => ['count' => $s['videos_count'], 'items' => ['Lecture 1', 'Lecture 2', 'Lecture 3', 'Lecture 4']],
-                        'qa_papers' => ['count' => (int)($s['quiz_count'] * 1.2), 'items' => ['Practice Set 1', 'Sample Paper', 'Model Test', 'Previous Year']],
-                        'quiz'      => ['count' => $s['quiz_count'],   'items' => ['Chapter 1 Quiz', 'Chapter 2 Quiz', 'Chapter 3 Quiz', 'Chapter 4 Quiz']],
-                    ];
-                }
-            }
-            return $data[101];
-        }
-        return $data[$subjectId];
-    }
-
-    private function getAllSubjects()
-    {
-        $all = [];
-        for ($i = 1; $i <= 7; $i++) {
-            foreach ($this->getSubjects($i) as $s) {
-                $all[] = $s;
-            }
-        }
-        return $all;
-    }
-
-    private function findSubject($subjectId)
-    {
-        foreach ($this->getAllSubjects() as $s) {
-            if ($s['id'] == $subjectId) return $s;
-        }
-        return null;
-    }
-
-    private function findCourseForSubject($subjectId)
-    {
-        for ($i = 1; $i <= 7; $i++) {
-            foreach ($this->getSubjects($i) as $s) {
-                if ($s['id'] == $subjectId) {
-                    $courses = $this->getCourses();
-                    return collect($courses)->firstWhere('id', $i);
-                }
-            }
-        }
-        return null;
-    }
-
     public function index()
     {
-        $courses = $this->getCourses();
+        $courses = Course::with('category')->withCount('subjects')->orderBy('sort_order')->get();
         return view('content.courses.index', compact('courses'));
     }
 
     public function create()
     {
-        return view('content.courses.create');
+        $categories = Category::active()->get();
+        return view('content.courses.create', compact('categories'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'category_id' => 'required|exists:categories,id',
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'price' => 'required|numeric|min:0',
+            'status' => 'required|in:active,inactive',
+            'icon_url' => 'nullable|string',
+            'color_code' => 'nullable|string',
+        ]);
+
+        Course::create([
+            'category_id' => $request->category_id,
+            'name' => $request->name,
+            'slug' => Str::slug($request->name),
+            'description' => $request->description,
+            'price' => $request->price,
+            'status' => $request->status,
+            'icon_url' => $request->icon_url ?? 'fa-solid fa-graduation-cap',
+            'color_code' => $request->color_code ?? '#1565C0',
+            'sort_order' => Course::max('sort_order') + 1,
+        ]);
+
+        return redirect('/content')->with('success', 'Course created successfully!');
     }
 
     public function edit($id)
     {
-        $id = (int)$id;
-        $courses = $this->getCourses();
-        $course = collect($courses)->firstWhere('id', $id);
-        return view('content.courses.edit', compact('course'));
+        $course = Course::findOrFail($id);
+        $categories = Category::active()->get();
+        return view('content.courses.edit', compact('course', 'categories'));
     }
 
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'category_id' => 'required|exists:categories,id',
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'price' => 'required|numeric|min:0',
+            'status' => 'required|in:active,inactive',
+            'icon_url' => 'nullable|string',
+            'color_code' => 'nullable|string',
+        ]);
+
+        $course = Course::findOrFail($id);
+        $course->update([
+            'category_id' => $request->category_id,
+            'name' => $request->name,
+            'slug' => Str::slug($request->name),
+            'description' => $request->description,
+            'price' => $request->price,
+            'status' => $request->status,
+            'icon_url' => $request->icon_url,
+            'color_code' => $request->color_code,
+        ]);
+
+        return redirect('/content')->with('success', 'Course updated successfully!');
+    }
+
+    public function destroy($id)
+    {
+        $course = Course::findOrFail($id);
+        $course->delete();
+
+        return redirect('/content')->with('success', 'Course deleted successfully!');
+    }
+
+    public function courseSubjects($id)
+    {
+        $course = Course::with('subjects.noteFolders', 'subjects.videoFolders')->findOrFail($id);
+        $subjects = $course->subjects;
+        $courseName = $course->name;
+        return view('content.subjects.index', compact('id', 'course', 'courseName', 'subjects'));
+    }
+
+    // Existing methods for subject details (to be updated later)
     public function subjectContent($id)
     {
-        $subject = $this->findSubject($id);
-        $course  = $this->findCourseForSubject($id);
-        $contentData = $this->getSubjectContent($id);
-
-        $subjectName = $subject['name'] ?? 'Subject';
-        $courseName = $course['name'] ?? 'Course';
-        $courseId = $course['id'] ?? 0;
+        $subject = Subject::withCount(['notes', 'videos', 'quizzes', 'qaPapers'])->findOrFail($id);
+        $course = $subject->course;
+        
+        $subjectName = $subject->name;
+        $courseName = $course->name;
+        $courseId = $course->id;
+        
+        // Mock data for content structure until folders are fully integrated
+        $contentData = [
+            'notes' => ['count' => $subject->notes_count, 'items' => $subject->notes->pluck('name')],
+            'videos' => ['count' => $subject->videos_count, 'items' => $subject->videos->pluck('name')],
+            'qa_papers' => ['count' => $subject->qa_papers_count, 'items' => $subject->qaPapers->pluck('name')],
+            'quiz' => ['count' => $subject->quizzes_count, 'items' => $subject->quizzes->pluck('title')],
+        ];
 
         return view('content.subjectdetails.index', compact('id', 'subject', 'subjectName', 'course', 'courseName', 'courseId', 'contentData'));
     }
 
     public function createSubject($courseId)
     {
-        $courses = $this->getCourses();
-        $course  = collect($courses)->firstWhere('id', (int)$courseId);
+        $course = Course::findOrFail($courseId);
         return view('content.subjects.create', compact('course'));
+    }
+
+    public function manageNotes(Request $request, $id)
+    {
+        $subject = Subject::findOrFail($id);
+        $folderId = $request->query('folder_id');
+        
+        $folders = NoteFolder::where('subject_id', $id)
+            ->where('parent_id', $folderId)
+            ->orderBy('sort_order')
+            ->get();
+            
+        $files = Note::where('subject_id', $id)
+            ->where('folder_id', $folderId)
+            ->orderBy('sort_order')
+            ->get();
+            
+        $currentFolder = $folderId ? NoteFolder::find($folderId) : null;
+        
+        // Breadcrumbs
+        $breadcrumbs = [];
+        $tempFolder = $currentFolder;
+        while ($tempFolder) {
+            array_unshift($breadcrumbs, [
+                'name' => $tempFolder->name,
+                'id' => $tempFolder->id
+            ]);
+            $tempFolder = $tempFolder->parent;
+        }
+        
+        $subjectName = $subject->name;
+        return view('content.subjectdetails.notes.index', compact('id', 'subject', 'subjectName', 'folders', 'files', 'currentFolder', 'breadcrumbs'));
+    }
+
+    public function storeNoteFolder(Request $request, $subjectId)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'parent_id' => 'nullable|exists:note_folders,id',
+        ]);
+
+        NoteFolder::create([
+            'subject_id' => $subjectId,
+            'parent_id' => $request->parent_id,
+            'name' => $request->name,
+            'sort_order' => NoteFolder::where('subject_id', $subjectId)->where('parent_id', $request->parent_id)->max('sort_order') + 1,
+        ]);
+
+        return back()->with('success', 'Folder created successfully!');
+    }
+
+    public function manageVideos(Request $request, $id)
+    {
+        $subject = Subject::findOrFail($id);
+        $folderId = $request->query('folder_id');
+        
+        $folders = VideoFolder::where('subject_id', $id)
+            ->where('parent_id', $folderId)
+            ->orderBy('sort_order')
+            ->get();
+            
+        $files = Video::where('subject_id', $id)
+            ->where('folder_id', $folderId)
+            ->orderBy('sort_order')
+            ->get();
+            
+        $currentFolder = $folderId ? VideoFolder::find($folderId) : null;
+        
+        $breadcrumbs = [];
+        $tempFolder = $currentFolder;
+        while ($tempFolder) {
+            array_unshift($breadcrumbs, [
+                'name' => $tempFolder->name,
+                'id' => $tempFolder->id
+            ]);
+            $tempFolder = $tempFolder->parent;
+        }
+        
+        $subjectName = $subject->name;
+        return view('content.subjectdetails.videos.index', compact('id', 'subject', 'subjectName', 'folders', 'files', 'currentFolder', 'breadcrumbs'));
+    }
+
+    public function manageQAPapers(Request $request, $id)
+    {
+        $subject = Subject::findOrFail($id);
+        $folderId = $request->query('folder_id');
+        
+        $folders = QaPaperFolder::where('subject_id', $id)
+            ->where('parent_id', $folderId)
+            ->orderBy('sort_order')
+            ->get();
+            
+        $files = QaPaper::where('subject_id', $id)
+            ->where('folder_id', $folderId)
+            ->orderBy('sort_order')
+            ->get();
+            
+        $currentFolder = $folderId ? QaPaperFolder::find($folderId) : null;
+        
+        $breadcrumbs = [];
+        $tempFolder = $currentFolder;
+        while ($tempFolder) {
+            array_unshift($breadcrumbs, [
+                'name' => $tempFolder->name,
+                'id' => $tempFolder->id
+            ]);
+            $tempFolder = $tempFolder->parent;
+        }
+        
+        $subjectName = $subject->name;
+        return view('content.subjectdetails.papers.index', compact('id', 'subject', 'subjectName', 'folders', 'files', 'currentFolder', 'breadcrumbs'));
+    }
+
+    public function storeSubject(Request $request, $courseId)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'price' => 'required|numeric|min:0',
+            'status' => 'required|in:active,inactive',
+            'icon_url' => 'nullable|string',
+            'color_code' => 'nullable|string',
+        ]);
+
+        Subject::create([
+            'course_id' => $courseId,
+            'name' => $request->name,
+            'slug' => Str::slug($request->name),
+            'description' => $request->description,
+            'price' => $request->price,
+            'status' => $request->status,
+            'icon_url' => $request->icon_url ?? 'fa-solid fa-book',
+            'color_code' => $request->color_code ?? '#1565C0',
+            'sort_order' => Subject::where('course_id', $courseId)->max('sort_order') + 1,
+        ]);
+
+        return redirect('/content/course/' . $courseId)->with('success', 'Subject created successfully!');
     }
 
     public function editSubject($id)
     {
-        $subject = $this->findSubject($id);
-        $course  = $this->findCourseForSubject($id);
+        $subject = Subject::findOrFail($id);
+        $course = $subject->course;
         return view('content.subjects.edit', compact('subject', 'course'));
     }
 
-    public function courseSubjects($id)
+    public function updateSubject(Request $request, $id)
     {
-        $id = (int)$id;
-        $courses    = $this->getCourses();
-        $course     = collect($courses)->firstWhere('id', $id);
-        $courseName = $course['name'] ?? 'Course';
-        $subjects   = $this->getSubjects($id);
-        return view('content.subjects.index', compact('id', 'course', 'courseName', 'subjects'));
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'price' => 'required|numeric|min:0',
+            'status' => 'required|in:active,inactive',
+            'icon_url' => 'nullable|string',
+            'color_code' => 'nullable|string',
+        ]);
+
+        $subject = Subject::findOrFail($id);
+        $subject->update([
+            'name' => $request->name,
+            'slug' => Str::slug($request->name),
+            'description' => $request->description,
+            'price' => $request->price,
+            'status' => $request->status,
+            'icon_url' => $request->icon_url,
+            'color_code' => $request->color_code,
+        ]);
+
+        return redirect('/content/course/' . $subject->course_id)->with('success', 'Subject updated successfully!');
     }
 
-    public function subjectManage($id)
+    public function destroySubject($id)
     {
-        $id          = (int)$id;
-        $subject     = $this->findSubject($id);
-        $course      = $this->findCourseForSubject($id);
-        $subjectName = $subject['name'] ?? 'Subject';
-        $courseName  = $course['name']  ?? 'Course';
-        $courseId    = $course['id']    ?? 1;
-        $contentData = $this->getSubjectContent($id);
-        return view('content.subjectdetails.index', compact('id', 'subjectName', 'courseName', 'courseId', 'contentData'));
+        $subject = Subject::findOrFail($id);
+        $courseId = $subject->course_id;
+        $subject->delete();
+
+        return redirect('/content/course/' . $courseId)->with('success', 'Subject deleted successfully!');
+    }
+    public function storeNote(Request $request, $subjectId)
+    {
+        $request->validate([
+            'files.*' => 'required|file|mimes:pdf,doc,docx,txt|max:10240',
+            'folder_id' => 'nullable|exists:note_folders,id',
+        ]);
+
+        if ($request->hasFile('files')) {
+            foreach ($request->file('files') as $file) {
+                $path = $file->store('notes/' . $subjectId, 'public');
+                
+                Note::create([
+                    'subject_id' => $subjectId,
+                    'folder_id' => $request->folder_id,
+                    'name' => $file->getClientOriginalName(),
+                    'file_path' => $path,
+                    'file_type' => $file->getClientOriginalExtension(),
+                    'is_free' => false,
+                    'status' => 'active',
+                    'sort_order' => Note::where('subject_id', $subjectId)->where('folder_id', $request->folder_id)->max('sort_order') + 1,
+                ]);
+            }
+        }
+
+        return back()->with('success', 'Files uploaded successfully!');
     }
 
-    public function manageNotes($id)    { $s = $this->findSubject($id); $subjectName = $s['name'] ?? 'Notes'; return view('content.subjectdetails.notes.index', compact('id', 'subjectName')); }
-    public function manageVideos($id)   { $s = $this->findSubject($id); $subjectName = $s['name'] ?? 'Videos'; return view('content.subjectdetails.videos.index', compact('id', 'subjectName')); }
-    public function manageQuiz($id)     { $s = $this->findSubject($id); $subjectName = $s['name'] ?? 'Quiz'; return view('content.subjectdetails.quiz.index', compact('id', 'subjectName')); }
-    public function quizBuilder($id)    { 
-        $id = (int)$id;
-        $subject = $this->findSubject($id);
-        $course = $this->findCourseForSubject($id);
-        $subjectName = $subject['name'] ?? 'Subject';
-        return view('content.subjectdetails.quiz.builder', compact('id', 'subject', 'subjectName', 'course')); 
+    public function deleteNote($id)
+    {
+        $note = Note::findOrFail($id);
+        Storage::disk('public')->delete($note->file_path);
+        $note->delete();
+        return back()->with('success', 'Note deleted successfully!');
     }
-    public function manageQAPapers($id) { $s = $this->findSubject($id); $subjectName = $s['name'] ?? 'QA Papers'; return view('content.subjectdetails.papers.index', compact('id', 'subjectName')); }
+
+    public function deleteNoteFolder($id)
+    {
+        $folder = NoteFolder::findOrFail($id);
+        if ($folder->children()->count() > 0 || $folder->notes()->count() > 0) {
+            return back()->with('error', 'Folder is not empty!');
+        }
+        $folder->delete();
+        return back()->with('success', 'Folder deleted successfully!');
+    }
+
+    // Video Management Methods
+    public function storeVideoFolder(Request $request, $subjectId)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'parent_id' => 'nullable|exists:video_folders,id',
+        ]);
+
+        VideoFolder::create([
+            'subject_id' => $subjectId,
+            'parent_id' => $request->parent_id,
+            'name' => $request->name,
+            'sort_order' => VideoFolder::where('subject_id', $subjectId)->where('parent_id', $request->parent_id)->max('sort_order') + 1,
+        ]);
+
+        return back()->with('success', 'Folder created successfully!');
+    }
+
+    public function storeVideo(Request $request, $subjectId)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'video_url' => 'required|string',
+            'video_source' => 'required|in:youtube,vimeo,mp4,other',
+            'folder_id' => 'nullable|exists:video_folders,id',
+            'is_free' => 'boolean',
+        ]);
+
+        Video::create([
+            'subject_id' => $subjectId,
+            'folder_id' => $request->folder_id,
+            'name' => $request->name,
+            'video_url' => $request->video_url,
+            'video_source' => $request->video_source,
+            'is_free' => $request->is_free ?? false,
+            'status' => 'active',
+            'sort_order' => Video::where('subject_id', $subjectId)->where('folder_id', $request->folder_id)->max('sort_order') + 1,
+        ]);
+
+        return back()->with('success', 'Video added successfully!');
+    }
+
+    public function deleteVideo($id)
+    {
+        $video = Video::findOrFail($id);
+        $video->delete();
+        return back()->with('success', 'Video deleted successfully!');
+    }
+
+    public function deleteVideoFolder($id)
+    {
+        $folder = VideoFolder::findOrFail($id);
+        if ($folder->children()->count() > 0 || $folder->videos()->count() > 0) {
+            return back()->with('error', 'Folder is not empty!');
+        }
+        $folder->delete();
+        return back()->with('success', 'Folder deleted successfully!');
+    }
+
+    // QA Papers Management Methods
+    public function storeQAPaperFolder(Request $request, $subjectId)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'parent_id' => 'nullable|exists:qa_paper_folders,id',
+        ]);
+
+        QaPaperFolder::create([
+            'subject_id' => $subjectId,
+            'parent_id' => $request->parent_id,
+            'name' => $request->name,
+            'sort_order' => QaPaperFolder::where('subject_id', $subjectId)->where('parent_id', $request->parent_id)->max('sort_order') + 1,
+        ]);
+
+        return back()->with('success', 'Folder created successfully!');
+    }
+
+    public function storeQAPaper(Request $request, $subjectId)
+    {
+        $request->validate([
+            'files.*' => 'required|file|mimes:pdf,doc,docx,txt|max:10240',
+            'folder_id' => 'nullable|exists:qa_paper_folders,id',
+        ]);
+
+        if ($request->hasFile('files')) {
+            foreach ($request->file('files') as $file) {
+                $path = $file->store('papers/' . $subjectId, 'public');
+                
+                QaPaper::create([
+                    'subject_id' => $subjectId,
+                    'folder_id' => $request->folder_id,
+                    'name' => $file->getClientOriginalName(),
+                    'file_path' => $path,
+                    'file_type' => $file->getClientOriginalExtension(),
+                    'is_free' => false,
+                    'status' => 'active',
+                    'sort_order' => QaPaper::where('subject_id', $subjectId)->where('folder_id', $request->folder_id)->max('sort_order') + 1,
+                ]);
+            }
+        }
+
+        return back()->with('success', 'Papers uploaded successfully!');
+    }
+
+    public function deleteQAPaper($id)
+    {
+        $paper = QaPaper::findOrFail($id);
+        Storage::disk('public')->delete($paper->file_path);
+        $paper->delete();
+        return back()->with('success', 'Paper deleted successfully!');
+    }
+
+    public function deleteQAPaperFolder($id)
+    {
+        $folder = QaPaperFolder::findOrFail($id);
+        if ($folder->children()->count() > 0 || $folder->qaPapers()->count() > 0) {
+            return back()->with('error', 'Folder is not empty!');
+        }
+        $folder->delete();
+        return back()->with('success', 'Folder deleted successfully!');
+    }
+
+    // Quiz Management Method
+    public function manageQuiz($id)
+    {
+        $subject = Subject::findOrFail($id);
+        $subjectName = $subject->name;
+        $quizzes = $subject->quizzes()->orderBy('sort_order')->get();
+        return view('content.subjectdetails.quiz.index', compact('id', 'subject', 'subjectName', 'quizzes'));
+    }
 }

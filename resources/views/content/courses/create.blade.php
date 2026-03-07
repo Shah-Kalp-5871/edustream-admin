@@ -157,11 +157,12 @@ document.querySelectorAll('.color-opt').forEach(opt => {
                 Course Details
             </h2>
 
-            <form action="{{ url('/content') }}" method="GET" onsubmit="event.preventDefault(); alert('Static demo: Course created!'); window.location.href='{{ url('/content') }}';">
+            <form action="{{ url('/content/course') }}" method="POST">
+                @csrf
                 <div class="form-grid">
                     <div class="form-group" style="grid-column: span 2;">
                         <label class="form-label">Course Title</label>
-                        <input type="text" class="form-control" placeholder="e.g. Advanced Mathematics for Standard 10" required>
+                        <input type="text" name="name" class="form-control" placeholder="e.g. Advanced Mathematics for Standard 10" required>
                     </div>
 
                     <div class="form-group" style="grid-column: span 2;">
@@ -175,12 +176,10 @@ document.querySelectorAll('.color-opt').forEach(opt => {
                             <div class="icon-opt" data-icon="fa-solid fa-code"><i class="fa-solid fa-code"></i></div>
                             <div class="icon-opt" data-icon="fa-solid fa-laptop-code"><i class="fa-solid fa-laptop-code"></i></div>
                             <div class="icon-opt" data-icon="fa-solid fa-chart-simple"><i class="fa-solid fa-chart-simple"></i></div>
-                            <div class="icon-opt" data-icon="fa-solid fa-briefcase"><i class="fa-solid fa-briefcase"></i></div>
-                            <div class="icon-opt" data-icon="fa-solid fa-microchip"><i class="fa-solid fa-microchip"></i></div>
                             <div class="icon-opt" data-icon="fa-solid fa-book"><i class="fa-solid fa-book"></i></div>
                             <div class="icon-opt" data-icon="fa-solid fa-dna"><i class="fa-solid fa-dna"></i></div>
                         </div>
-                        <input type="hidden" name="icon" id="selectedIcon" value="fa-solid fa-graduation-cap">
+                        <input type="hidden" name="icon_url" id="selectedIcon" value="fa-solid fa-graduation-cap">
                     </div>
 
                     <div class="form-group" style="grid-column: span 2;">
@@ -193,55 +192,41 @@ document.querySelectorAll('.color-opt').forEach(opt => {
                             <div class="color-opt" data-color="#E64A19" style="background: #E64A19;"></div>
                             <div class="color-opt" data-color="#4A148C" style="background: #4A148C;"></div>
                             <div class="color-opt" data-color="#B71C1C" style="background: #B71C1C;"></div>
-                            <div class="color-opt" data-color="#00838F" style="background: #00838F;"></div>
-                            <div class="color-opt" data-color="#283593" style="background: #283593;"></div>
-                            <div class="color-opt" data-color="#F9A825" style="background: #F9A825;"></div>
                         </div>
-                        <input type="hidden" name="color" id="selectedColor" value="#1565C0">
+                        <input type="hidden" name="color_code" id="selectedColor" value="#1565C0">
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">Course Category</label>
-                        <select class="form-control">
-                            <option>Primary School</option>
-                            <option>Secondary School</option>
-                            <option>High School</option>
-                            <option>Higher Secondary</option>
-                            <option>Undergraduate</option>
-                            <option>Postgraduate</option>
+                        <select name="category_id" class="form-control" required>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                            @endforeach
                         </select>
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">Full Course Price (₹)</label>
-                        <input type="number" class="form-control" placeholder="e.g. 5000" required>
+                        <input type="number" name="price" class="form-control" placeholder="e.g. 5000" required>
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">Course Status</label>
-                        <select class="form-control">
-                            <option>Active</option>
-                            <option>Inactive</option>
+                        <select name="status" class="form-control">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
                         </select>
                     </div>
 
                     <div class="form-group" style="grid-column: span 2;">
                         <label class="form-label">Description</label>
-                        <textarea class="form-control textarea" placeholder="Enter course overview and objectives..."></textarea>
+                        <textarea name="description" class="form-control textarea" placeholder="Enter course overview and objectives..."></textarea>
                     </div>
 
-                    <div class="form-group" style="grid-column: span 2;">
-                        <label class="form-label">Course Thumbnail</label>
-                        <div class="image-upload-preview" onclick="alert('File upload dialog would open here')">
-                            <i class="fa-solid fa-cloud-arrow-up"></i>
-                            <span>Click to upload or drag and drop</span>
-                            <small>PNG, JPG up to 5MB</small>
-                        </div>
-                    </div>
                 </div>
 
                 <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border);">
-                    <a href="{{ url('/content') }}" class="btn btn-secondary" style="width: auto; padding: 12px 24px; text-decoration: none;">Cancel</a>
+                    <a href="{{ url('/content') }}" class="quick-action-btn" style="width: auto; padding: 12px 24px; text-decoration: none;">Cancel</a>
                     <button type="submit" class="btn-submit">
                         <i class="fa-solid fa-check"></i> Create Course
                     </button>

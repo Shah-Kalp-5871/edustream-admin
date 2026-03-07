@@ -116,24 +116,35 @@
             <div>
                 <div class="cat-header">
                     <div class="cat-icon">
-                        <i class="fa-solid fa-tags"></i>
+                        @if($category->icon_url && str_contains($category->icon_url, 'fa-'))
+                            <i class="{{ $category->icon_url }}"></i>
+                        @else
+                            <i class="fa-solid fa-tags"></i>
+                        @endif
                     </div>
                 </div>
-                <h3 class="cat-name">{{ $category['name'] }}</h3>
+                <h3 class="cat-name">{{ $category->name }}</h3>
+                <span class="status-badge {{ $category->status == 'active' ? 'status-active' : 'status-pending' }}" style="padding: 2px 8px; font-size: 10px;">
+                    {{ ucfirst($category->status) }}
+                </span>
             </div>
             
             <div class="cat-footer">
                 <div class="cat-stats">
                     <i class="fa-solid fa-graduation-cap" style="margin-right: 4px;"></i>
-                    {{ $category['courses_count'] }} Courses
+                    {{ $category->courses_count }} Courses
                 </div>
                 <div class="cat-actions">
-                    <a href="{{ url('/content/categories/' . $category['id'] . '/edit') }}" class="action-circle-btn" title="Edit Category">
+                    <a href="{{ url('/content/categories/' . $category->id . '/edit') }}" class="action-circle-btn" title="Edit Category">
                         <i class="fa-solid fa-pen-to-square"></i>
                     </a>
-                    <button class="action-circle-btn delete" onclick="confirmDeleteCat('{{ $category['name'] }}')">
+                    <button class="action-circle-btn delete" onclick="confirmDeleteCat({{ $category->id }}, '{{ $category->name }}')" title="Delete Category">
                         <i class="fa-solid fa-trash-can"></i>
                     </button>
+                    <form id="delete-cat-{{ $category->id }}" action="{{ url('/content/categories/' . $category->id) }}" method="POST" style="display: none;">
+                        @csrf
+                        @method('DELETE')
+                    </form>
                 </div>
             </div>
         </div>
@@ -146,7 +157,7 @@
 @section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-function confirmDeleteCat(name) {
+function confirmDeleteCat(id, name) {
     Swal.fire({
         title: 'Delete Category?',
         text: "Are you sure you want to delete '" + name + "'? This will affect courses in this category.",
@@ -159,7 +170,7 @@ function confirmDeleteCat(name) {
         color: 'var(--text)'
     }).then((result) => {
         if (result.isConfirmed) {
-            Swal.fire('Deleted!', 'Category removed (Demo).', 'success')
+            document.getElementById('delete-cat-' + id).submit();
         }
     })
 }

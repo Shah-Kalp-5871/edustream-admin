@@ -143,35 +143,39 @@
     <!-- Courses List -->
     <div class="courses-list" id="coursesList">
         @foreach($courses as $course)
-        <div class="course-list-item" onclick="window.location.href='{{ url('/content/course/' . $course['id']) }}'">
+        <div class="course-list-item" onclick="window.location.href='{{ url('/content/course/' . $course->id) }}'">
             <div class="course-list-left">
-                <div class="course-list-icon" style="background: {{ $course['color'] }}20; color: {{ $course['color'] }};">
-                    <i class="{{ $course['icon'] }}"></i>
+                <div class="course-list-icon" style="background: {{ $course->color_code }}20; color: {{ $course->color_code }};">
+                    <i class="{{ $course->icon_url }}"></i>
                 </div>
                 <div class="course-list-info">
                     <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 4px;">
-                        <h3 class="course-list-name" style="margin-bottom: 0;">{{ $course['name'] }}</h3>
-                        <span class="status-badge {{ $course['status'] == 'Active' ? 'status-active' : 'status-pending' }}" style="padding: 2px 8px; font-size: 10px;">
-                            {{ $course['status'] }}
+                        <h3 class="course-list-name" style="margin-bottom: 0;">{{ $course->name }}</h3>
+                        <span class="status-badge {{ $course->status == 'active' ? 'status-active' : 'status-pending' }}" style="padding: 2px 8px; font-size: 10px;">
+                            {{ ucfirst($course->status) }}
                         </span>
                     </div>
-                    <p class="course-list-desc">{{ $course['description'] }}</p>
+                    <p class="course-list-desc">{{ $course->description }}</p>
                     <div class="course-list-meta">
-                        <span style="color: var(--primary); font-weight: 700; font-size: 13px;">₹{{ number_format($course['price']) }}</span>
-                        <span><i class="fa-regular fa-bookmark"></i> {{ $course['category'] }}</span>
-                        <span><i class="fa-regular fa-folder"></i> {{ $course['subjects_count'] }} subjects</span>
-                        <span><i class="fa-regular fa-clock"></i> Updated 2 days ago</span>
+                        <span style="color: var(--primary); font-weight: 700; font-size: 13px;">₹{{ number_format($course->price) }}</span>
+                        <span><i class="fa-regular fa-bookmark"></i> {{ $course->category->name }}</span>
+                        <span><i class="fa-regular fa-folder"></i> {{ $course->subjects_count }} subjects</span>
+                        <span><i class="fa-regular fa-clock"></i> Updated {{ $course->updated_at->diffForHumans() }}</span>
                     </div>
                 </div>
             </div>
             <div class="course-list-right">
-                <a href="{{ url('/content/course/' . $course['id'] . '/edit') }}" class="course-list-menu" onclick="event.stopPropagation();" title="Edit Course" style="color: var(--primary); text-decoration: none;">
+                <a href="{{ url('/content/course/' . $course->id . '/edit') }}" class="course-list-menu" onclick="event.stopPropagation();" title="Edit Course" style="color: var(--primary); text-decoration: none;">
                     <i class="fa-solid fa-pen-to-square"></i>
                 </a>
-                <button class="course-list-menu" onclick="event.stopPropagation(); confirmDelete('{{ $course['name'] }}')" title="Delete Course" style="color: #ef4444;">
+                <button class="course-list-menu" onclick="event.stopPropagation(); confirmDelete({{ $course->id }}, '{{ $course->name }}')" title="Delete Course" style="color: #ef4444;">
                     <i class="fa-solid fa-trash-can"></i>
                 </button>
-                <button class="course-list-manage" onclick="event.stopPropagation(); window.location.href='{{ url('/content/course/' . $course['id']) }}'">
+                <form id="delete-course-{{ $course->id }}" action="{{ url('/content/course/' . $course->id) }}" method="POST" style="display: none;">
+                    @csrf
+                    @method('DELETE')
+                </form>
+                <button class="course-list-manage" onclick="event.stopPropagation(); window.location.href='{{ url('/content/course/' . $course->id) }}'">
                     Manage <i class="fa-solid fa-arrow-right"></i>
                 </button>
             </div>
@@ -250,7 +254,7 @@ document.getElementById('courseSearch')?.addEventListener('input', function(e) {
     });
 });
 
-function confirmDelete(courseName) {
+function confirmDelete(id, courseName) {
     Swal.fire({
         title: 'Are you sure?',
         text: "You are about to delete '" + courseName + "'. This action cannot be undone!",
@@ -263,11 +267,7 @@ function confirmDelete(courseName) {
         color: 'var(--text)'
     }).then((result) => {
         if (result.isConfirmed) {
-            Swal.fire(
-                'Deleted!',
-                'The course has been deleted (Demo only).',
-                'success'
-            )
+            document.getElementById('delete-course-' + id).submit();
         }
     })
 }

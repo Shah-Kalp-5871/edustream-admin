@@ -2,25 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
-    private function getCategories()
-    {
-        return [
-            ['id' => 1, 'name' => 'Primary School', 'courses_count' => 12],
-            ['id' => 2, 'name' => 'Secondary School', 'courses_count' => 15],
-            ['id' => 3, 'name' => 'High School', 'courses_count' => 8],
-            ['id' => 4, 'name' => 'Higher Secondary', 'courses_count' => 10],
-            ['id' => 5, 'name' => 'Undergraduate', 'courses_count' => 6],
-            ['id' => 6, 'name' => 'Postgraduate', 'courses_count' => 4],
-        ];
-    }
-
     public function index()
     {
-        $categories = $this->getCategories();
+        $categories = Category::withCount('courses')->orderBy('sort_order')->get();
         return view('content.categories.index', compact('categories'));
     }
 
@@ -29,11 +19,55 @@ class CategoryController extends Controller
         return view('content.categories.create');
     }
 
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'icon_url' => 'nullable|string',
+            'status' => 'required|in:active,inactive',
+        ]);
+
+        Category::create([
+            'name' => $request->name,
+            'slug' => Str::slug($request->name),
+            'icon_url' => $request->icon_url,
+            'status' => $request->status,
+            'sort_order' => Category::max('sort_order') + 1,
+        ]);
+
+        return redirect('/content/categories')->with('success', 'Category created successfully!');
+    }
+
     public function edit($id)
     {
-        $id = (int)$id;
-        $categories = $this->getCategories();
-        $category = collect($categories)->firstWhere('id', $id);
+        $category = Category::findOrFail($id);
         return view('content.categories.edit', compact('category'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'icon_url' => 'nullable|string',
+            'status' => 'required|in:active,inactive',
+        ]);
+
+        $category = Category::findOrFail($id);
+        $category->update([
+            'name' => $request->name,
+            'slug' => Str::slug($request->name),
+            'icon_url' => $request->icon_url,
+            'status' => $request->status,
+        ]);
+
+        return redirect('/content/categories')->with('success', 'Category updated successfully!');
+    }
+
+    public function destroy($id)
+    {
+        $category = Category::findOrFail($id);
+        $category->delete();
+
+        return redirect('/content/categories')->with('success', 'Category deleted successfully!');
     }
 }
