@@ -45,6 +45,11 @@ return [
             'driver' => 'jwt',
             'provider' => 'students',
         ],
+
+        'api-admin' => [
+            'driver' => 'jwt',
+            'provider' => 'admins',
+        ],
     ],
 
     /*

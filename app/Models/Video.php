@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Support\Facades\Storage;
+
 
 class Video extends Model
 {
@@ -48,5 +51,32 @@ class Video extends Model
     public function scopeFree($query)
     {
         return $query->where('is_free', true);
+    }
+
+    protected function filePath(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? Storage::url($value) : null,
+        );
+    }
+
+    protected function thumbnailUrl(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? Storage::url($value) : null,
+        );
+    }
+
+    protected function videoUrl(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value) {
+                if (!$value) return null;
+                if (filter_var($value, FILTER_VALIDATE_URL)) {
+                    return $value;
+                }
+                return Storage::url($value);
+            },
+        );
     }
 }

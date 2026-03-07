@@ -189,7 +189,7 @@ class ContentApiController extends Controller
                 'student_id' => $student->id,
                 'order_number' => 'ORD-' . strtoupper(Str::random(10)),
                 'total_amount' => $course->price,
-                'payment_status' => 'paid', // Assuming instant payment for now
+                'payment_status' => 'completed', // Assuming instant payment for now
                 'payment_method' => $request->payment_method,
                 'payment_id' => $request->payment_id,
             ]);
