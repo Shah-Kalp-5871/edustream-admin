@@ -23,10 +23,10 @@ class ContentController extends Controller
     {
         $courses = Course::with('category')->withCount('subjects')->orderBy('sort_order')->get();
         $totalSubjects = Subject::count();
-        $totalStudents = \App\Models\Student::count();
-        $totalEnrollments = \App\Models\Enrollment::count();
+        $totalContents = Note::count() + Video::count() + QaPaper::count();
+        $totalQuizzes = Quiz::count();
         
-        return view('content.courses.index', compact('courses', 'totalSubjects', 'totalStudents', 'totalEnrollments'));
+        return view('content.courses.index', compact('courses', 'totalSubjects', 'totalContents', 'totalQuizzes'));
     }
 
     public function create()

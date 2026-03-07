@@ -86,9 +86,12 @@ Route::post('/quiz/toggle-free/{id}', [QuizController::class, 'toggleFree']);
 Route::post('/quiz/{id}/update', [QuizController::class, 'update']);
 Route::delete('/quiz/{id}', [QuizController::class, 'destroy']);
 Route::post('/quiz/{id}/question/store', [QuizController::class, 'storeQuestion']);
+Route::post('/quiz/{id}/bulk-save', [QuizController::class, 'bulkSave']);
+Route::post('/quiz/{id}/import-json', [QuizController::class, 'importJson']);
 Route::post('/quiz/question/{id}/update', [QuizController::class, 'updateQuestion']);
 Route::delete('/quiz/question/{id}', [QuizController::class, 'deleteQuestion']);
 Route::post('/quiz/question/{id}/option/store', [QuizController::class, 'storeOption']);
+Route::post('/quiz/option/{id}/update', [QuizController::class, 'updateOption']);
 Route::delete('/quiz/option/{id}', [QuizController::class, 'deleteOption']);
 
 // User Routes
