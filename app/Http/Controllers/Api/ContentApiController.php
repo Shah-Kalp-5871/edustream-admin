@@ -18,65 +18,147 @@ use Illuminate\Support\Str;
 
 class ContentApiController extends Controller
 {
+    public function home()
+    {
+        $categories = Category::active()->orderBy('sort_order')->take(8)->get();
+        $featuredCourses = Course::active()->where('price', '>', 0)->orderBy('created_at', 'desc')->take(5)->get();
+        
+        $banners = \App\Models\Banner::active()->orderBy('sort_order')->get()->map(function($banner) {
+            return [
+                'id'          => $banner->id,
+                'title'       => $banner->title,
+                'subtitle'    => $banner->subtitle,
+                'icon'        => $banner->icon ?? 'fa-graduation-cap',
+                'color_start' => $banner->color_start ?? '#1565C0',
+                'color_end'   => $banner->color_end ?? '#7B1FA2',
+                'link'        => $banner->redirect_url,
+            ];
+        });
+
+        return response()->json([
+            'categories' => $categories,
+            'featured_courses' => $featuredCourses,
+            'banners' => $banners
+        ]);
+    }
+
+    public function allCourses()
+    {
+        // For the signup dropdown, we just need courses, optionally their category info
+        $courses = Course::active()->with('category:id,name')->orderBy('category_id')->get();
+        return response()->json($courses);
+    }
+
     public function categories()
     {
         $categories = Category::active()->withCount('courses')->get();
         return response()->json($categories);
     }
 
-    public function courses(Request $request)
+    public function categoryCourses($id)
     {
-        $query = Course::active()->with('category');
-
-        if ($request->has('category_id')) {
-            $query->where('category_id', $request->category_id);
-        }
-
-        if ($request->has('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
-        }
-
-        $courses = $query->paginate(10);
+        $courses = Course::active()->where('category_id', $id)->withCount('subjects')->get();
         return response()->json($courses);
     }
 
-    public function courseDetails($id)
+    public function courseSubjects($id)
     {
-        $course = Course::with(['subjects' => function($q) {
-            $q->active()->orderBy('sort_order');
-        }])->findOrFail($id);
-
-        return response()->json($course);
+        $course = Course::active()->findOrFail($id);
+        $subjects = Subject::active()->where('course_id', $id)->orderBy('sort_order')->get();
+        
+        return response()->json([
+            'course' => $course,
+            'subjects' => $subjects
+        ]);
     }
 
     public function subjectDetails(Request $request, $id)
     {
-        $subject = Subject::with(['notes', 'videos', 'qaPapers', 'quizzes'])->findOrFail($id);
+        $subject = Subject::findOrFail($id);
         $student = auth()->guard('api-student')->user();
 
         // Check enrollment
         $isEnrolled = Enrollment::where('student_id', $student->id)
-            ->where('subject_id', $id)
+            ->where(function($q) use ($subject) {
+                $q->where('subject_id', $subject->id)
+                  ->orWhere('course_id', $subject->course_id);
+            })
             ->active()
             ->exists();
 
-        // Process content to add 'locked' status
-        $subject->notes->each(function($note) use ($isEnrolled) {
+        return response()->json([
+            'subject' => $subject,
+            'is_enrolled' => $isEnrolled,
+            'content_summary' => [
+                'notes_count' => $subject->notes()->count(),
+                'videos_count' => $subject->videos()->count(),
+                'papers_count' => $subject->qaPapers()->count(),
+                'quizzes_count' => $subject->quizzes()->count(),
+            ]
+        ]);
+    }
+
+    public function subjectNotes($id)
+    {
+        $subject = Subject::findOrFail($id);
+        $student = auth()->guard('api-student')->user();
+        $isEnrolled = $this->checkEnrollment($student->id, $subject);
+
+        $notes = $subject->notes()->active()->orderBy('sort_order')->get();
+        $notes->each(function($note) use ($isEnrolled) {
             $note->is_locked = !$note->is_free && !$isEnrolled;
             if ($note->is_locked) unset($note->file_path);
         });
 
-        $subject->videos->each(function($video) use ($isEnrolled) {
+        return response()->json($notes);
+    }
+
+    public function subjectVideos($id)
+    {
+        $subject = Subject::findOrFail($id);
+        $student = auth()->guard('api-student')->user();
+        $isEnrolled = $this->checkEnrollment($student->id, $subject);
+
+        $videos = $subject->videos()->active()->orderBy('sort_order')->get();
+        $videos->each(function($video) use ($isEnrolled) {
             $video->is_locked = !$video->is_free && !$isEnrolled;
-            if ($video->is_locked) unset($video->video_url);
+            if ($video->is_locked) unset($video->video_url, $video->file_path);
         });
 
-        $subject->qaPapers->each(function($paper) use ($isEnrolled) {
+        return response()->json($videos);
+    }
+
+    public function subjectPapers($id)
+    {
+        $subject = Subject::findOrFail($id);
+        $student = auth()->guard('api-student')->user();
+        $isEnrolled = $this->checkEnrollment($student->id, $subject);
+
+        $papers = $subject->qaPapers()->active()->orderBy('sort_order')->get();
+        $papers->each(function($paper) use ($isEnrolled) {
             $paper->is_locked = !$paper->is_free && !$isEnrolled;
             if ($paper->is_locked) unset($paper->file_path);
         });
 
-        return response()->json($subject);
+        return response()->json($papers);
+    }
+
+    public function subjectQuizzes($id)
+    {
+        $subject = Subject::findOrFail($id);
+        $quizzes = $subject->quizzes()->active()->orderBy('sort_order')->get();
+        return response()->json($quizzes);
+    }
+
+    private function checkEnrollment($studentId, $subject)
+    {
+        return Enrollment::where('student_id', $studentId)
+            ->where(function($q) use ($subject) {
+                $q->where('subject_id', $subject->id)
+                  ->orWhere('course_id', $subject->course_id);
+            })
+            ->active()
+            ->exists();
     }
 
     public function myCourses()
@@ -104,120 +186,108 @@ class ContentApiController extends Controller
         return response()->json($quiz);
     }
 
-    public function submitQuiz(Request $request, $id)
+    public function getCart()
     {
-        $quiz = Quiz::with('questions.options')->findOrFail($id);
         $student = auth()->guard('api-student')->user();
+        $cartItems = CartItem::where('student_id', $student->id)->with('item')->get();
         
-        $answers = $request->input('answers', []); // format: [question_id => option_id]
+        $total = $cartItems->sum('price');
         
-        $totalQuestions = $quiz->questions->count();
-        $correctAnswers = 0;
-        $earnedMarks = 0;
-        $totalMarks = $quiz->questions->sum('marks');
-
-        DB::beginTransaction();
-        try {
-            $attempt = QuizAttempt::create([
-                'quiz_id' => $quiz->id,
-                'student_id' => $student->id,
-                'start_time' => $request->start_time ?? now(),
-                'end_time' => now(),
-                'total_questions' => $totalQuestions,
-                'status' => 'completed',
-            ]);
-
-            foreach ($quiz->questions as $question) {
-                $selectedOptionId = $answers[$question->id] ?? null;
-                $isCorrect = false;
-                
-                if ($selectedOptionId) {
-                    $correctOption = $question->options->where('is_correct', true)->first();
-                    if ($correctOption && $correctOption->id == $selectedOptionId) {
-                        $isCorrect = true;
-                        $correctAnswers++;
-                        $earnedMarks += $question->marks;
-                    }
-                }
-
-                QuizAnswer::create([
-                    'quiz_attempt_id' => $attempt->id,
-                    'quiz_question_id' => $question->id,
-                    'quiz_option_id' => $selectedOptionId,
-                    'is_correct' => $isCorrect,
-                    'marks_earned' => $isCorrect ? $question->marks : 0,
-                ]);
-            }
-
-            $attempt->update([
-                'correct_answers' => $correctAnswers,
-                'score' => ($totalMarks > 0) ? ($earnedMarks / $totalMarks) * 100 : 0,
-            ]);
-
-            DB::commit();
-
-            return response()->json([
-                'message' => 'Quiz submitted successfully',
-                'result' => [
-                    'total_questions' => $totalQuestions,
-                    'correct_answers' => $correctAnswers,
-                    'score' => $attempt->score,
-                    'earned_marks' => $earnedMarks,
-                    'total_marks' => $totalMarks,
-                ]
-            ]);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['error' => 'Submission failed: ' . $e->getMessage()], 500);
-        }
+        return response()->json([
+            'items' => $cartItems,
+            'total' => $total
+        ]);
     }
 
-    public function checkout(Request $request)
+    public function addToCart(Request $request)
     {
         $request->validate([
-            'course_id' => 'required|exists:courses,id',
-            'payment_method' => 'required|string',
-            'payment_id' => 'nullable|string',
+            'item_type' => 'required|in:course,subject',
+            'item_id' => 'required',
         ]);
 
-        $course = Course::findOrFail($request->course_id);
         $student = auth()->guard('api-student')->user();
+        $model = $request->item_type === 'course' ? Course::class : Subject::class;
+        $item = $model::findOrFail($request->item_id);
+
+        // Check if already in cart
+        $exists = CartItem::where('student_id', $student->id)
+            ->where('item_type', $model)
+            ->where('item_id', $item->id)
+            ->exists();
+
+        if ($exists) {
+            return response()->json(['message' => 'Item already in cart'], 400);
+        }
+
+        $cartItem = CartItem::create([
+            'student_id' => $student->id,
+            'item_type' => $model,
+            'item_id' => $item->id,
+            'price' => $item->price,
+        ]);
+
+        return response()->json(['message' => 'Added to cart', 'item' => $cartItem]);
+    }
+
+    public function removeFromCart($id)
+    {
+        $student = auth()->guard('api-student')->user();
+        CartItem::where('student_id', $student->id)->where('id', $id)->delete();
+        
+        return response()->json(['message' => 'Removed from cart']);
+    }
+
+    public function createOrder(Request $request)
+    {
+        $student = auth()->guard('api-student')->user();
+        $cartItems = CartItem::where('student_id', $student->id)->get();
+
+        if ($cartItems->isEmpty()) {
+            return response()->json(['error' => 'Cart is empty'], 400);
+        }
 
         DB::beginTransaction();
         try {
             $order = Order::create([
                 'student_id' => $student->id,
                 'order_number' => 'ORD-' . strtoupper(Str::random(10)),
-                'total_amount' => $course->price,
-                'payment_status' => 'completed', // Assuming instant payment for now
-                'payment_method' => $request->payment_method,
+                'total_amount' => $cartItems->sum('price'),
+                'payment_status' => 'completed',
+                'payment_method' => $request->payment_method ?? 'wallet',
                 'payment_id' => $request->payment_id,
             ]);
 
-            OrderItem::create([
-                'order_id' => $order->id,
-                'item_type' => 'App\Models\Course',
-                'item_id' => $course->id,
-                'price' => $course->price,
-            ]);
+            foreach ($cartItems as $cartItem) {
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'item_type' => $cartItem->item_type,
+                    'item_id' => $cartItem->item_id,
+                    'price' => $cartItem->price,
+                ]);
 
-            // Create Enrollment
-            Enrollment::create([
-                'student_id' => $student->id,
-                'course_id' => $course->id,
-                'order_id' => $order->id,
-                'status' => 'active',
-            ]);
+                // Create Enrollment
+                Enrollment::create([
+                    'student_id' => $student->id,
+                    'course_id' => $cartItem->item_type === Course::class ? $cartItem->item_id : null,
+                    'subject_id' => $cartItem->item_type === Subject::class ? $cartItem->item_id : null,
+                    'order_id' => $order->id,
+                    'status' => 'active',
+                ]);
+            }
+
+            // Clear cart
+            CartItem::where('student_id', $student->id)->delete();
 
             DB::commit();
 
             return response()->json([
-                'message' => 'Enrollment successful',
-                'order_number' => $order->order_number
+                'message' => 'Order created successfully',
+                'order' => $order
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['error' => 'Checkout failed'], 500);
+            return response()->json(['error' => 'Order failed: ' . $e->getMessage()], 500);
         }
     }
 

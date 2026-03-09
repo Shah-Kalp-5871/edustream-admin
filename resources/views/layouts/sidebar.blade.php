@@ -26,6 +26,11 @@
             Categories
         </a>
 
+        <a href="/banners" class="nav-link {{ request()->is('banners*') ? 'active' : '' }}">
+            <span class="nav-icon"><i class="fas fa-images"></i></span>
+            Banners
+        </a>
+
         <span class="nav-section">People</span>
 
         <a href="/users" class="nav-link {{ request()->is('users*') ? 'active' : '' }}">

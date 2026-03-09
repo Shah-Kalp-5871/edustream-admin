@@ -1,0 +1,39 @@
+# EduStream Integration Plan Walkthrough
+
+This walkthrough summarizes the proposed integration strategy for making the EduStream Flutter app fully dynamic.
+
+## 1. System Architecture & Data Flow
+The integration centers on a robust data flow from the Laravel Admin CMS to the Flutter Student App.
+
+```mermaid
+graph TD
+    Admin[Admin Panel] -->|1. Upload Content| DB[(Laravel Database)]
+    DB -->|2. Provide Data| API[Student API Layer]
+    API -->|3. Fetch JSON| Flutter[Flutter App]
+    Flutter -->|4. Render UI| Student[Student User]
+```
+
+## 2. Dynamic Content Hierarchy
+The app will dynamically load content based on the following hierarchy:
+1.  **Category (Standard)**: e.g., Grade 10
+2.  **Course**: e.g., Full Secondary Package
+3.  **Subject**: e.g., Mathematics
+4.  **Content**: Notes (PDFs), Videos (Streaming), QA Papers (Previous Years), and Quizzes (Interactive).
+
+## 3. Key API Endpoints
+We leverage existing APIs and propose new ones for a complete experience:
+- **Auth**: Fully dynamic login/register/profile management.
+- **Content**: On-demand fetching of course and subject data.
+- **Interactive**: Real-time quiz submission and scoring.
+- **Commerce**: Integrated checkout and order history.
+
+## 4. Flutter implementation Strategy
+The Flutter app will move away from static mocks to a clean, service-oriented architecture:
+- **ApiService**: Central handling of network requests.
+- **Repositories**: Feature-specific data fetching.
+- **State Management**: Reactive UI updates as data arrives.
+
+## 5. Next Steps
+1.  Review and approve the [implementation plan](file:///C:/Users/Kalp/.gemini/antigravity/brain/b6f15b1e-4dba-4bdb-ad43-840f3fbc4a64/implementation_plan.md).
+2.  Finalize the API contract for any missing endpoints (e.g., Home Screen, Order Persistence).
+3.  Begin implementation of the Flutter Repository layer.

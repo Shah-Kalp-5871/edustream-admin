@@ -10,6 +10,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\BannerWebController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -112,4 +113,10 @@ Route::get('/orders/{id}/invoice', [OrderController::class, 'invoice']);
 // Analytics & Settings
     Route::get('/analytics', [AnalyticsController::class, 'index']);
     Route::get('/settings', [SettingsController::class, 'index']);
+
+    // Banner Routes
+    Route::get('/banners', [BannerWebController::class, 'index']);
+    Route::post('/banners', [BannerWebController::class, 'store']);
+    Route::patch('/banners/{banner}/toggle', [BannerWebController::class, 'toggleStatus']);
+    Route::delete('/banners/{banner}', [BannerWebController::class, 'destroy']);
 });

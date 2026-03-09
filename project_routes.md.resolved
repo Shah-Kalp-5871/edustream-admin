@@ -1,0 +1,53 @@
+# Laravel Routes & APIs List
+
+This document contains a comprehensive list of all defined routes and APIs in the Edustream Admin project.
+
+## API Endpoints (api.php)
+
+| Method | URI | Controller Action | Middleware |
+| :--- | :--- | :--- | :--- |
+| POST | `api/admin/login` | AuthController@login | api |
+| POST | `api/admin/logout` | AuthController@logout | api, auth:api-admin |
+| GET | `api/admin/me` | AuthController@me | api, auth:api-admin |
+| POST | `api/admin/refresh` | AuthController@refresh | api, auth:api-admin |
+| GET | `api/admin/dashboard` | DashboardController@index | api, auth:api-admin |
+| GET | `api/admin/analytics/dashboard` | AnalyticsController@dashboard | api, auth:api-admin |
+| GET | `api/admin/analytics/revenue` | AnalyticsController@revenue | api, auth:api-admin |
+| GET | `api/admin/analytics/users` | AnalyticsController@users | api, auth:api-admin |
+| GET | `api/admin/categories` | CategoryController@index | api, auth:api-admin |
+| POST | `api/admin/categories` | CategoryController@store | api, auth:api-admin |
+| GET | `api/admin/courses` | CourseController@index | api, auth:api-admin |
+| POST | `api/admin/courses` | CourseController@store | api, auth:api-admin |
+| GET | `api/admin/subjects` | SubjectController@index | api, auth:api-admin |
+| POST | `api/admin/subjects` | SubjectController@store | api, auth:api-admin |
+| GET | `api/admin/quizzes` | QuizController@index | api, auth:api-admin |
+| POST | `api/admin/quizzes` | QuizController@store | api, auth:api-admin |
+| GET | `api/admin/users` | UserController@index | api, auth:api-admin |
+| POST | `api/admin/users` | UserController@store | api, auth:api-admin |
+| GET | `api/admin/orders` | OrderController@index | api, auth:api-admin |
+| GET | `api/admin/settings` | SettingsController@index | api, auth:api-admin |
+| PUT | `api/admin/settings` | SettingsController@update | api, auth:api-admin |
+
+## Web Routes (web.php)
+
+| Method | URI | Controller Action | Middleware |
+| :--- | :--- | :--- | :--- |
+| GET | [login](file:///c:/laravel-projects/edustream-admin/app/Http/Controllers/Api/Admin/AuthController.php#12-31) | AuthController@login | web |
+| POST | [login](file:///c:/laravel-projects/edustream-admin/app/Http/Controllers/Api/Admin/AuthController.php#12-31) | AuthController@loginPost | web |
+| POST | [logout](file:///c:/laravel-projects/edustream-admin/app/Http/Controllers/AuthController.php#34-41) | AuthController@logout | web |
+| GET | `dashboard` | DashboardController@index | web, auth |
+| GET | `analytics` | AnalyticsController@index | web, auth |
+| GET | `content` | ContentController@index | web, auth |
+| GET | `content/categories` | CategoryController@index | web, auth |
+| GET | `content/course/{id}` | ContentController@courseSubjects | web, auth |
+| GET | `content/subject/{id}` | ContentController@subjectContent | web, auth |
+| GET | `content/notes/{id}` | ContentController@manageNotes | web, auth |
+| GET | `content/videos/{id}` | ContentController@manageVideos | web, auth |
+| GET | `content/qa-papers/{id}` | ContentController@manageQAPapers | web, auth |
+| GET | `content/quiz/{id}` | ContentController@manageQuiz | web, auth |
+| GET | `users` | UserController@index | web, auth |
+| GET | `orders` | OrderController@index | web, auth |
+| GET | `settings` | SettingsController@index | web, auth |
+
+> [!NOTE]
+> This is a summarized list of primary endpoints. Resource routes (show, edit, update, destroy) use standard Laravel conventions following their respective index/store patterns.

@@ -20,6 +20,13 @@ use App\Http\Controllers\Api\ContentApiController;
 Route::prefix('auth')->group(function () {
     Route::post('/register', [StudentAuthController::class, 'register']);
     Route::post('/login', [StudentAuthController::class, 'login']);
+    Route::post('/send-otp', [StudentAuthController::class, 'sendOtp']);
+    Route::post('/verify-otp', [StudentAuthController::class, 'verifyOtp']);
+});
+
+// Expose public content endpoints
+Route::prefix('public')->group(function () {
+    Route::get('/courses', [ContentApiController::class, 'allCourses']);
 });
 
 // Protected Routes (Student JWT)
@@ -31,10 +38,16 @@ Route::middleware('auth:api-student')->group(function () {
     });
 
     Route::prefix('content')->group(function () {
+        Route::get('/home', [ContentApiController::class, 'home']);
         Route::get('/categories', [ContentApiController::class, 'categories']);
-        Route::get('/courses', [ContentApiController::class, 'courses']);
-        Route::get('/courses/{id}', [ContentApiController::class, 'courseDetails']);
+        Route::get('/categories/{id}/courses', [ContentApiController::class, 'categoryCourses']);
+        Route::get('/courses/{id}/subjects', [ContentApiController::class, 'courseSubjects']);
+        
         Route::get('/subjects/{id}', [ContentApiController::class, 'subjectDetails']);
+        Route::get('/subjects/{id}/notes', [ContentApiController::class, 'subjectNotes']);
+        Route::get('/subjects/{id}/videos', [ContentApiController::class, 'subjectVideos']);
+        Route::get('/subjects/{id}/papers', [ContentApiController::class, 'subjectPapers']);
+        Route::get('/subjects/{id}/quizzes', [ContentApiController::class, 'subjectQuizzes']);
     });
 
     Route::prefix('learning')->group(function () {
@@ -46,9 +59,19 @@ Route::middleware('auth:api-student')->group(function () {
         Route::post('/{id}/submit', [ContentApiController::class, 'submitQuiz']);
     });
 
+    Route::prefix('cart')->group(function () {
+        Route::get('/', [ContentApiController::class, 'getCart']);
+        Route::post('/add', [ContentApiController::class, 'addToCart']);
+        Route::delete('/remove/{id}', [ContentApiController::class, 'removeFromCart']);
+    });
+
     Route::prefix('orders')->group(function () {
-        Route::post('/checkout', [ContentApiController::class, 'checkout']);
+        Route::post('/create', [ContentApiController::class, 'createOrder']);
         Route::get('/history', [ContentApiController::class, 'orderHistory']);
+    });
+
+    Route::prefix('profile')->group(function () {
+        Route::put('/', [StudentAuthController::class, 'updateProfile']);
     });
 });
 
@@ -74,6 +97,7 @@ Route::prefix('admin')->group(function () {
         Route::apiResource('users', App\Http\Controllers\Api\Admin\UserController::class);
 
         // Core Content
+        Route::apiResource('banners', App\Http\Controllers\Api\Admin\BannerController::class);
         Route::apiResource('categories', App\Http\Controllers\Api\Admin\CategoryController::class);
         Route::apiResource('courses', App\Http\Controllers\Api\Admin\CourseController::class);
         Route::apiResource('subjects', App\Http\Controllers\Api\Admin\SubjectController::class);

@@ -1,0 +1,118 @@
+# EduStream Integration Plan: Flutter & Laravel
+
+This document outlines the architecture and integration strategy to transition the EduStream Flutter app from static mock data to a fully dynamic system powered by the Laravel backend.
+
+## System Architecture
+
+The EduStream platform follows a client-server architecture:
+
+1.  **Backend (Laravel)**:
+    *   **Admin Panel**: Used by staff to manage content (Categories, Courses, Subjects, Notes, Videos, Quizzes).
+    *   **Database (MySQL)**: Centralized storage for all entities and relationships.
+    *   **API Layer**: RESTful endpoints providing data to the student app.
+2.  **Frontend (Flutter App)**:
+    *   **Student App**: Consumes APIs for learning, purchasing courses, and attempting quizzes.
+    *   **Data Flow**: Admin → Database → Student API → Flutter App.
+
+### Data Flow Example: Content Life Cycle
+1.  **Creation**: Admin uploads a video and pairs it with a subject in the Admin Panel.
+2.  **Storage**: The video path and metadata are stored in the `videos` table, linked to `subject_id`.
+3.  **Endpoint**: The student app calls `GET /api/content/subjects/{id}`.
+4.  **Delivery**: The backend returns the subject details, including the list of videos.
+5.  **Experience**: The Flutter `VideoPlayer` screen fetches the URL from the API response and plays the content.
+
+## Student API Layer Design
+
+The following table summarizes the existing and proposed APIs for the student app.
+
+| Feature | Endpoint | Method | Purpose |
+| :--- | :--- | :--- | :--- |
+| **Auth** | `/api/auth/register` | POST | Student signup |
+| | `/api/auth/login` | POST | Student login |
+| | `/api/auth/otp-verify` | POST | Verify mobile/email OTP |
+| | `/api/auth/me` | GET | Get current profile |
+| **Home/Explore** | `/api/content/categories` | GET | List available standards/categories |
+| | `/api/content/courses` | GET | List courses (filterable by category) |
+| | `/api/content/courses/{id}` | GET | Get subjects for a specific course |
+| **Learning** | `/api/content/subjects/{id}`| GET | Get all content (Notes, Videos, Papers, Quizzes) |
+| | `/api/learning/my-courses` | GET | List student's enrolled subjects/courses |
+| **Quiz** | `/api/quiz/{id}` | GET | Fetch quiz questions and options |
+| | `/api/quiz/{id}/submit` | POST | Submit quiz answers and get score |
+| **Orders** | `/api/orders/checkout` | POST | Purchase a course/subject |
+| | `/api/orders/history` | GET | List past transactions |
+
+## Flutter Screen → API Mapping
+
+| Flutter Screen | API Endpoint | Primary Data Needed |
+| :--- | :--- | :--- |
+| **Home Screen** | `/api/content/categories`, `/api/content/courses?featured=1` | Banners, Categories, Featured Courses |
+| **Standard List** | `/api/content/categories` | Category name, icon, course count |
+| **Standard Detail** | `/api/content/courses?category_id={id}` | List of courses in that standard |
+| **Course Detail** | `/api/content/courses/{id}` | Course description, subjects list |
+| **Subject Detail** | `/api/content/subjects/{id}` | Folders for Notes, Videos, Papers, Quizzes |
+| **Notes Screen** | `/api/content/subjects/{id}` | List of note items, file URLs, lock status |
+| **Quiz List** | `/api/content/subjects/{id}` | Quiz metadata (questions count, duration) |
+| **My Courses** | `/api/learning/my-courses` | Enrolled courses with progress |
+| **Profile** | `/api/auth/me` | Name, Bio, Mobile, Avatar |
+
+## API Response Format (Flutter-Friendly)
+
+All APIs should return a unified JSON structure for easy parsing.
+
+```json
+{
+  "status": true,
+  "message": "Data retrieved successfully",
+  "data": {
+    "id": 1,
+    "title": "Mathematics",
+    "icon": "calculate_rounded",
+    "color": "0xFF1565C0",
+    "videos": [
+      {
+        "id": 101,
+        "title": "Linear Equations Part 1",
+        "duration": "15:20",
+        "is_free": true,
+        "is_locked": false,
+        "video_url": "https://storage.com/v1.mp4"
+      }
+    ]
+  }
+}
+```
+
+## Flutter Data Flow Strategy
+
+We will use **Clean Architecture** patterns to decouple UI from API:
+
+1.  **Core API Service**: A singleton class using `Dio` for base configuration (BaseURL, Interceptors, Headers).
+2.  **Models**: Freezed/JsonSerializable classes matching backend JSON.
+3.  **Repository Layer**: Fetches data from API and returns parsed models.
+4.  **State Management (Riverpod/Provider)**: Manages loading states, errors, and data updates.
+5.  **UI Components**: Consume state and display data.
+
+### Example Flow (Explore):
+`ExploreScreen` (UI) → `exploreManager` (State) → `ExploreRepository.fetchStandards()` (Repo) → `ApiService.get('/categories')` (API)
+
+## Missing APIs & Recommendations
+
+1.  **Home Page API**: A dedicated `/api/home` endpoint is needed to fetch banners, featured courses, and personalized content in a single call to improve performance.
+2.  **OTP Verification**: The Flutter UI exists, but the backend `/api/auth/otp-verify` endpoint needs implementation.
+3.  **Live Class API**: The `live_class` feature is static; need endpoints for scheduled live sessions (Zoom/Jitsi integration).
+4.  **Cart Persistence**: Currently, checkout is direct; suggest a `/api/cart` endpoint to sync cart items across devices.
+5.  **Profile Update**: Missing `PUT /api/profile` to allow students to update their details.
+
+## Final Integration Blueprint
+The following route prefixes should be finalized in [api.php](file:///c:/laravel-projects/edustream-admin/routes/api.php):
+- `/api/auth/*`
+- `/api/content/*`
+- `/api/learning/*`
+- `/api/quiz/*`
+- `/api/orders/*`
+- `/api/profile/*` (NEW)
+- `/api/home` (NEW)
+
+---
+> [!IMPORTANT]
+> This plan focuses on structural integration. Code implementation should follow once the API contract is finalized.

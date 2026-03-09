@@ -18,6 +18,7 @@ class Student extends Authenticatable implements JWTSubject
         'name',
         'email',
         'mobile',
+        'course_id',
         'avatar_url',
         'plan',
         'status',
