@@ -21,7 +21,7 @@ class ContentApiController extends Controller
     public function home()
     {
         $categories = Category::active()->orderBy('sort_order')->take(8)->get();
-        $featuredCourses = Course::active()->where('price', '>', 0)->orderBy('created_at', 'desc')->take(5)->get();
+        $featuredCourses = Course::active()->with('subjects')->where('price', '>', 0)->orderBy('created_at', 'desc')->take(5)->get();
         
         $banners = \App\Models\Banner::active()->orderBy('sort_order')->get()->map(function($banner) {
             return [
@@ -89,18 +89,20 @@ class ContentApiController extends Controller
                     'name' => $s->name,
                     'description' => $s->description,
                     'price' => $s->price,
-                    'icon' => $s->icon_url,
-                    'color' => $s->color_code,
+                    'icon' => $s->icon_url ?? 'fa-solid fa-book',
+                    'color' => $s->color_code ?? '#1565C0',
                 ];
             }),
             'thumbnail_url' => $course->thumbnail_url,
+            'icon_url' => $course->icon_url ?? 'fa-solid fa-graduation-cap',
+            'color_code' => $course->color_code ?? '#1565C0',
         ];
     }
 
     public function allCourses()
     {
         // For the signup dropdown, we just need courses, optionally their category info
-        $courses = Course::active()->with('category:id,name')->orderBy('category_id')->get();
+        $courses = Course::active()->with(['category:id,name', 'subjects'])->orderBy('category_id')->get();
         return response()->json($courses);
     }
 
@@ -112,7 +114,7 @@ class ContentApiController extends Controller
 
     public function categoryCourses($id)
     {
-        $courses = Course::active()->where('category_id', $id)->withCount('subjects')->get();
+        $courses = Course::active()->where('category_id', $id)->with('subjects')->withCount('subjects')->get();
         return response()->json($courses);
     }
 

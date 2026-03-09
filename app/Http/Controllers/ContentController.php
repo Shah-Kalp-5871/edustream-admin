@@ -101,8 +101,8 @@ class ContentController extends Controller
             'description' => $request->description,
             'price' => $request->price,
             'status' => $request->status,
-            'icon_url' => $request->icon_url,
-            'color_code' => $request->color_code,
+            'icon_url' => $request->icon_url ?? 'fa-solid fa-graduation-cap',
+            'color_code' => $request->color_code ?? '#1565C0',
             'is_recommended' => $request->is_recommended ? true : false,
         ]);
 
@@ -265,8 +265,8 @@ class ContentController extends Controller
             'description' => $request->description,
             'price' => $request->price,
             'status' => $request->status,
-            'icon_url' => $request->icon_url,
-            'color_code' => $request->color_code,
+            'icon_url' => $request->icon_url ?? 'fa-solid fa-book',
+            'color_code' => $request->color_code ?? '#1565C0',
         ]);
 
         return redirect('/content/course/' . $subject->course_id)->with('success', 'Subject updated successfully!');
