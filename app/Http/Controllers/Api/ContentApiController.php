@@ -35,11 +35,66 @@ class ContentApiController extends Controller
             ];
         });
 
+        // Recommended course logic
+        $recommended = $this->getRecommendedCourse();
+
         return response()->json([
             'categories' => $categories,
             'featured_courses' => $featuredCourses,
-            'banners' => $banners
+            'banners' => $banners,
+            'recommended_course' => $recommended
         ]);
+    }
+
+    public function recommendedCourse()
+    {
+        return response()->json($this->getRecommendedCourse());
+    }
+
+    private function getRecommendedCourse()
+    {
+        $student = auth()->guard('api-student')->user();
+        
+        // 1. Try to find the student's selected course
+        $course = null;
+        if ($student && $student->course_id) {
+            $course = Course::active()->find($student->course_id);
+        }
+
+        // 2. Fallback to the course marked as Global Fallback (is_recommended)
+        if (!$course) {
+            $course = Course::active()->where('is_recommended', true)->first();
+        }
+
+        // 3. Last resort: any active course
+        if (!$course) {
+            $course = Course::active()->first();
+        }
+
+        if (!$course) return null;
+
+        // Calculate MRP from active subjects
+        $subjects = $course->subjects()->active()->get();
+        $mrp = $subjects->sum('price');
+
+        return [
+            'id' => $course->id,
+            'name' => $course->name,
+            'description' => $course->description,
+            'price' => $course->price,
+            'mrp' => $mrp,
+            'save' => max(0, $mrp - $course->price),
+            'subjects' => $subjects->map(function($s) {
+                return [
+                    'name' => $s->name,
+                    'description' => $s->description,
+                    'price' => $s->price,
+                    'icon' => $s->icon_url,
+                    'color' => $s->color_code,
+                ];
+            }),
+            'thumbnail_url' => $course->thumbnail_url,
+        ];
     }
 
     public function allCourses()

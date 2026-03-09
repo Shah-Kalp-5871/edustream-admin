@@ -226,6 +226,14 @@ document.querySelectorAll('.color-opt').forEach(opt => {
                         </select>
                     </div>
 
+                    <div class="form-group" style="grid-column: span 2; display: flex; align-items: center; gap: 12px; margin-top: 12px;">
+                        <label class="form-label" style="margin-bottom: 0;">Mark as Global Fallback Course</label>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox" name="is_recommended" value="1" {{ $course->is_recommended ? 'checked' : '' }} style="width: 20px; height: 20px; cursor: pointer;">
+                            <span style="font-size: 13px; color: var(--text-muted);">Shown if student's course is missing</span>
+                        </div>
+                    </div>
+
                     <div class="form-group" style="grid-column: span 2;">
                         <label class="form-label">Description</label>
                         <textarea name="description" class="form-control textarea" placeholder="Enter course overview and objectives...">{{ $course->description }}</textarea>

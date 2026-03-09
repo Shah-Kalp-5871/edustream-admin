@@ -154,6 +154,11 @@
                         <span class="status-badge {{ $course->status == 'active' ? 'status-active' : 'status-pending' }}" style="padding: 2px 8px; font-size: 10px;">
                             {{ ucfirst($course->status) }}
                         </span>
+                        @if($course->is_recommended)
+                            <span class="status-badge" style="background: #FFF9C4; color: #F57F17; padding: 2px 8px; font-size: 10px;">
+                                <i class="fa-solid fa-star" style="font-size: 9px; margin-right: 4px;"></i> Global Fallback
+                            </span>
+                        @endif
                     </div>
                     <p class="course-list-desc">{{ $course->description }}</p>
                     <div class="course-list-meta">

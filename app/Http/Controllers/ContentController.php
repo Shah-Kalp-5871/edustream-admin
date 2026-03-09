@@ -45,7 +45,12 @@ class ContentController extends Controller
             'status' => 'required|in:active,inactive',
             'icon_url' => 'nullable|string',
             'color_code' => 'nullable|string',
+            'is_recommended' => 'nullable|boolean',
         ]);
+
+        if ($request->is_recommended) {
+            Course::where('is_recommended', true)->update(['is_recommended' => false]);
+        }
 
         Course::create([
             'category_id' => $request->category_id,
@@ -56,6 +61,7 @@ class ContentController extends Controller
             'status' => $request->status,
             'icon_url' => $request->icon_url ?? 'fa-solid fa-graduation-cap',
             'color_code' => $request->color_code ?? '#1565C0',
+            'is_recommended' => $request->is_recommended ? true : false,
             'sort_order' => Course::max('sort_order') + 1,
         ]);
 
@@ -79,9 +85,15 @@ class ContentController extends Controller
             'status' => 'required|in:active,inactive',
             'icon_url' => 'nullable|string',
             'color_code' => 'nullable|string',
+            'is_recommended' => 'nullable|boolean',
         ]);
 
         $course = Course::findOrFail($id);
+
+        if ($request->is_recommended) {
+            Course::where('is_recommended', true)->where('id', '!=', $id)->update(['is_recommended' => false]);
+        }
+
         $course->update([
             'category_id' => $request->category_id,
             'name' => $request->name,
@@ -91,6 +103,7 @@ class ContentController extends Controller
             'status' => $request->status,
             'icon_url' => $request->icon_url,
             'color_code' => $request->color_code,
+            'is_recommended' => $request->is_recommended ? true : false,
         ]);
 
         return redirect('/content')->with('success', 'Course updated successfully!');

@@ -21,6 +21,7 @@ class Course extends Model
         'color_code',
         'thumbnail_url',
         'price',
+        'is_recommended',
         'status',
         'sort_order',
     ];
