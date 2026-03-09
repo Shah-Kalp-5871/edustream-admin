@@ -86,6 +86,7 @@ class ContentApiController extends Controller
             'save' => max(0, $mrp - $course->price),
             'subjects' => $subjects->map(function($s) {
                 return [
+                    'id' => $s->id,
                     'name' => $s->name,
                     'description' => $s->description,
                     'price' => $s->price,
@@ -143,9 +144,25 @@ class ContentApiController extends Controller
             ->active()
             ->exists();
 
+        $videoFolders = $subject->videoFolders()->active()->whereNull('parent_id')->withCount('videos')->get();
+        $noteFolders = $subject->noteFolders()->active()->whereNull('parent_id')->withCount('notes')->get();
+        $paperFolders = $subject->qaPaperFolders()->active()->whereNull('parent_id')->withCount('qaPapers')->get();
+        $quizzes = $subject->quizzes()->active()->get();
+        
+        // Attach free content flag to folders
+        $videoFolders->each(function($f) { $f->is_free = $f->videos()->active()->free()->exists(); });
+        $noteFolders->each(function($f) { $f->is_free = $f->notes()->active()->free()->exists(); });
+        $paperFolders->each(function($f) { $f->is_free = $f->qaPapers()->active()->free()->exists(); });
+
         return response()->json([
             'subject' => $subject,
             'is_enrolled' => $isEnrolled,
+            'sections' => [
+                'video_folders' => $videoFolders,
+                'note_folders' => $noteFolders,
+                'paper_folders' => $paperFolders,
+                'quizzes' => $quizzes,
+            ],
             'content_summary' => [
                 'notes_count' => $subject->notes()->count(),
                 'videos_count' => $subject->videos()->count(),

@@ -397,9 +397,6 @@ function showNewFolderModal() {
     openModal('newFolderModal');
 }
 
-    closeModal('newFolderModal');
-}
-
 function navigateTo(path) { currentPath = path; }
 
 function searchNotes(query) {

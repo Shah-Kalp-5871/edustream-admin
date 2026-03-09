@@ -106,11 +106,7 @@
             </div>
             <div style="display: flex; gap: 4px;">
                 <button class="action-icon-btn" onclick="event.stopPropagation(); openEditDetailsModal('{{ $video->name }}', '{{ $video->id }}', 'file', '{{ $video->description }}', '{{ $video->duration }}', '{{ $video->sort_order }}')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
-                @if($video->file_path)
                 <button class="action-icon-btn" onclick="event.stopPropagation(); window.open('{{ asset('storage/' . $video->file_path) }}')" title="Play/Download"><i class="fa-solid fa-play"></i></button>
-                @else
-                <button class="action-icon-btn" onclick="event.stopPropagation(); window.open('{{ $video->video_url }}')" title="View Link"><i class="fa-solid fa-link"></i></button>
-                @endif
                 <button class="action-icon-btn" onclick="openDeleteModal('{{ $video->name }}', '{{ $video->id }}', 'file')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
             </div>
         </div>
