@@ -12,6 +12,9 @@ use App\Models\QuizAttempt;
 use App\Models\QuizAnswer;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\NoteFolder;
+use App\Models\VideoFolder;
+use App\Models\QaPaperFolder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -149,6 +152,10 @@ class ContentApiController extends Controller
         $paperFolders = $subject->qaPaperFolders()->active()->whereNull('parent_id')->withCount('qaPapers')->get();
         $quizzes = $subject->quizzes()->active()->get();
         
+        $rootVideos = $subject->videos()->active()->whereNull('folder_id')->get();
+        $rootNotes = $subject->notes()->active()->whereNull('folder_id')->get();
+        $rootPapers = $subject->qaPapers()->active()->whereNull('folder_id')->get();
+
         // Attach free content flag to folders
         $videoFolders->each(function($f) { $f->is_free = $f->videos()->active()->free()->exists(); });
         $noteFolders->each(function($f) { $f->is_free = $f->notes()->active()->free()->exists(); });
@@ -161,6 +168,9 @@ class ContentApiController extends Controller
                 'video_folders' => $videoFolders,
                 'note_folders' => $noteFolders,
                 'paper_folders' => $paperFolders,
+                'root_videos' => $rootVideos,
+                'root_notes' => $rootNotes,
+                'root_papers' => $rootPapers,
                 'quizzes' => $quizzes,
             ],
             'content_summary' => [
@@ -172,49 +182,103 @@ class ContentApiController extends Controller
         ]);
     }
 
-    public function subjectNotes($id)
+    public function subjectNotes(Request $request, $id)
     {
         $subject = Subject::findOrFail($id);
         $student = auth()->guard('api-student')->user();
         $isEnrolled = $this->checkEnrollment($student->id, $subject);
+        $folderId = $request->query('folder_id');
 
-        $notes = $subject->notes()->active()->orderBy('sort_order')->get();
+        $folders = NoteFolder::where('subject_id', $subject->id)
+            ->where('parent_id', $folderId)
+            ->active()
+            ->withCount('notes')
+            ->orderBy('sort_order')
+            ->get();
+
+        $notes = $subject->notes()
+            ->where('folder_id', $folderId)
+            ->active()
+            ->orderBy('sort_order')
+            ->get();
+
+        $folders->each(function($f) { $f->is_free = $f->notes()->active()->free()->exists(); });
+        
         $notes->each(function($note) use ($isEnrolled) {
             $note->is_locked = !$note->is_free && !$isEnrolled;
             if ($note->is_locked) unset($note->file_path);
         });
 
-        return response()->json($notes);
+        return response()->json([
+            'folders' => $folders,
+            'files' => $notes
+        ]);
     }
 
-    public function subjectVideos($id)
+    public function subjectVideos(Request $request, $id)
     {
         $subject = Subject::findOrFail($id);
         $student = auth()->guard('api-student')->user();
         $isEnrolled = $this->checkEnrollment($student->id, $subject);
+        $folderId = $request->query('folder_id');
 
-        $videos = $subject->videos()->active()->orderBy('sort_order')->get();
+        $folders = VideoFolder::where('subject_id', $subject->id)
+            ->where('parent_id', $folderId)
+            ->active()
+            ->withCount('videos')
+            ->orderBy('sort_order')
+            ->get();
+
+        $videos = $subject->videos()
+            ->where('folder_id', $folderId)
+            ->active()
+            ->orderBy('sort_order')
+            ->get();
+
+        $folders->each(function($f) { $f->is_free = $f->videos()->active()->free()->exists(); });
+
         $videos->each(function($video) use ($isEnrolled) {
             $video->is_locked = !$video->is_free && !$isEnrolled;
             if ($video->is_locked) unset($video->video_url, $video->file_path);
         });
 
-        return response()->json($videos);
+        return response()->json([
+            'folders' => $folders,
+            'files' => $videos
+        ]);
     }
 
-    public function subjectPapers($id)
+    public function subjectPapers(Request $request, $id)
     {
         $subject = Subject::findOrFail($id);
         $student = auth()->guard('api-student')->user();
         $isEnrolled = $this->checkEnrollment($student->id, $subject);
+        $folderId = $request->query('folder_id');
 
-        $papers = $subject->qaPapers()->active()->orderBy('sort_order')->get();
+        $folders = QaPaperFolder::where('subject_id', $subject->id)
+            ->where('parent_id', $folderId)
+            ->active()
+            ->withCount('qaPapers')
+            ->orderBy('sort_order')
+            ->get();
+
+        $papers = $subject->qaPapers()
+            ->where('folder_id', $folderId)
+            ->active()
+            ->orderBy('sort_order')
+            ->get();
+
+        $folders->each(function($f) { $f->is_free = $f->qaPapers()->active()->free()->exists(); });
+
         $papers->each(function($paper) use ($isEnrolled) {
             $paper->is_locked = !$paper->is_free && !$isEnrolled;
             if ($paper->is_locked) unset($paper->file_path);
         });
 
-        return response()->json($papers);
+        return response()->json([
+            'folders' => $folders,
+            'files' => $papers
+        ]);
     }
 
     public function subjectQuizzes($id)
