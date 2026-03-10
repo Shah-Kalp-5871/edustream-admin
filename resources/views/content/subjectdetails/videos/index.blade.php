@@ -91,6 +91,13 @@
                 <div>
                     <div style="font-weight: 500;">{{ $video->name }}</div>
                     <span style="background: var(--primary-glow); color: var(--primary); padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase;">{{ $video->video_source }}</span>
+                    @if($video->processing_status === 'pending')
+                        <span style="background: #f1c40f; color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase;">HLS: Pending</span>
+                    @elseif($video->processing_status === 'processing')
+                        <span style="background: #3498db; color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase;">HLS: Processing</span>
+                    @elseif($video->processing_status === 'failed')
+                        <span style="background: #e74c3c; color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase;">HLS: Failed</span>
+                    @endif
                 </div>
             </div>
             <div style="color: var(--text-muted);">{{ $video->duration ?? '--:--' }}</div>
@@ -106,7 +113,11 @@
             </div>
             <div style="display: flex; gap: 4px;">
                 <button class="action-icon-btn" onclick="event.stopPropagation(); openEditDetailsModal('{{ $video->name }}', '{{ $video->id }}', 'file', '{{ $video->description }}', '{{ $video->duration }}', '{{ $video->sort_order }}')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
-                <button class="action-icon-btn" onclick="event.stopPropagation(); window.open('{{ asset('storage/' . $video->file_path) }}')" title="Play/Download"><i class="fa-solid fa-play"></i></button>
+                @if($video->processing_status === 'completed')
+                    <button class="action-icon-btn" onclick="event.stopPropagation(); Swal.fire('HLS Ready', 'This video is now streaming via secure HLS. View it in the mobile app to verify.', 'success')" title="HLS Active"><i class="fa-solid fa-circle-check" style="color: var(--primary);"></i></button>
+                @else
+                    <button class="action-icon-btn" style="opacity: 0.5; cursor: not-allowed;" title="Processing..."><i class="fa-solid fa-hourglass-half"></i></button>
+                @endif
                 <button class="action-icon-btn" onclick="openDeleteModal('{{ $video->name }}', '{{ $video->id }}', 'file')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
             </div>
         </div>

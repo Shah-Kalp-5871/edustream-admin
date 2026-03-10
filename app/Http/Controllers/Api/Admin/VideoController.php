@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Models\Video;
 use App\Models\VideoFolder;
+use App\Jobs\ConvertVideoToHls;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -36,15 +37,22 @@ class VideoController extends BaseApiController
         $uploaded = [];
         if ($request->hasFile('files')) {
             foreach ($request->file('files') as $file) {
-                $path = $file->store('videos', 'public');
-                $uploaded[] = Video::create([
+                // Store raw videos in the private disk
+                $path = $file->store('videos/raw', 'private');
+                $video = Video::create([
                     'subject_id' => $subjectId,
                     'folder_id' => $request->folder_id,
                     'name' => $file->getClientOriginalName(),
                     'file_path' => $path,
                     'video_source' => 'local',
                     'sort_order' => Video::where('subject_id', $subjectId)->where('folder_id', $request->folder_id)->max('sort_order') + 1,
+                    'processing_status' => 'pending',
                 ]);
+                
+                $uploaded[] = $video;
+
+                // Dispatch HLS conversion job
+                ConvertVideoToHls::dispatch($video);
             }
         }
 
@@ -73,9 +81,19 @@ class VideoController extends BaseApiController
     public function destroy($id)
     {
         $video = Video::findOrFail($id);
-        if ($video->file_path) {
-            Storage::disk('public')->delete($video->file_path);
+        
+        if ($video->getRawOriginal('file_path')) {
+            Storage::disk('private')->delete($video->getRawOriginal('file_path'));
         }
+        
+        if ($video->getRawOriginal('hls_path')) {
+            // Delete the HLS folder which is named after the video ID
+            $hlsDir = dirname($video->getRawOriginal('hls_path'));
+            if ($hlsDir !== '.') {
+                Storage::disk('private')->deleteDirectory($hlsDir);
+            }
+        }
+
         $video->delete();
         return $this->response(true, 'Video deleted successfully');
     }

@@ -25,6 +25,8 @@ class Video extends Model
         'is_free',
         'status',
         'sort_order',
+        'hls_path',
+        'processing_status',
     ];
 
     protected $casts = [
@@ -51,20 +53,6 @@ class Video extends Model
     public function scopeFree($query)
     {
         return $query->where('is_free', true);
-    }
-
-    protected function filePath(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => $value ? Storage::url($value) : null,
-        );
-    }
-
-    protected function thumbnailUrl(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => $value ? Storage::url($value) : null,
-        );
     }
 
     protected function videoUrl(): Attribute

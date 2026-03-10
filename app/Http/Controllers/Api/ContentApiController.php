@@ -239,7 +239,11 @@ class ContentApiController extends Controller
 
         $videos->each(function($video) use ($isEnrolled) {
             $video->is_locked = !$video->is_free && !$isEnrolled;
+            // Optionally, do not return video_url if locked, or keep it to be handled by Signed URL endpoint later
             if ($video->is_locked) unset($video->video_url, $video->file_path);
+            
+            // Send processing status to the frontend
+            $video->processing_status = $video->processing_status ?? 'completed'; // Fallback for old videos
         });
 
         return response()->json([

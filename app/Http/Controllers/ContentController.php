@@ -13,6 +13,7 @@ use App\Models\QaPaper;
 use App\Models\QaPaperFolder;
 use App\Models\Quiz;
 use App\Models\QuizQuestion;
+use App\Jobs\ConvertVideoToHls;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
@@ -419,16 +420,21 @@ class ContentController extends Controller
         if ($request->hasFile('files')) {
             foreach ($request->file('files') as $file) {
                 $fileName = $file->getClientOriginalName();
-                $filePath = $file->store('videos', 'public');
+                // Store in private disk for security and processing
+                $filePath = $file->store('videos/raw', 'private');
 
-                Video::create([
+                $video = Video::create([
                     'subject_id' => $id,
                     'folder_id' => $request->folder_id,
                     'name' => $fileName,
                     'file_path' => $filePath,
                     'video_source' => 'local',
+                    'processing_status' => 'pending',
                     'sort_order' => Video::where('subject_id', $id)->where('folder_id', $request->folder_id)->max('sort_order') + 1,
                 ]);
+
+                // Dispatch HLS conversion job
+                ConvertVideoToHls::dispatch($video);
             }
         }
 
@@ -438,9 +444,19 @@ class ContentController extends Controller
     public function deleteVideo($id)
     {
         $video = Video::findOrFail($id);
-        if ($video->file_path) {
-            Storage::disk('public')->delete($video->file_path);
+        $rawPath = $video->getRawOriginal('file_path');
+        if ($rawPath) {
+            Storage::disk('private')->delete($rawPath);
         }
+        
+        $rawHlsPath = $video->getRawOriginal('hls_path');
+        if ($rawHlsPath) {
+            $hlsDir = dirname($rawHlsPath);
+            if ($hlsDir !== '.') {
+                Storage::disk('private')->deleteDirectory($hlsDir);
+            }
+        }
+
         $video->delete();
         return back()->with('success', 'Video deleted successfully');
     }

@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\StudentAuthController;
 use App\Http\Controllers\Api\ContentApiController;
+use App\Http\Controllers\Api\VideoStreamController;
 
 /*
 |--------------------------------------------------------------------------
@@ -73,7 +74,18 @@ Route::middleware('auth:api-student')->group(function () {
     Route::prefix('profile')->group(function () {
         Route::put('/', [StudentAuthController::class, 'updateProfile']);
     });
+
+    // Video Streaming
+    Route::get('/video/{id}/stream', [\App\Http\Controllers\Api\VideoStreamController::class, 'getStreamUrl']);
 });
+
+// Private Signed HLS Routes (Accessed by Player)
+Route::get('/video/stream/hls/{id}/playlist.m3u8', [\App\Http\Controllers\Api\VideoStreamController::class, 'streamHls'])
+    ->name('video.stream.hls')
+    ->middleware('signed');
+
+Route::get('/video/stream/hls/{id}/{segment}', [\App\Http\Controllers\Api\VideoStreamController::class, 'streamSegment'])
+    ->name('video.stream.segment');
 
 // Admin API Layer (NEW)
 Route::prefix('admin')->group(function () {
