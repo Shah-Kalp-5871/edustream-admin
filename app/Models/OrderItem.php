@@ -13,7 +13,12 @@ class OrderItem extends Model
         'order_id',
         'item_type',
         'item_id',
+        'bundle_subjects',
         'price',
+    ];
+
+    protected $casts = [
+        'bundle_subjects' => 'array',
     ];
 
     // Relationships

@@ -12,6 +12,7 @@ use App\Models\QuizAttempt;
 use App\Models\QuizAnswer;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\CartItem;
 use App\Models\NoteFolder;
 use App\Models\VideoFolder;
 use App\Models\QaPaperFolder;
@@ -343,49 +344,156 @@ class ContentApiController extends Controller
 
     public function addToCart(Request $request)
     {
+        \Illuminate\Support\Facades\Log::info('Adding to cart', $request->all());
+        \Illuminate\Support\Facades\Log::info('Current User: ' . (auth()->guard('api-student')->check() ? auth()->guard('api-student')->id() : 'None'));
+
         $request->validate([
-            'item_type' => 'required|in:course,subject',
-            'item_id' => 'required',
+            'item_type' => 'required|in:course,subject,bundle',
+            'item_id' => 'required_unless:item_type,bundle',
+            'bundle_subjects' => 'required_if:item_type,bundle|nullable|array',
+            'price' => 'required_if:item_type,bundle|nullable|numeric',
         ]);
 
         $student = auth()->guard('api-student')->user();
-        $model = $request->item_type === 'course' ? Course::class : Subject::class;
-        $item = $model::findOrFail($request->item_id);
+        $itemType = $request->item_type;
 
-        // Check if already in cart
+        if ($itemType === 'course') {
+            $course = Course::findOrFail($request->item_id);
+            
+            // Constraint 1: Remove existing subjects from same course if adding course
+            CartItem::where('student_id', $student->id)
+                ->where('item_type', Subject::class)
+                ->whereIn('item_id', $course->subjects()->pluck('id'))
+                ->delete();
+
+            $model = Course::class;
+            $itemId = $course->id;
+            $price = $course->price;
+            $bundleSubjects = null;
+        } elseif ($itemType === 'subject') {
+            $subject = Subject::findOrFail($request->item_id);
+            
+            // Constraint 2: Don't add if parent course is already in cart
+            $courseInCart = CartItem::where('student_id', $student->id)
+                ->where('item_type', Course::class)
+                ->where('item_id', $subject->course_id)
+                ->exists();
+
+            if ($courseInCart) {
+                return response()->json(['message' => 'Course for this subject is already in cart'], 400);
+            }
+
+            $model = Subject::class;
+            $itemId = $subject->id;
+            $price = $subject->price;
+            $bundleSubjects = null;
+        } else {
+            // Bundle
+            $model = 'bundle';
+            $itemId = 0; // Or a hash/id if needed
+            $price = $request->price;
+            $bundleSubjects = $request->bundle_subjects;
+        }
+
+        // Check if exact item already in cart
         $exists = CartItem::where('student_id', $student->id)
             ->where('item_type', $model)
-            ->where('item_id', $item->id)
+            ->where('item_id', $itemId)
+            ->when($model === 'bundle', function($q) use ($bundleSubjects) {
+                // For bundles, usually we just add a new one or check subset, 
+                // but for simplicity let's just let it add or check exact list
+                $q->where('bundle_subjects', json_encode($bundleSubjects));
+            })
             ->exists();
 
         if ($exists) {
             return response()->json(['message' => 'Item already in cart'], 400);
         }
 
-        $cartItem = CartItem::create([
-            'student_id' => $student->id,
-            'item_type' => $model,
-            'item_id' => $item->id,
-            'price' => $item->price,
-        ]);
+        try {
+            $cartItem = CartItem::create([
+                'student_id' => $student->id,
+                'item_type' => $model,
+                'item_id' => $itemId,
+                'bundle_subjects' => $bundleSubjects,
+                'price' => $price,
+            ]);
+            \Illuminate\Support\Facades\Log::info('Cart item created successfully', ['id' => $cartItem->id]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to create cart item', ['error' => $e->getMessage()]);
+            return response()->json(['message' => 'Failed to save: ' . $e->getMessage()], 500);
+        }
 
+
+        \Illuminate\Support\Facades\Log::info('Successfully added to cart', ['item' => $cartItem->toArray()]);
         return response()->json(['message' => 'Added to cart', 'item' => $cartItem]);
     }
 
-    public function removeFromCart($id)
-    {
-        $student = auth()->guard('api-student')->user();
-        CartItem::where('student_id', $student->id)->where('id', $id)->delete();
-        
-        return response()->json(['message' => 'Removed from cart']);
-    }
-
-    public function createOrder(Request $request)
+    public function initiateRazorpayOrder(Request $request)
     {
         $student = auth()->guard('api-student')->user();
         $cartItems = CartItem::where('student_id', $student->id)->get();
 
         if ($cartItems->isEmpty()) {
+            return response()->json(['error' => 'Cart is empty'], 400);
+        }
+
+        $totalAmount = $cartItems->sum('price');
+        $receiptId = 'rcpt_' . Str::random(10);
+
+        try {
+            $razorpayService = new \App\Services\RazorpayService();
+            $razorpayOrder = $razorpayService->createOrder($totalAmount, $receiptId, [
+                'student_id' => $student->id,
+                'email' => $student->email,
+            ]);
+
+            return response()->json([
+                'razorpay_order_id' => $razorpayOrder['id'],
+                'amount' => $totalAmount * 100, // in paise
+                'currency' => 'INR',
+                'name' => 'EduStream',
+                'description' => 'Course Purchase',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to initiate payment: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function verifyRazorpayPayment(Request $request)
+    {
+        $request->validate([
+            'razorpay_order_id' => 'required',
+            'razorpay_payment_id' => 'required',
+            'razorpay_signature' => 'required',
+        ]);
+
+        $razorpayService = new \App\Services\RazorpayService();
+        $isValid = $razorpayService->verifySignature(
+            $request->razorpay_order_id,
+            $request->razorpay_payment_id,
+            $request->razorpay_signature
+        );
+
+        if (!$isValid) {
+            return response()->json(['error' => 'Invalid payment signature'], 400);
+        }
+
+        $student = auth()->guard('api-student')->user();
+        
+        return $this->fulfillOrder($student, $request->all());
+    }
+
+    private function fulfillOrder($student, $paymentData)
+    {
+        $cartItems = CartItem::where('student_id', $student->id)->get();
+
+        if ($cartItems->isEmpty()) {
+            // Might have been fulfilled by webhook already
+            $existingOrder = Order::where('razorpay_order_id', $paymentData['razorpay_order_id'])->first();
+            if ($existingOrder) {
+                return response()->json(['message' => 'Order already fulfilled', 'order' => $existingOrder]);
+            }
             return response()->json(['error' => 'Cart is empty'], 400);
         }
 
@@ -396,8 +504,11 @@ class ContentApiController extends Controller
                 'order_number' => 'ORD-' . strtoupper(Str::random(10)),
                 'total_amount' => $cartItems->sum('price'),
                 'payment_status' => 'completed',
-                'payment_method' => $request->payment_method ?? 'wallet',
-                'payment_id' => $request->payment_id,
+                'payment_method' => 'razorpay',
+                'payment_id' => $paymentData['razorpay_payment_id'],
+                'razorpay_order_id' => $paymentData['razorpay_order_id'],
+                'razorpay_payment_id' => $paymentData['razorpay_payment_id'],
+                'razorpay_signature' => $paymentData['razorpay_signature'],
             ]);
 
             foreach ($cartItems as $cartItem) {
@@ -405,17 +516,41 @@ class ContentApiController extends Controller
                     'order_id' => $order->id,
                     'item_type' => $cartItem->item_type,
                     'item_id' => $cartItem->item_id,
+                    'bundle_subjects' => $cartItem->bundle_subjects,
                     'price' => $cartItem->price,
                 ]);
 
                 // Create Enrollment
-                Enrollment::create([
-                    'student_id' => $student->id,
-                    'course_id' => $cartItem->item_type === Course::class ? $cartItem->item_id : null,
-                    'subject_id' => $cartItem->item_type === Subject::class ? $cartItem->item_id : null,
-                    'order_id' => $order->id,
-                    'status' => 'active',
-                ]);
+                if ($cartItem->item_type === Course::class) {
+                    Enrollment::updateOrCreate([
+                        'student_id' => $student->id,
+                        'course_id' => $cartItem->item_id,
+                        'subject_id' => null,
+                    ], [
+                        'order_id' => $order->id,
+                        'status' => 'active',
+                    ]);
+                } elseif ($cartItem->item_type === Subject::class) {
+                    Enrollment::updateOrCreate([
+                        'student_id' => $student->id,
+                        'subject_id' => $cartItem->item_id,
+                    ], [
+                        'course_id' => Subject::find($cartItem->item_id)->course_id ?? null,
+                        'order_id' => $order->id,
+                        'status' => 'active',
+                    ]);
+                } elseif ($cartItem->item_type === 'bundle') {
+                    foreach ($cartItem->bundle_subjects as $subjectId) {
+                        Enrollment::updateOrCreate([
+                            'student_id' => $student->id,
+                            'subject_id' => $subjectId,
+                        ], [
+                            'course_id' => Subject::find($subjectId)->course_id ?? null,
+                            'order_id' => $order->id,
+                            'status' => 'active',
+                        ]);
+                    }
+                }
             }
 
             // Clear cart
@@ -424,12 +559,12 @@ class ContentApiController extends Controller
             DB::commit();
 
             return response()->json([
-                'message' => 'Order created successfully',
+                'message' => 'Order fulfilled successfully',
                 'order' => $order
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['error' => 'Order failed: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Fulfillment failed: ' . $e->getMessage()], 500);
         }
     }
 

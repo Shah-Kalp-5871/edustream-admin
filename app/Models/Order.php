@@ -16,6 +16,9 @@ class Order extends Model
         'payment_status',
         'payment_method',
         'payment_id',
+        'razorpay_order_id',
+        'razorpay_payment_id',
+        'razorpay_signature',
     ];
 
     // Relationships
