@@ -450,6 +450,7 @@ class ContentApiController extends Controller
 
             return response()->json([
                 'razorpay_order_id' => $razorpayOrder['id'],
+                'razorpay_key' => config('services.razorpay.key_id'),
                 'amount' => $totalAmount * 100, // in paise
                 'currency' => 'INR',
                 'name' => 'EduStream',
