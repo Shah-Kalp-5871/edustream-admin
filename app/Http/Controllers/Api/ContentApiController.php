@@ -126,11 +126,19 @@ class ContentApiController extends Controller
     public function courseSubjects($id)
     {
         $course = Course::active()->findOrFail($id);
+        $student = auth()->guard('api-student')->user();
+        
         $subjects = Subject::active()->where('course_id', $id)->orderBy('sort_order')->get();
         
+        $isEnrolled = Enrollment::where('student_id', $student->id)
+            ->where('course_id', $id)
+            ->active()
+            ->exists();
+            
         return response()->json([
             'course' => $course,
-            'subjects' => $subjects
+            'subjects' => $subjects,
+            'is_enrolled' => $isEnrolled
         ]);
     }
 
@@ -427,6 +435,20 @@ class ContentApiController extends Controller
 
         \Illuminate\Support\Facades\Log::info('Successfully added to cart', ['item' => $cartItem->toArray()]);
         return response()->json(['message' => 'Added to cart', 'item' => $cartItem]);
+    }
+
+    public function removeFromCart($id)
+    {
+        $student = auth()->guard('api-student')->user();
+        $cartItem = CartItem::where('student_id', $student->id)->where('id', $id)->first();
+
+        if (!$cartItem) {
+            return response()->json(['message' => 'Item not found in cart'], 404);
+        }
+
+        $cartItem->delete();
+
+        return response()->json(['message' => 'Item removed from cart']);
     }
 
     public function initiateRazorpayOrder(Request $request)
