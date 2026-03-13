@@ -84,7 +84,8 @@
             "php-http/discovery": true
         },
         "platform": {
-            "php": "8.2.28"
+            "php": "8.2.28",
+            "ext-redis": "5.3.7"
         }
     },
     "minimum-stability": "stable",
