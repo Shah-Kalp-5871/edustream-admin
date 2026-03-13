@@ -6,7 +6,7 @@
     <button class="btn btn-secondary">
         <i class="fas fa-download"></i> Export Report
     </button>
-    <a href="/content" class="btn btn-primary">
+    <a href="{{ url('content') }}" class="btn btn-primary">
         <i class="fas fa-plus"></i> Add Content
     </a>
 @endsection
@@ -284,7 +284,7 @@
     <div class="card animate-scale-in" style="animation-delay:0.1s;">
         <div class="flex-between card-pad" style="border-bottom: 1px solid var(--border);">
             <h3 style="font-size: 16px; font-weight: 700;">Recent Enrollments</h3>
-            <a href="/orders" class="btn btn-ghost btn-sm">View All <i class="fas fa-chevron-right" style="font-size:10px;"></i></a>
+            <a href="{{ url('orders') }}" class="btn btn-ghost btn-sm">View All <i class="fas fa-chevron-right" style="font-size:10px;"></i></a>
         </div>
         <div class="table-wrap">
             <table class="data-table enroll-table">

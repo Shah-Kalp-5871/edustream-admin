@@ -3,7 +3,7 @@
 @section('subtitle', 'All assessments across your courses — edit, create, and organize quizzes.')
 
 @section('actions')
-    <a href="/quizzes/create" class="btn btn-primary">
+    <a href="{{ url('quizzes/create') }}" class="btn btn-primary">
         <i class="fas fa-plus"></i> Create Quiz
     </a>
 @endsection
@@ -196,7 +196,7 @@
                 <div class="quiz-card-footer">
                     <span class="badge badge-success">Free</span>
                     <div class="quiz-actions">
-                        <a href="/quizzes/1/edit" class="btn btn-secondary btn-sm"><i class="fas fa-pen"></i> Edit</a>
+                        <a href="{{ url('quizzes/1/edit') }}" class="btn btn-secondary btn-sm"><i class="fas fa-pen"></i> Edit</a>
                         <button class="btn btn-ghost btn-sm"><i class="fas fa-list-check"></i></button>
                     </div>
                 </div>
@@ -220,7 +220,7 @@
                 <div class="quiz-card-footer">
                     <span class="badge badge-warning">₹199 · Paid</span>
                     <div class="quiz-actions">
-                        <a href="/quizzes/2/edit" class="btn btn-secondary btn-sm"><i class="fas fa-pen"></i> Edit</a>
+                        <a href="{{ url('quizzes/2/edit') }}" class="btn btn-secondary btn-sm"><i class="fas fa-pen"></i> Edit</a>
                         <button class="btn btn-ghost btn-sm"><i class="fas fa-list-check"></i></button>
                     </div>
                 </div>
@@ -244,7 +244,7 @@
                 <div class="quiz-card-footer">
                     <span class="badge badge-warning">₹299 · Paid</span>
                     <div class="quiz-actions">
-                        <a href="/quizzes/3/edit" class="btn btn-secondary btn-sm"><i class="fas fa-pen"></i> Edit</a>
+                        <a href="{{ url('quizzes/3/edit') }}" class="btn btn-secondary btn-sm"><i class="fas fa-pen"></i> Edit</a>
                         <button class="btn btn-ghost btn-sm"><i class="fas fa-list-check"></i></button>
                     </div>
                 </div>
@@ -268,7 +268,7 @@
                 <div class="quiz-card-footer">
                     <span class="badge badge-success">Free</span>
                     <div class="quiz-actions">
-                        <a href="/quizzes/4/edit" class="btn btn-secondary btn-sm"><i class="fas fa-pen"></i> Edit</a>
+                        <a href="{{ url('quizzes/4/edit') }}" class="btn btn-secondary btn-sm"><i class="fas fa-pen"></i> Edit</a>
                         <button class="btn btn-ghost btn-sm"><i class="fas fa-list-check"></i></button>
                     </div>
                 </div>

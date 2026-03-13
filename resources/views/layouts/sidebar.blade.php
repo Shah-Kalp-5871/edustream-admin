@@ -1,5 +1,5 @@
 <aside class="sidebar" id="sidebar">
-    <a href="/dashboard" class="sidebar-brand">
+    <a href="{{ url('dashboard') }}" class="sidebar-brand">
         <div class="brand-icon">
             <i class="fas fa-graduation-cap"></i>
         </div>
@@ -9,52 +9,52 @@
     <nav class="sidebar-nav">
         <span class="nav-section">Overview</span>
 
-        <a href="/dashboard" class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}">
+        <a href="{{ url('dashboard') }}" class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}">
             <span class="nav-icon"><i class="fas fa-gauge-high"></i></span>
             Dashboard
         </a>
 
         <span class="nav-section">Learning</span>
 
-        <a href="/content" class="nav-link {{ request()->is('content*') && !request()->is('content/categories*') ? 'active' : '' }}">
+        <a href="{{ url('content') }}" class="nav-link {{ request()->is('content*') && !request()->is('content/categories*') ? 'active' : '' }}">
             <span class="nav-icon"><i class="fas fa-folder-open"></i></span>
             Content Manager
         </a>
 
-        <a href="/content/categories" class="nav-link {{ request()->is('content/categories*') ? 'active' : '' }}">
+        <a href="{{ url('content/categories') }}" class="nav-link {{ request()->is('content/categories*') ? 'active' : '' }}">
             <span class="nav-icon"><i class="fas fa-tags"></i></span>
             Categories
         </a>
 
-        <a href="/banners" class="nav-link {{ request()->is('banners*') ? 'active' : '' }}">
+        <a href="{{ url('banners') }}" class="nav-link {{ request()->is('banners*') ? 'active' : '' }}">
             <span class="nav-icon"><i class="fas fa-images"></i></span>
             Banners
         </a>
 
         <span class="nav-section">People</span>
 
-        <a href="/users" class="nav-link {{ request()->is('users*') ? 'active' : '' }}">
+        <a href="{{ url('users') }}" class="nav-link {{ request()->is('users*') ? 'active' : '' }}">
             <span class="nav-icon"><i class="fas fa-users"></i></span>
             Students
         </a>
 
         <span class="nav-section">Business</span>
 
-        <a href="/orders" class="nav-link {{ request()->is('orders*') ? 'active' : '' }}">
+        <a href="{{ url('orders') }}" class="nav-link {{ request()->is('orders*') ? 'active' : '' }}">
             <span class="nav-icon"><i class="fas fa-ticket"></i></span>
             Enrollments
         </a>
 
         <span class="nav-section">Reports</span>
 
-        <a href="/analytics" class="nav-link {{ request()->is('analytics*') ? 'active' : '' }}">
+        <a href="{{ url('analytics') }}" class="nav-link {{ request()->is('analytics*') ? 'active' : '' }}">
             <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
             Analytics
         </a>
 
         <span class="nav-section">System</span>
 
-        <a href="/settings" class="nav-link {{ request()->is('settings*') ? 'active' : '' }}">
+        <a href="{{ url('settings') }}" class="nav-link {{ request()->is('settings*') ? 'active' : '' }}">
             <span class="nav-icon"><i class="fas fa-sliders"></i></span>
             Settings
         </a>

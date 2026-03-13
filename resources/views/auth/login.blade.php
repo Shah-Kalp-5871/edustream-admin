@@ -20,7 +20,7 @@
         <div class="inp-group">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:7px;">
                 <label class="inp-label" style="margin-bottom:0;">Password</label>
-                <a href="/forgot-password" class="forgot-link">Forgot password?</a>
+                <a href="{{ url('forgot-password') }}" class="forgot-link">Forgot password?</a>
             </div>
             <div class="inp-wrap">
                 <i class="fas fa-lock inp-icon"></i>

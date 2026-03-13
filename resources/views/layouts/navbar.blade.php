@@ -56,10 +56,10 @@
                     <span>admin@edustream.com</span>
                 </div>
                 <hr>
-                <a href="/settings" class="dropdown-item">
+                <a href="{{ url('settings') }}" class="dropdown-item">
                     <i class="fas fa-user-gear"></i> Account Settings
                 </a>
-                <a href="/settings" class="dropdown-item">
+                <a href="{{ url('settings') }}" class="dropdown-item">
                     <i class="fas fa-shield-halved"></i> Security
                 </a>
                 <hr>

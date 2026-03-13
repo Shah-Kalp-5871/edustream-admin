@@ -3,7 +3,7 @@
 @section('subtitle', 'Build a new quiz with questions, answers, and timing settings.')
 
 @section('actions')
-    <a href="/quizzes" class="btn btn-secondary">
+    <a href="{{ url('quizzes') }}" class="btn btn-secondary">
         <i class="fas fa-arrow-left"></i> Back to Quizzes
     </a>
 @endsection

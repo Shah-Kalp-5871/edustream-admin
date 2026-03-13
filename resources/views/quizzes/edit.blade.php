@@ -3,7 +3,7 @@
 @section('subtitle', 'Modify quiz questions, settings, and pricing.')
 
 @section('actions')
-    <a href="/quizzes" class="btn btn-secondary">
+    <a href="{{ url('quizzes') }}" class="btn btn-secondary">
         <i class="fas fa-arrow-left"></i> Back to Quizzes
     </a>
     <button class="btn btn-primary">

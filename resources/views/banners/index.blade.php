@@ -188,13 +188,13 @@
                     <span class="sort-badge"><i class="fa-solid fa-sort"></i> {{ $banner->sort_order }}</span>
                 </div>
                 <div style="display: flex; gap: 6px;">
-                    <form action="/banners/{{ $banner->id }}/toggle" method="POST" style="display: inline;">
+                    <form action="{{ url('banners/' . $banner->id . '/toggle') }}" method="POST" style="display: inline;">
                         @csrf @method('PATCH')
                         <button type="submit" class="btn-icon btn-toggle" title="{{ $banner->status === 'active' ? 'Deactivate' : 'Activate' }}">
                             <i class="fa-solid fa-{{ $banner->status === 'active' ? 'eye-slash' : 'eye' }}"></i>
                         </button>
                     </form>
-                    <form action="/banners/{{ $banner->id }}" method="POST" style="display: inline;" onsubmit="return confirm('Delete banner: {{ $banner->title }}?')">
+                    <form action="{{ url('banners/' . $banner->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Delete banner: {{ $banner->title }}?')">
                         @csrf @method('DELETE')
                         <button type="submit" class="btn-icon btn-delete"><i class="fa-solid fa-trash-can"></i></button>
                     </form>
@@ -211,7 +211,7 @@
             <i class="fa-solid fa-plus-circle" style="color: var(--primary);"></i>
             Add New Explore Banner
         </div>
-        <form action="/banners" method="POST">
+        <form action="{{ url('banners') }}" method="POST">
             @csrf
             <div class="form-row">
                 <div>
