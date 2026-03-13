@@ -130,15 +130,25 @@ class ContentApiController extends Controller
         
         $subjects = Subject::active()->where('course_id', $id)->orderBy('sort_order')->get();
         
-        $isEnrolled = Enrollment::where('student_id', $student->id)
+        // Check if student has full course enrollment
+        $isCourseEnrolled = Enrollment::where('student_id', $student->id)
             ->where('course_id', $id)
+            ->whereNull('subject_id')
             ->active()
             ->exists();
+        
+        // Get individually enrolled subject IDs for this course
+        $enrolledSubjectIds = Enrollment::where('student_id', $student->id)
+            ->whereIn('subject_id', $subjects->pluck('id'))
+            ->active()
+            ->pluck('subject_id')
+            ->toArray();
             
         return response()->json([
-            'course' => $course,
-            'subjects' => $subjects,
-            'is_enrolled' => $isEnrolled
+            'course'               => $course,
+            'subjects'             => $subjects,
+            'is_enrolled'          => $isCourseEnrolled,          // true = full course purchased
+            'enrolled_subject_ids' => $enrolledSubjectIds,        // list of individually purchased subject IDs
         ]);
     }
 
@@ -159,7 +169,7 @@ class ContentApiController extends Controller
         $videoFolders = $subject->videoFolders()->active()->whereNull('parent_id')->withCount('videos')->get();
         $noteFolders = $subject->noteFolders()->active()->whereNull('parent_id')->withCount('notes')->get();
         $paperFolders = $subject->qaPaperFolders()->active()->whereNull('parent_id')->withCount('qaPapers')->get();
-        $quizzes = $subject->quizzes()->active()->get();
+        $quizzes = $subject->quizzes()->active()->withCount('questions')->get();
         
         $rootVideos = $subject->videos()->active()->whereNull('folder_id')->get();
         $rootNotes = $subject->notes()->active()->whereNull('folder_id')->get();
@@ -297,7 +307,7 @@ class ContentApiController extends Controller
     public function subjectQuizzes($id)
     {
         $subject = Subject::findOrFail($id);
-        $quizzes = $subject->quizzes()->active()->orderBy('sort_order')->get();
+        $quizzes = $subject->quizzes()->active()->withCount('questions')->orderBy('sort_order')->get();
         return response()->json($quizzes);
     }
 
