@@ -5,7 +5,7 @@
     <h2 class="form-title">Welcome back 👋</h2>
     <p class="form-subtitle">Sign in to your admin account to continue.</p>
 
-    <form action="/login" method="POST">
+    <form action="{{ route('login') }}" method="POST">
         @csrf
         <div class="inp-group">
             <label class="inp-label">Email Address</label>

@@ -83,8 +83,9 @@
     <div class="container">
         <h1>Welcome! 👋</h1>
         <p>You're just one step away from accessing your dashboard.</p>
-        <a href="http://127.0.0.1:8000/login" class="login-link">
-            Go to Login Page →
+        <a href="{{ route('login') }}" class="login-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-in"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/></svg>
+            Sign in to dashboard
         </a>
         <div class="info-text">
             Need help? <a href="#">Contact support</a>
