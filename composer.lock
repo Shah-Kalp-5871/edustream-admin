@@ -2887,7 +2887,7 @@
         },
         {
             "name": "php-open-source-saver/jwt-auth",
-            "version": "v2.9.0",
+            "version": "v2.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHP-Open-Source-Saver/jwt-auth.git",
