@@ -2,13 +2,13 @@
 
 return [
     'ffmpeg' => [
-        'binaries' => env('FFMPEG_BINARIES', 'ffmpeg'),
+        'binaries' => env('FFMPEG_BINARIES', '/home/u362391755/domains/gujjuscholar.in/ffmpeg/ffmpeg'),
 
         'threads' => 12,   // set to false to disable the default 'threads' filter
     ],
 
     'ffprobe' => [
-        'binaries' => env('FFPROBE_BINARIES', 'ffprobe'),
+        'binaries' => env('FFPROBE_BINARIES', '/home/u362391755/domains/gujjuscholar.in/ffmpeg/ffprobe'),
     ],
 
     'timeout' => 3600,
