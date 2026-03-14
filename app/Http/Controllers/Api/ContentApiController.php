@@ -16,6 +16,8 @@ use App\Models\CartItem;
 use App\Models\NoteFolder;
 use App\Models\VideoFolder;
 use App\Models\QaPaperFolder;
+use App\Models\Video;
+use App\Models\Note;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -42,11 +44,43 @@ class ContentApiController extends Controller
         // Recommended course logic
         $recommended = $this->getRecommendedCourse();
 
+        // Personalized Data
+        $student = auth()->guard('api-student')->user();
+        $personalizedVideos = [];
+        $personalizedNotes = [];
+        $personalizedQuizzes = [];
+
+        if ($student && $student->course_id) {
+            $subjectIds = Subject::where('course_id', $student->course_id)->active()->pluck('id');
+            
+            $personalizedVideos = Video::whereIn('subject_id', $subjectIds)
+                ->active()
+                ->orderBy('created_at', 'desc')
+                ->take(10)
+                ->get();
+                
+            $personalizedNotes = Note::whereIn('subject_id', $subjectIds)
+                ->active()
+                ->orderBy('created_at', 'desc')
+                ->take(10)
+                ->get();
+
+            $personalizedQuizzes = Quiz::whereIn('subject_id', $subjectIds)
+                ->active()
+                ->withCount('questions')
+                ->orderBy('created_at', 'desc')
+                ->take(10)
+                ->get();
+        }
+
         return response()->json([
             'categories' => $categories,
             'featured_courses' => $featuredCourses,
             'banners' => $banners,
-            'recommended_course' => $recommended
+            'recommended_course' => $recommended,
+            'personalized_videos' => $personalizedVideos,
+            'personalized_notes' => $personalizedNotes,
+            'personalized_quizzes' => $personalizedQuizzes,
         ]);
     }
 
