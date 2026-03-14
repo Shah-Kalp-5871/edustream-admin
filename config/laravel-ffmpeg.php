@@ -3,7 +3,7 @@
 return [
     'ffmpeg' => [
         'binaries' => env('FFMPEG_BINARIES', '/home/u362391755/domains/gujjuscholar.in/ffmpeg/ffmpeg'),
-
+        'threads' => 1,
     ],
 
     'ffprobe' => [
