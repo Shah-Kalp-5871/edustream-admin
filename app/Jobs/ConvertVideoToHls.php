@@ -49,7 +49,14 @@ class ConvertVideoToHls implements ShouldQueue
             $this->video->update(['processing_status' => 'processing']);
 
             // Create HLS format (720p example, can add more resolutions later)
-            $lowBitrateFormat = (new X264)->setKiloBitrate(1000);
+            // Add scale filter to ensure dimensions are even (libx264 requirement)
+            // Force 1 thread for stability on some shared environments
+            $lowBitrateFormat = (new X264('aac'))
+                ->setKiloBitrate(1000)
+                ->setAdditionalParameters([
+                    '-threads', '1',
+                    '-vf', 'scale=trunc(iw/2)*2:trunc(ih/2)*2'
+                ]);
 
             // Path to save HLS files: videos/hls/{video_id}
             $hlsFolderName = 'videos/hls/' . $this->video->id;
