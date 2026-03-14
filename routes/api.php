@@ -48,6 +48,7 @@ Route::group(['middleware' => 'auth:api-student'], function () {
         Route::get('/subjects/{id}/videos', [ContentApiController::class, 'subjectVideos']);
         Route::get('/subjects/{id}/papers', [ContentApiController::class, 'subjectPapers']);
         Route::get('/subjects/{id}/quizzes', [ContentApiController::class, 'subjectQuizzes']);
+        Route::get('/quiz-hub', [ContentApiController::class, 'quizHub']);
     });
 
     Route::group(['prefix' => 'learning'], function () {
@@ -56,6 +57,7 @@ Route::group(['middleware' => 'auth:api-student'], function () {
 
     Route::group(['prefix' => 'quiz'], function () {
         Route::get('/{id}', [ContentApiController::class, 'quizDetails']);
+        Route::post('/{id}/submit', [ContentApiController::class, 'submitQuiz']);
     });
 
     Route::group(['prefix' => 'cart'], function () {

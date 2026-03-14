@@ -311,6 +311,41 @@ class ContentApiController extends Controller
         return response()->json($quizzes);
     }
 
+    public function quizHub()
+    {
+        $categories = Category::active()
+            ->whereHas('courses', function ($q) {
+                $q->active()->whereHas('subjects', function ($sq) {
+                    $sq->active()->whereHas('quizzes', function ($qz) {
+                        $qz->active();
+                    });
+                });
+            })
+            ->with(['courses' => function ($q) {
+                $q->active()
+                    ->whereHas('subjects', function ($sq) {
+                        $sq->active()->whereHas('quizzes', function ($qz) {
+                            $qz->active();
+                        });
+                    })
+                    ->orderBy('sort_order')
+                    ->with(['subjects' => function ($sq) {
+                        $sq->active()
+                            ->whereHas('quizzes', function ($qz) {
+                                $qz->active();
+                            })
+                            ->orderBy('sort_order')
+                            ->with(['quizzes' => function ($qz) {
+                                $qz->active()->withCount('questions')->orderBy('sort_order');
+                            }]);
+                    }]);
+            }])
+            ->orderBy('sort_order')
+            ->get();
+
+        return response()->json($categories);
+    }
+
     private function checkEnrollment($studentId, $subject)
     {
         return Enrollment::where('student_id', $studentId)
@@ -345,6 +380,51 @@ class ContentApiController extends Controller
         });
 
         return response()->json($quiz);
+    }
+
+    public function submitQuiz(Request $request, $id)
+    {
+        $request->validate([
+            'answers' => 'required|array',
+        ]);
+
+        $quiz = Quiz::with('questions.options')->findOrFail($id);
+        $submittedAnswers = $request->answers; // [question_id => selected_option_index]
+        $score = 0;
+        $totalQuestions = $quiz->questions->count();
+
+        foreach ($quiz->questions as $question) {
+            $correctOptionIndex = -1;
+            foreach ($question->options as $index => $option) {
+                if ($option->is_correct) {
+                    $correctOptionIndex = $index;
+                    break;
+                }
+            }
+
+            if (isset($submittedAnswers[$question->id]) && $submittedAnswers[$question->id] == $correctOptionIndex) {
+                $score++;
+            }
+        }
+
+        $percentage = ($totalQuestions > 0) ? ($score / $totalQuestions) * 100 : 0;
+        $status = ($percentage >= ($quiz->passing_percentage ?? 0)) ? 'passed' : 'failed';
+
+        // Record the Attempt
+        QuizAttempt::create([
+            'student_id' => auth()->guard('api-student')->id(),
+            'quiz_id' => $quiz->id,
+            'score' => $score,
+            'percentage' => $percentage,
+            'status' => $status,
+            'completed_at' => now(),
+        ]);
+
+        return response()->json([
+            'score' => $score,
+            'total' => $totalQuestions,
+            'percentage' => $percentage,
+        ]);
     }
 
     public function getCart()
