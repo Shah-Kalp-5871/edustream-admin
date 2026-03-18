@@ -26,7 +26,7 @@
 .save-banner { position: sticky; bottom: 24px; z-index: 100; }
 .save-banner-inner { background: var(--primary); color: white; border-radius: var(--r-lg); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 24px rgba(0,0,0,.3); }
 .json-format-box { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 14px; font-size: 12px; font-family: monospace; white-space: pre; overflow-x: auto; }
-.ai-prompt-box { background: #f5f3ff; border: 1px solid #ddd6fe; border-radius: var(--r-sm); padding: 14px; font-size: 13px; color: #5b21b6; line-height: 1.6; position: relative; }
+.ai-prompt-box { background: #f5f3ff; border: 1px solid #ddd6fe; border-radius: var(--r-sm); padding: 14px; font-size: 13px; color: #5b21b6; line-height: 1.6; position: relative; white-space: pre-wrap; }
 </style>
 @endsection
 
