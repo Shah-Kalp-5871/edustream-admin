@@ -28,23 +28,9 @@
 .json-format-box { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 14px; font-size: 12px; font-family: monospace; white-space: pre; overflow-x: auto; }
 .ai-prompt-box { background: #f5f3ff; border: 1px solid #ddd6fe; border-radius: var(--r-sm); padding: 14px; font-size: 13px; color: #5b21b6; line-height: 1.6; position: relative; white-space: pre-wrap; }
 
-/* Redesigned Modal Styles */
-.modal-header-hero { background: linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%); color: white; padding: 32px 24px; text-align: center; position: relative; }
-.modal-header-hero h3 { margin: 0; font-size: 22px; font-weight: 800; }
-.modal-header-hero p { margin: 8px 0 0; opacity: 0.9; font-size: 14px; }
-.modal-header-hero .modal-close { color: white; opacity: 0.7; transition: opacity .2s; }
-.modal-header-hero .modal-close:hover { opacity: 1; }
-
-.import-zone { border: 2px dashed var(--border-strong); border-radius: var(--r); padding: 40px 24px; text-align: center; transition: all .2s; cursor: pointer; background: var(--surface); margin-bottom: 24px; position: relative; }
-.import-zone:hover, .import-zone.dragover { border-color: var(--primary); background: var(--primary-glow); }
-.import-zone i { font-size: 40px; color: var(--primary); margin-bottom: 16px; opacity: 0.8; }
-.import-zone h4 { margin: 0 0 4px; font-size: 16px; font-weight: 700; color: var(--text); }
-.import-zone p { margin: 0; font-size: 13px; color: var(--text-muted); }
-.import-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-
-.prompt-card { background: #faf5ff; border: 1px solid #e9d5ff; border-radius: var(--r); overflow: hidden; }
-.prompt-card-header { padding: 12px 16px; background: #f3e8ff; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e9d5ff; }
-.prompt-card-body { padding: 16px; font-size: 13px; color: #5b21b6; line-height: 1.6; white-space: pre-wrap; max-height: 200px; overflow-y: auto; font-family: 'Inter', system-ui, sans-serif; }
+.prompt-card { background: #faf5ff; border: 1px solid #e9d5ff; border-radius: var(--r-sm); overflow: hidden; margin-bottom: 10px; }
+.prompt-card-header { padding: 10px 16px; background: #f3e8ff; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e9d5ff; }
+.prompt-card-body { padding: 16px; font-size: 13px; color: #5b21b6; line-height: 1.6; white-space: pre-wrap; max-height: 250px; overflow-y: auto; font-family: 'Inter', system-ui, sans-serif; }
 </style>
 @endsection
 
@@ -113,31 +99,21 @@
 
 {{-- Import JSON Modal --}}
 <div class="modal-backdrop" id="importModal" onclick="if(event.target===this) closeModal('importModal')">
-    <div class="modal" style="max-width: 600px; padding: 0; border: none; overflow: hidden;">
-        <div class="modal-header-hero">
-            <button class="modal-close" onclick="closeModal('importModal')" style="position: absolute; top: 16px; right: 16px; background: transparent; border: none; font-size: 24px;">&times;</button>
-            <i class="fa-solid fa-cloud-arrow-up" style="font-size: 48px; margin-bottom: 16px; opacity: 0.9;"></i>
-            <h3>Import Quiz Questions</h3>
-            <p>Upload a JSON file or use AI to generate one</p>
-        </div>
-        
-        <div class="modal-body" style="padding: 32px;">
-            {{-- Drop Zone --}}
-            <div class="import-zone" id="dropZone">
-                <i class="fa-solid fa-file-code"></i>
-                <h4 id="fileStatusTitle">Click or Drag JSON file here</h4>
-                <p id="fileStatusSub">Maximum file size: 2MB</p>
-                <input type="file" id="jsonFileInput" accept=".json,.txt" onchange="handleFileSelect(this)">
+    <div class="modal" style="max-width: 560px;">
+        <div class="modal-header">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fa-solid fa-robot" style="color: var(--primary); font-size: 20px;"></i>
+                <h3 style="margin: 0; font-size: 18px;">AI Quiz Assistant</h3>
             </div>
-
-            {{-- AI Assistant Section --}}
+            <button class="modal-close" onclick="closeModal('importModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Copy the prompt below and paste your questions into an AI (like ChatGPT) to generate a JSON file.</p>
+            
             <div class="prompt-card">
                 <div class="prompt-card-header">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <i class="fa-solid fa-robot" style="color: #9333ea;"></i>
-                        <span style="font-size: 13px; font-weight: 700; color: #6b21a8;">AI Assistant Prompt</span>
-                    </div>
-                    <button class="btn btn-sm" onclick="copyAiPrompt()" style="font-size: 11px; padding: 6px 12px; background: white; color: #9333ea; border: 1px solid #d8b4fe; border-radius: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                    <span style="font-size: 12px; font-weight: 700; color: #6b21a8; text-transform: uppercase; letter-spacing: 0.5px;">Your AI Prompt</span>
+                    <button class="btn btn-sm" onclick="copyAiPrompt()" style="font-size: 11px; padding: 4px 12px; background: white; color: #9333ea; border: 1px solid #d8b4fe;">
                         <i class="fa-solid fa-copy"></i> Copy Prompt
                     </button>
                 </div>
@@ -163,17 +139,15 @@ My questions are:
 
 Provide ONLY the JSON file output.</div>
             </div>
-
-            <p style="font-size: 12px; color: var(--text-muted); margin-top: 16px; text-align: center;">
-                <i class="fa-solid fa-circle-info"></i> Note: Importing will replace all questions currently in this builder.
-            </p>
+            
+            <div style="margin-top: 24px; padding: 16px; background: var(--surface-2); border-radius: var(--r-sm); border: 1px dashed var(--border);">
+                <label style="display: block; margin-bottom: 10px; font-size: 13px; font-weight: 600;">Upload Your Generated JSON</label>
+                <input type="file" id="jsonFileInput" accept=".json,.txt" class="form-control" style="font-size: 13px;">
+            </div>
         </div>
-
-        <div class="modal-footer" style="padding: 24px 32px; background: var(--surface-2); border-top: 1px solid var(--border); display: flex; gap: 12px; justify-content: flex-end;">
-            <button class="btn btn-secondary" onclick="closeModal('importModal')" style="padding: 10px 24px;">Discard</button>
-            <button class="btn btn-primary" onclick="importJson()" id="importBtn" style="padding: 10px 32px; background: var(--primary);">
-                <i class="fa-solid fa-bolt"></i> Import & Start
-            </button>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('importModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="importJson()"><i class="fa-solid fa-upload"></i> Import & Replace</button>
         </div>
     </div>
 </div>
@@ -426,35 +400,6 @@ function copyAiPrompt() {
             timer: 2000
         });
     });
-}
-
-// ------- File Zone Handlers --------------------------------------------------
-const dropZone = document.getElementById('dropZone');
-if (dropZone) {
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        dropZone.addEventListener(eventName, e => { e.preventDefault(); e.stopPropagation(); }, false);
-    });
-    ['dragenter', 'dragover'].forEach(eventName => {
-        dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
-    });
-    ['dragleave', 'drop'].forEach(eventName => {
-        dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
-    });
-    dropZone.addEventListener('drop', e => {
-        const file = e.dataTransfer.files[0];
-        document.getElementById('jsonFileInput').files = e.dataTransfer.files;
-        handleFileSelect(document.getElementById('jsonFileInput'));
-    });
-}
-
-function handleFileSelect(input) {
-    const file = input.files[0];
-    if (file) {
-        document.getElementById('fileStatusTitle').innerText = file.name;
-        document.getElementById('fileStatusSub').innerText = (file.size / 1024).toFixed(1) + ' KB - Ready to import';
-        dropZone.style.borderColor = 'var(--primary)';
-        dropZone.style.background = 'var(--primary-glow)';
-    }
 }
 
 // Init
