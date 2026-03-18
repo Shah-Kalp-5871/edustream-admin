@@ -22,11 +22,11 @@ class Student extends Authenticatable implements JWTSubject
         'avatar_url',
         'plan',
         'status',
-        'mobile_verified_at',
+        'email_verified_at',
     ];
 
     protected $casts = [
-        'mobile_verified_at' => 'datetime',
+        'email_verified_at' => 'datetime',
     ];
 
     // Relationships

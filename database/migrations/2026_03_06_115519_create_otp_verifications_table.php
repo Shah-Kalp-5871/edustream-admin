@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('otp_verifications', function (Blueprint $table) {
             $table->id();
-            $table->string('mobile', 15)->index();
+            $table->string('email')->index();
             $table->string('otp', 10);
             $table->enum('purpose', ['login', 'signup', 'reset']);
             $table->tinyInteger('attempts')->default(0);

@@ -10,37 +10,38 @@ use Illuminate\Support\Str;
 
 class StudentAuthController extends Controller
 {
-    protected $authService;
+    protected $emailService;
 
-    public function __construct(AuthService $authService)
+    public function __construct(AuthService $authService, \App\Services\EmailService $emailService)
     {
         $this->authService = $authService;
+        $this->emailService = $emailService;
     }
 
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'mobile' => 'required|string|digits:10|unique:students',
+            'email' => 'required|string|email|unique:students',
             'course_id' => 'required|exists:courses,id',
+            'mobile' => 'nullable|string|digits:10|unique:students',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // Auto-generate email and password
-        $email = $request->mobile . '_' . \Illuminate\Support\Str::random(4) . '@edustream.test';
+        // Finalize student account
         $password = \Illuminate\Support\Str::random(10);
 
         $student = \App\Models\Student::create([
             'name' => $request->name,
-            'mobile' => $request->mobile,
+            'email' => $request->email,
+            'mobile' => $request->mobile ?? null,
             'course_id' => $request->course_id,
-            'email' => $email,
             'password' => \Illuminate\Support\Facades\Hash::make($password),
             'status' => 'active',
-            'mobile_verified_at' => now(), // already verified if they reached here via OTP
+            'email_verified_at' => now(),
         ]);
 
         $token = auth()->guard('api-student')->login($student);
@@ -78,65 +79,115 @@ class StudentAuthController extends Controller
     public function sendOtp(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'mobile' => 'required|string|digits:10',
+            'email' => 'required|string|email',
+            'purpose' => 'required|in:login,signup',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // Generate 4 digit OTP
-        $otp = (string) rand(1000, 9999);
+        $email = $request->email;
+        $purpose = $request->purpose;
+
+        // Check user existence based on purpose
+        $studentExists = \App\Models\Student::where('email', $email)->exists();
+
+        if ($purpose === 'signup' && $studentExists) {
+            return response()->json(['error' => 'This email is already registered. Please login.'], 400);
+        }
+
+        if ($purpose === 'login' && !$studentExists) {
+            return response()->json(['error' => 'Account not found. Please signup first.'], 400);
+        }
+
+        // Generate 6-digit OTP
+        $otp = (string) rand(100000, 999999);
         
-        // Store in cache for 5 minutes
-        \Illuminate\Support\Facades\Cache::put('otp_' . $request->mobile, $otp, now()->addMinutes(5));
+        // Store in DB
+        \Illuminate\Support\Facades\DB::table('otp_verifications')->updateOrInsert(
+            ['email' => $email, 'purpose' => $purpose],
+            [
+                'otp' => $otp,
+                'attempts' => 0,
+                'expires_at' => now()->addMinutes(5),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
+
+        // Send OTP via Email
+        $sent = $this->emailService->sendOtpEmail($email, $otp, $purpose);
+
+        if (!$sent) {
+            return response()->json(['error' => 'Failed to send OTP email. Please try again later.'], 500);
+        }
 
         return response()->json([
-            'message' => 'OTP sent successfully',
-            'mobile' => $request->mobile,
-            'otp' => $otp // Return OTP for testing
+            'message' => 'OTP sent successfully to your email',
+            'email' => $email,
+            'otp' => $otp // Return OTP for testing if needed, remove in production
         ]);
     }
 
     public function verifyOtp(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'mobile' => 'required|string',
+            'email' => 'required|string|email',
             'otp' => 'required|string',
+            'purpose' => 'required|in:login,signup',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $cachedOtp = \Illuminate\Support\Facades\Cache::get('otp_' . $request->mobile);
+        $email = $request->email;
+        $otp = $request->otp;
+        $purpose = $request->purpose;
 
-        if (!$cachedOtp || $cachedOtp != $request->otp) {
-            // Also allow a static bypass OTP for review or testing
-            if ($request->otp !== '1234') {
-                return response()->json(['error' => 'Invalid or expired OTP'], 400);
-            }
+        $otpRecord = \Illuminate\Support\Facades\DB::table('otp_verifications')
+            ->where('email', $email)
+            ->where('purpose', $purpose)
+            ->first();
+
+        if (!$otpRecord) {
+            return response()->json(['error' => 'Invalid OTP request.'], 400);
         }
 
-        // Try to find the student
-        $student = \App\Models\Student::where('mobile', $request->mobile)->first();
+        /** @var object $otpRecord */
+        if (now()->greaterThan($otpRecord->expires_at)) {
+            return response()->json(['error' => 'OTP expired. Please request a new OTP.'], 400);
+        }
 
-        // Delete OTP
-        \Illuminate\Support\Facades\Cache::forget('otp_' . $request->mobile);
+        if ($otpRecord->attempts >= 5) {
+            return response()->json(['error' => 'Max OTP attempts reached. Please request a new OTP.'], 400);
+        }
 
-        if (!$student) {
+        if ($otpRecord->otp !== $otp) {
+            \Illuminate\Support\Facades\DB::table('otp_verifications')
+                ->where('id', $otpRecord->id)
+                ->increment('attempts');
+            return response()->json(['error' => 'Invalid OTP'], 400);
+        }
+
+        // Success - Clear OTP
+        \Illuminate\Support\Facades\DB::table('otp_verifications')->where('id', $otpRecord->id)->delete();
+
+        if ($purpose === 'signup') {
             return response()->json([
                 'status' => 'needs_signup',
-                'mobile' => $request->mobile
+                'email' => $email
             ]);
         }
 
-        if (!$student->mobile_verified_at) {
-            $student->mobile_verified_at = now();
-            $student->save();
+        // Login flow
+        $student = \App\Models\Student::where('email', $email)->first();
+        
+        if (!$student) {
+            return response()->json(['error' => 'Student not found.'], 404);
         }
 
-        // Login using JWT
         $token = auth()->guard('api-student')->login($student);
 
         return response()->json([
@@ -146,6 +197,7 @@ class StudentAuthController extends Controller
             'token' => $token
         ]);
     }
+
     public function me()
     {
         return response()->json(auth()->guard('api-student')->user());

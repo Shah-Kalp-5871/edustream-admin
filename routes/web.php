@@ -113,6 +113,7 @@ Route::get('/orders/{id}/invoice', [OrderController::class, 'invoice']);
 // Analytics & Settings
     Route::get('/analytics', [AnalyticsController::class, 'index']);
     Route::get('/settings', [SettingsController::class, 'index']);
+    Route::post('/settings/password', [SettingsController::class, 'updatePassword'])->name('settings.update-password');
 
     // Banner Routes
     Route::get('/banners', [BannerWebController::class, 'index']);

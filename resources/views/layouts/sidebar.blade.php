@@ -55,7 +55,7 @@
         <span class="nav-section">System</span>
 
         <a href="{{ url('settings') }}" class="nav-link {{ request()->is('settings*') ? 'active' : '' }}">
-            <span class="nav-icon"><i class="fas fa-sliders"></i></span>
+            <span class="nav-icon"><i class="fas fa-lock"></i></span>
             Settings
         </a>
     </nav>
