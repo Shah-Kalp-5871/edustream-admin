@@ -26,6 +26,7 @@
 .save-banner { position: sticky; bottom: 24px; z-index: 100; }
 .save-banner-inner { background: var(--primary); color: white; border-radius: var(--r-lg); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 24px rgba(0,0,0,.3); }
 .json-format-box { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 14px; font-size: 12px; font-family: monospace; white-space: pre; overflow-x: auto; }
+.ai-prompt-box { background: #f5f3ff; border: 1px solid #ddd6fe; border-radius: var(--r-sm); padding: 14px; font-size: 13px; color: #5b21b6; line-height: 1.6; position: relative; }
 </style>
 @endsection
 
@@ -115,6 +116,39 @@
     }
   ]
 }</div>
+
+            <div style="margin-top: 24px; padding-top: 20px; border-top: 1px dashed var(--border);">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                    <h4 style="font-size: 14px; color: var(--text); margin: 0;">
+                        <i class="fa-solid fa-robot" style="color: #8b5cf6;"></i> AI Assistant Prompt
+                    </h4>
+                    <button class="btn btn-sm" onclick="copyAiPrompt()" style="font-size: 11px; padding: 4px 10px; background: white; border: 1px solid #ddd6fe; color: #7c3aed;">
+                        <i class="fa-solid fa-copy"></i> Copy Prompt
+                    </button>
+                </div>
+                <div class="ai-prompt-box" id="aiPromptContent">Act as a Quiz Generator. Convert questions into a valid JSON file using this EXACT schema:
+
+{
+  "questions": [
+    {
+      "question_text": "Question here",
+      "marks": 1,
+      "options": [
+        { "option_text": "Option 1", "is_correct": false },
+        { "option_text": "Option 2", "is_correct": true }
+      ]
+    }
+  ]
+}
+
+My questions are:
+--------------
+[PASTE YOUR QUESTIONS HERE]
+--------------
+
+Provide ONLY the JSON file output.</div>
+            </div>
+
             <div style="margin-top: 16px;">
                 <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Select JSON File</label>
                 <input type="file" id="jsonFileInput" accept=".json,.txt" class="form-control">
@@ -361,6 +395,21 @@ async function importJson() {
 
 // Warn on leaving with unsaved changes
 window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+
+// ------- AI Prompt Copy -------------------------------------------------------
+function copyAiPrompt() {
+    const text = document.getElementById('aiPromptContent').innerText;
+    navigator.clipboard.writeText(text).then(() => {
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'success',
+            title: 'AI Prompt copied to clipboard!',
+            showConfirmButton: false,
+            timer: 2000
+        });
+    });
+}
 
 // Init
 render();
