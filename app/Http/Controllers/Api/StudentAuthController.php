@@ -126,7 +126,6 @@ class StudentAuthController extends Controller
         return response()->json([
             'message' => 'OTP sent successfully to your email',
             'email' => $email,
-            'otp' => $otp // Return OTP for testing if needed, remove in production
         ]);
     }
 

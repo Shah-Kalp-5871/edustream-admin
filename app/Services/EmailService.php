@@ -18,12 +18,14 @@ class EmailService
     public function sendOtpEmail($email, $otp, $purpose)
     {
         $subject = $purpose === 'signup' ? 'Account Verification OTP' : 'Login OTP';
-        $messageText = $purpose === 'signup' 
-            ? "Your signup OTP is {$otp}\n\nThis OTP will expire in 5 minutes."
-            : "Your login OTP is {$otp}\n\nThis OTP expires in 5 minutes.";
+        $data = [
+            'otp' => $otp,
+            'purpose' => $purpose,
+            'subject' => $subject
+        ];
 
         try {
-            Mail::raw($messageText, function ($message) use ($email, $subject) {
+            Mail::send('emails.otp', $data, function ($message) use ($email, $subject) {
                 $message->to($email)
                         ->subject($subject);
             });
