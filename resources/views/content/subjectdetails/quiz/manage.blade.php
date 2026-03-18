@@ -101,23 +101,14 @@
             <button class="modal-close" onclick="closeModal('importModal')">&times;</button>
         </div>
         <div class="modal-body">
-            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Upload a <code>.json</code> file with your questions. <strong>This will replace all existing questions.</strong></p>
-            <div class="json-format-box">{
-  "questions": [
-    {
-      "question_text": "What is 2 + 2?",
-      "marks": 1,
-      "options": [
-        { "option_text": "3", "is_correct": false },
-        { "option_text": "4", "is_correct": true },
-        { "option_text": "5", "is_correct": false },
-        { "option_text": "6", "is_correct": false }
-      ]
-    }
-  ]
-}</div>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 24px;">Upload a <code>.json</code> file with your questions. This will replace all existing questions.</p>
 
-            <div style="margin-top: 24px; padding-top: 20px; border-top: 1px dashed var(--border);">
+            <div style="margin-bottom: 24px;">
+                <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Select JSON File</label>
+                <input type="file" id="jsonFileInput" accept=".json,.txt" class="form-control">
+            </div>
+
+            <div style="border-top: 1px dashed var(--border); padding-top: 20px;">
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
                     <h4 style="font-size: 14px; color: var(--text); margin: 0;">
                         <i class="fa-solid fa-robot" style="color: #8b5cf6;"></i> AI Assistant Prompt
@@ -147,11 +138,6 @@ My questions are:
 --------------
 
 Provide ONLY the JSON file output.</div>
-            </div>
-
-            <div style="margin-top: 16px;">
-                <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Select JSON File</label>
-                <input type="file" id="jsonFileInput" accept=".json,.txt" class="form-control">
             </div>
         </div>
         <div class="modal-footer">
