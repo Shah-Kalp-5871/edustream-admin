@@ -455,9 +455,27 @@ class ContentApiController extends Controller
         ]);
 
         return response()->json([
-            'score' => $score,
-            'total' => $totalQuestions,
+            'score'      => $score,
+            'total'      => $totalQuestions,
             'percentage' => $percentage,
+            'quiz'       => [
+                'id'        => $quiz->id,
+                'title'     => $quiz->title,
+                'questions' => $quiz->questions->map(function($q) {
+                    return [
+                        'id'            => $q->id,
+                        'question_text' => $q->question_text,
+                        'marks'         => $q->marks,
+                        'options'       => $q->options->map(function($o) {
+                            return [
+                                'id'          => $o->id,
+                                'option_text' => $o->option_text,
+                                'is_correct'  => (bool)$o->is_correct,
+                            ];
+                        })
+                    ];
+                })
+            ],
         ]);
     }
 
