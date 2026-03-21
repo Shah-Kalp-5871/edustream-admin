@@ -31,6 +31,21 @@
 .prompt-card { background: #faf5ff; border: 1px solid #e9d5ff; border-radius: var(--r-sm); overflow: hidden; margin-bottom: 10px; }
 .prompt-card-header { padding: 10px 16px; background: #f3e8ff; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e9d5ff; }
 .prompt-card-body { padding: 16px; font-size: 13px; color: #5b21b6; line-height: 1.6; white-space: pre-wrap; max-height: 250px; overflow-y: auto; font-family: 'Inter', system-ui, sans-serif; }
+
+/* Add Question Block at Bottom */
+.btn-add-block {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; padding: 20px; background: var(--surface); border: 2px dashed var(--border-strong);
+    border-radius: var(--r-lg); color: var(--primary); font-weight: 700; cursor: pointer;
+    transition: all .2s; margin-top: 24px; margin-bottom: 60px;
+}
+.btn-add-block:hover { 
+    background: var(--primary-glow); 
+    border-color: var(--primary); 
+    border-style: solid; 
+    box-shadow: var(--shadow-sm); 
+    transform: translateY(-2px); 
+}
 </style>
 @endsection
 
@@ -248,6 +263,14 @@ function render() {
             </div>`;
         container.appendChild(div);
     });
+
+    if (questions.length > 0) {
+        const addBlock = document.createElement('div');
+        addBlock.className = 'btn-add-block animate-fade-up';
+        addBlock.onclick = addQuestion;
+        addBlock.innerHTML = `<i class="fa-solid fa-plus-circle"></i> Add Another Question`;
+        container.appendChild(addBlock);
+    }
 }
 
 function renderOption(qi, oi, opt) {
