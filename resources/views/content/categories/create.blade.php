@@ -101,10 +101,7 @@
                     <input type="text" name="name" class="form-control" placeholder="e.g. Higher Secondary" required>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">Icon Class (FontAwesome)</label>
-                    <input type="text" name="icon_url" class="form-control" placeholder="e.g. fa-solid fa-graduation-cap">
-                </div>
+                <input type="hidden" name="icon_url" value="fa-solid fa-folder">
 
                 <div class="form-group">
                     <label class="form-label">Status</label>
