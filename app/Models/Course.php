@@ -21,9 +21,15 @@ class Course extends Model
         'color_code',
         'thumbnail_url',
         'price',
+        'is_free',
         'is_recommended',
         'status',
         'sort_order',
+    ];
+
+    protected $casts = [
+        'is_free' => 'boolean',
+        'is_recommended' => 'boolean',
     ];
 
     // Relationships

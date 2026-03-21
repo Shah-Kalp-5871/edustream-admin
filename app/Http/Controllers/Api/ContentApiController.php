@@ -180,19 +180,28 @@ class ContentApiController extends Controller
             
         return response()->json([
             'course'               => $course,
-            'subjects'             => $subjects,
-            'is_enrolled'          => $isCourseEnrolled,          // true = full course purchased
+            'subjects'             => $subjects->map(function($s) use ($isCourseEnrolled, $enrolledSubjectIds, $course) {
+                $data = $s->toArray();
+                // A subject is effectively free if the course is free OR the subject itself is free
+                $data['is_free'] = $course->is_free || $s->is_free;
+                return $data;
+            }),
+            'is_enrolled'          => $isCourseEnrolled || $course->is_free,   // true = full course purchased or free
             'enrolled_subject_ids' => $enrolledSubjectIds,        // list of individually purchased subject IDs
+            'course_is_free'       => $course->is_free,
         ]);
     }
 
     public function subjectDetails(Request $request, $id)
     {
-        $subject = Subject::findOrFail($id);
+        $subject = Subject::with('course')->findOrFail($id);
         $student = auth()->guard('api-student')->user();
 
-        // Check enrollment
-        $isEnrolled = Enrollment::where('student_id', $student->id)
+        // Check if access should be granted (free course, free subject, or enrolled)
+        $courseIsFree = $subject->course ? $subject->course->is_free : false;
+        $subjectIsFree = $subject->is_free;
+        $isEffectivelyFree = $courseIsFree || $subjectIsFree;
+        $isEnrolled = $isEffectivelyFree || Enrollment::where('student_id', $student->id)
             ->where(function($q) use ($subject) {
                 $q->where('subject_id', $subject->id)
                   ->orWhere('course_id', $subject->course_id);
@@ -217,6 +226,7 @@ class ContentApiController extends Controller
         return response()->json([
             'subject' => $subject,
             'is_enrolled' => $isEnrolled,
+            'is_free' => $isEffectivelyFree,
             'sections' => [
                 'video_folders' => $videoFolders,
                 'note_folders' => $noteFolders,
@@ -382,6 +392,10 @@ class ContentApiController extends Controller
 
     private function checkEnrollment($studentId, $subject)
     {
+        // If the course or subject is marked free, access is always granted
+        if ($subject->is_free) return true;
+        if ($subject->course && $subject->course->is_free) return true;
+
         return Enrollment::where('student_id', $studentId)
             ->where(function($q) use ($subject) {
                 $q->where('subject_id', $subject->id)

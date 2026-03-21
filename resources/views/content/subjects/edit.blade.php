@@ -196,6 +196,16 @@
                         <option value="inactive" {{ $subject->status == 'inactive' ? 'selected' : '' }}>Inactive</option>
                     </select>
                 </div>
+
+                <div class="form-group" style="grid-column: span 2; padding: 16px; background: #f0fdf4; border: 1.5px solid #22c55e; border-radius: var(--r); margin-top: 4px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <input type="checkbox" name="is_free" value="1" id="isFreeSubject" {{ $subject->is_free ? 'checked' : '' }} style="width: 20px; height: 20px; cursor: pointer; accent-color: #22c55e;">
+                        <div>
+                            <label for="isFreeSubject" class="form-label" style="margin-bottom: 0; cursor: pointer; color: #15803d;">🆓 Mark this Subject as FREE</label>
+                            <p style="font-size: 12px; color: #166534; margin: 2px 0 0 0;">All notes, videos, papers and quizzes in this subject will be free — regardless of their individual price.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 32px; border-top: 1px solid var(--border); padding-top: 24px;">

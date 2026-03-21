@@ -47,6 +47,7 @@ class ContentController extends Controller
             'icon_url' => 'nullable|string',
             'color_code' => 'nullable|string',
             'is_recommended' => 'nullable|boolean',
+            'is_free' => 'nullable|boolean',
         ]);
 
         if ($request->is_recommended) {
@@ -59,6 +60,7 @@ class ContentController extends Controller
             'slug' => Str::slug($request->name),
             'description' => $request->description,
             'price' => $request->price,
+            'is_free' => $request->has('is_free'),
             'status' => $request->status,
             'icon_url' => $request->icon_url ?? 'fa-solid fa-graduation-cap',
             'color_code' => $request->color_code ?? '#1565C0',
@@ -87,6 +89,7 @@ class ContentController extends Controller
             'icon_url' => 'nullable|string',
             'color_code' => 'nullable|string',
             'is_recommended' => 'nullable|boolean',
+            'is_free' => 'nullable|boolean',
         ]);
 
         $course = Course::findOrFail($id);
@@ -101,6 +104,7 @@ class ContentController extends Controller
             'slug' => Str::slug($request->name),
             'description' => $request->description,
             'price' => $request->price,
+            'is_free' => $request->has('is_free'),
             'status' => $request->status,
             'icon_url' => $request->icon_url ?? 'fa-solid fa-graduation-cap',
             'color_code' => $request->color_code ?? '#1565C0',
@@ -145,6 +149,7 @@ class ContentController extends Controller
             'status' => 'required|in:active,inactive',
             'icon_url' => 'nullable|string',
             'color_code' => 'nullable|string',
+            'is_free' => 'nullable|boolean',
         ]);
 
         Subject::create([
@@ -153,6 +158,7 @@ class ContentController extends Controller
             'slug' => Str::slug($request->name),
             'description' => $request->description,
             'price' => $request->price,
+            'is_free' => $request->has('is_free'),
             'status' => $request->status,
             'icon_url' => $request->icon_url ?? 'fa-solid fa-book',
             'color_code' => $request->color_code ?? '#1565C0',
@@ -257,6 +263,7 @@ class ContentController extends Controller
             'status' => 'required|in:active,inactive',
             'icon_url' => 'nullable|string',
             'color_code' => 'nullable|string',
+            'is_free' => 'nullable|boolean',
         ]);
 
         $subject = Subject::findOrFail($id);
@@ -265,6 +272,7 @@ class ContentController extends Controller
             'slug' => Str::slug($request->name),
             'description' => $request->description,
             'price' => $request->price,
+            'is_free' => $request->has('is_free'),
             'status' => $request->status,
             'icon_url' => $request->icon_url ?? 'fa-solid fa-book',
             'color_code' => $request->color_code ?? '#1565C0',

@@ -21,8 +21,13 @@ class Subject extends Model
         'color_code',
         'thumbnail_url',
         'price',
+        'is_free',
         'status',
         'sort_order',
+    ];
+
+    protected $casts = [
+        'is_free' => 'boolean',
     ];
 
     // Relationships
