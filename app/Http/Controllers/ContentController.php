@@ -116,7 +116,12 @@ class ContentController extends Controller
 
     public function destroy($id)
     {
-        $course = Course::findOrFail($id);
+        $course = Course::withCount('subjects')->findOrFail($id);
+        
+        if ($course->subjects_count > 0) {
+            return redirect('/content')->with('error', 'Cannot delete Standard/Course while it has Subjects. Please delete the Subjects first.');
+        }
+
         $course->delete();
 
         return redirect('/content')->with('success', 'Course deleted successfully!');
@@ -283,8 +288,14 @@ class ContentController extends Controller
 
     public function destroySubject($id)
     {
-        $subject = Subject::findOrFail($id);
+        $subject = Subject::withCount(['notes', 'videos', 'qaPapers', 'quizzes', 'noteFolders', 'videoFolders', 'qaPaperFolders'])->findOrFail($id);
         $courseId = $subject->course_id;
+
+        if ($subject->notes_count > 0 || $subject->videos_count > 0 || $subject->qa_papers_count > 0 || $subject->quizzes_count > 0 || 
+            $subject->note_folders_count > 0 || $subject->video_folders_count > 0 || $subject->qa_paper_folders_count > 0) {
+            return redirect('/content/course/' . $courseId)->with('error', 'Cannot delete Subject while it has contents (Notes, Videos, Folders, etc.). Please delete the contents first.');
+        }
+
         $subject->delete();
 
         return redirect('/content/course/' . $courseId)->with('success', 'Subject deleted successfully!');

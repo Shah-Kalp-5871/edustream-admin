@@ -65,7 +65,12 @@ class CategoryController extends Controller
 
     public function destroy($id)
     {
-        $category = Category::findOrFail($id);
+        $category = Category::withCount('courses')->findOrFail($id);
+        
+        if ($category->courses_count > 0) {
+            return redirect('/content/categories')->with('error', 'Cannot delete category. Please delete associated Courses & Standards first.');
+        }
+
         $category->delete();
 
         return redirect('/content/categories')->with('success', 'Category deleted successfully!');
