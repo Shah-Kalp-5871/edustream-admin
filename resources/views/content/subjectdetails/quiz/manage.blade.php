@@ -117,8 +117,18 @@
                         <i class="fa-solid fa-copy"></i> Copy Prompt
                     </button>
                 </div>
-                <div class="prompt-card-body" id="aiPromptContent">Act as a Quiz Generator. Convert questions into a valid JSON file using this EXACT schema:
+                <div class="prompt-card-body" id="aiPromptContent">Act as a Quiz Generator.
 
+Your task is STRICTLY to convert given questions into a valid JSON file and ALWAYS generate it as a downloadable .json file.
+
+IMPORTANT RULES:
+1. DO NOT display the JSON in chat.
+2. DO NOT explain anything.
+3. DO NOT add any extra text.
+4. ONLY generate a downloadable .json file.
+5. The response must contain only the file.
+
+SCHEMA (MUST FOLLOW EXACTLY):
 {
   "questions": [
     {
@@ -126,18 +136,26 @@
       "marks": 1,
       "options": [
         { "option_text": "Option 1", "is_correct": false },
-        { "option_text": "Option 2", "is_correct": true }
+        { "option_text": "Option 2", "is_correct": false },
+        { "option_text": "Option 3", "is_correct": false },
+        { "option_text": "Option 4", "is_correct": true }
       ]
     }
   ]
 }
 
-My questions are:
---------------
-[PASTE YOUR QUESTIONS HERE]
---------------
+OPTION RULES:
+- Every question MUST have exactly 4 options.
+- If a question has NO options → generate 4 relevant options.
+- If a question has 2 options → add 2 more relevant options.
+- If a question has 3 options → add 1 more relevant option.
+- Ensure ONLY ONE correct answer (is_correct: true).
+- Other options must be false.
+- Keep options meaningful and related to the question.
 
-Provide ONLY the JSON file output.</div>
+Now convert the following questions into the file:
+
+[PASTE YOUR QUESTIONS HERE]</div>
             </div>
             
             <div style="margin-top: 24px; padding: 16px; background: var(--surface-2); border-radius: var(--r-sm); border: 1px dashed var(--border);">
