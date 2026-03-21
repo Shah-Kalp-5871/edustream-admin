@@ -22,9 +22,9 @@ class StudentAuthController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|unique:students',
+            'email' => 'required|string|email|unique:students,email,NULL,id,deleted_at,NULL',
             'course_id' => 'required|exists:courses,id',
-            'mobile' => 'nullable|string|digits:10|unique:students',
+            'mobile' => 'nullable|string|digits:10|unique:students,mobile,NULL,id,deleted_at,NULL',
         ]);
 
         if ($validator->fails()) {
@@ -220,8 +220,8 @@ class StudentAuthController extends Controller
         
         $validator = Validator::make($request->all(), [
             'name' => 'sometimes|string|max:255',
-            'email' => 'sometimes|string|email|max:255|unique:students,email,' . $student->id,
-            'mobile' => 'sometimes|string|digits:10|unique:students,mobile,' . $student->id,
+            'email' => 'sometimes|string|email|max:255|unique:students,email,' . $student->id . ',id,deleted_at,NULL',
+            'mobile' => 'sometimes|string|digits:10|unique:students,mobile,' . $student->id . ',id,deleted_at,NULL',
             'bio' => 'nullable|string',
             'password' => 'sometimes|string|min:6|confirmed',
         ]);

@@ -3,9 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Banner extends Model
 {
+    use SoftDeletes; // Assuming HasFactory is not needed or will be added separately if it was intended. The instruction specifically asks for SoftDeletes.
     protected $fillable = [
         'title',
         'subtitle',
