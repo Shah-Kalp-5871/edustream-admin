@@ -950,6 +950,19 @@
             });
         @endif
 
+        @if($errors->any())
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                html: '<ul style="text-align: left; list-style: none; padding: 0; margin: 0;">@foreach($errors->all() as $error)<li style="margin-bottom: 8px;"><i class="fa-solid fa-circle-exclamation" style="color: #ef4444; margin-right: 8px;"></i> {{ $error }}</li>@endforeach</ul>',
+                confirmButtonColor: 'var(--primary)',
+                customClass: {
+                    confirmButton: 'btn btn-primary',
+                    popup: 'card-pad'
+                }
+            });
+        @endif
+
         // Sidebar toggle (mobile)
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebarOverlay');
