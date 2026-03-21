@@ -400,6 +400,14 @@
         justify-content: flex-end;
         gap: 12px;
     }
+    /* AI Prompt Styles */
+    .modal-body p { line-height: 1.5; }
+    .prompt-card { background: #faf5ff; border: 1px solid #e9d5ff; border-radius: var(--r-sm); overflow: hidden; margin-bottom: 24px; }
+    .prompt-card-header { padding: 10px 16px; background: #f3e8ff; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e9d5ff; }
+    .prompt-card-body { padding: 16px; font-size: 13px; color: #5b21b6; line-height: 1.6; white-space: pre-wrap; max-height: 250px; overflow-y: auto; font-family: 'Inter', system-ui, sans-serif; }
+    .prompt-label { font-size: 11px; font-weight: 700; color: #6b21a8; text-transform: uppercase; letter-spacing: 0.5px; }
+    .btn-copy { font-size: 11px; padding: 4px 12px; background: white; color: #9333ea; border: 1px solid #d8b4fe; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
+    .btn-copy:hover { background: #f3e8ff; }
 </style>
 @endsection
 
@@ -525,16 +533,62 @@
             <button class="modal-close" onclick="closeImportModal()">&times;</button>
         </div>
         <div class="modal-body">
-            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Paste your JSON data below. Follow this format:</p>
-            <pre style="background: var(--surface-2); padding: 12px; border-radius: 8px; font-size: 11px; margin-bottom: 20px; overflow-x: auto; border: 1px solid var(--border);">
-[
-  {
-    "text": "What is the capital of France?",
-    "options": ["London", "Paris", "Berlin", "Madrid"],
-    "correct": 1
-  }
-]</pre>
-            <textarea id="jsonInput" class="q-textarea" rows="10" placeholder="Paste JSON here..."></textarea>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                <i class="fa-solid fa-robot" style="color: #9333ea; font-size: 20px;"></i>
+                <h4 style="margin: 0; font-size: 15px; font-weight: 700;">AI Quiz Assistant</h4>
+            </div>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">Copy the prompt below and paste your questions into an AI (like ChatGPT) to generate a compatible JSON file.</p>
+            
+            <div class="prompt-card">
+                <div class="prompt-card-header">
+                    <span class="prompt-label">Your AI Prompt</span>
+                    <button class="btn-copy" onclick="copyAiPrompt()">
+                        <i class="fa-solid fa-copy"></i> Copy Prompt
+                    </button>
+                </div>
+                <div class="prompt-card-body" id="aiPromptContent">Act as a Quiz Generator.
+
+Your task is STRICTLY to convert given questions into a valid JSON file and ALWAYS generate it as a downloadable .json file.
+
+IMPORTANT RULES:
+1. DO NOT display the JSON in chat.
+2. DO NOT explain anything.
+3. DO NOT add any extra text.
+4. ONLY generate a downloadable .json file.
+5. The response must contain only the file.
+
+SCHEMA (MUST FOLLOW EXACTLY):
+{
+  "questions": [
+    {
+      "question_text": "Question here",
+      "marks": 1,
+      "options": [
+        { "option_text": "Option 1", "is_correct": false },
+        { "option_text": "Option 2", "is_correct": false },
+        { "option_text": "Option 3", "is_correct": false },
+        { "option_text": "Option 4", "is_correct": true }
+      ]
+    }
+  ]
+}
+
+OPTION RULES:
+- Every question MUST have exactly 4 options.
+- If a question has NO options → generate 4 relevant options.
+- If a question has 2 options → add 2 more relevant options.
+- If a question has 3 options → add 1 more relevant option.
+- Ensure ONLY ONE correct answer (is_correct: true).
+- Other options must be false.
+- Keep options meaningful and related to the question.
+
+Now convert the following questions into the file:
+
+[PASTE QUESTIONS HERE]</div>
+            </div>
+
+            <label style="display: block; font-size: 13px; font-weight: 700; margin-bottom: 10px;">Paste Generated JSON</label>
+            <textarea id="jsonInput" class="q-textarea" rows="8" placeholder="Paste your generated JSON here..."></textarea>
         </div>
         <div class="modal-footer">
             <button class="btn btn-secondary" onclick="closeImportModal()">Cancel</button>
@@ -698,20 +752,88 @@
         document.getElementById('importModal').classList.remove('show');
     }
 
-    function processImport() {
-        const input = document.getElementById('jsonInput').value;
-        try {
-            const data = JSON.parse(input);
-            if(!Array.isArray(data)) throw new Error("JSON must be an array of questions");
+    function copyAiPrompt() {
+        const text = document.getElementById('aiPromptContent').innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            const btn = document.querySelector('.btn-copy');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
+            btn.style.borderColor = '#22c55e';
+            btn.style.color = '#16a34a';
             
-            data.forEach(q => {
-                if(!q.text || !q.options || q.options.length !== 4) return;
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.style.borderColor = '#d8b4fe';
+                btn.style.color = '#9333ea';
+            }, 2000);
+            
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: 'AI Prompt copied!',
+                showConfirmButton: false,
+                timer: 2000
+            });
+        });
+    }
+
+    function processImport() {
+        const input = document.getElementById('jsonInput').value.trim();
+        if (!input) {
+            Swal.fire('Error', 'Please paste JSON data first.', 'error');
+            return;
+        }
+
+        try {
+            let data = JSON.parse(input);
+            let importedQuestions = [];
+
+            // Case 1: New schema { questions: [...] }
+            if (data.questions && Array.isArray(data.questions)) {
+                importedQuestions = data.questions;
+            } 
+            // Case 2: Array root [...]
+            else if (Array.isArray(data)) {
+                importedQuestions = data;
+            } else {
+                throw new Error("JSON must be an array or contain a 'questions' array.");
+            }
+            
+            let count = 0;
+            importedQuestions.forEach(q => {
+                // Determine format
+                let qText = q.question_text || q.text;
+                let qOptions = [];
+                let qCorrect = 0;
+
+                if (Array.isArray(q.options)) {
+                    // Check if options are objects (new schema)
+                    if (q.options.length > 0 && typeof q.options[0] === 'object') {
+                        qOptions = q.options.map(o => o.option_text || '');
+                        qCorrect = q.options.findIndex(o => o.is_correct === true);
+                        if (qCorrect === -1) qCorrect = 0;
+                    } 
+                    // Or strings (old schema)
+                    else {
+                        qOptions = q.options;
+                        qCorrect = q.correct || 0;
+                    }
+                }
+
+                if (!qText || qOptions.length === 0) return;
+
+                // Ensure exactly 4 options for this builder's fixed UI
+                while (qOptions.length < 4) qOptions.push("Option " + (qOptions.length + 1));
+                if (qOptions.length > 4) qOptions = qOptions.slice(0, 4);
+
                 questions.push({
                     id: Date.now() + Math.random(),
-                    text: q.text,
-                    options: q.options,
-                    correct: q.correct || 0
+                    text: qText,
+                    options: qOptions,
+                    correct: qCorrect
                 });
+                count++;
             });
             
             renderQuestions();
@@ -721,7 +843,7 @@
             Swal.fire({
                 icon: 'success',
                 title: 'Import Successful',
-                text: `Added ${data.length} questions to your quiz.`,
+                text: `Added ${count} questions to your quiz.`,
                 confirmButtonColor: 'var(--subject-accent)'
             });
         } catch(e) {
