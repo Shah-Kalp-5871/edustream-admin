@@ -428,15 +428,10 @@ class ContentApiController extends Controller
         $totalQuestions = $quiz->questions->count();
 
         foreach ($quiz->questions as $question) {
-            $correctOptionIndex = -1;
-            foreach ($question->options as $index => $option) {
-                if ($option->is_correct) {
-                    $correctOptionIndex = $index;
-                    break;
-                }
-            }
+            $correctOption = $question->options->firstWhere('is_correct', true);
+            $correctOptionId = $correctOption ? $correctOption->id : null;
 
-            if (isset($submittedAnswers[$question->id]) && $submittedAnswers[$question->id] == $correctOptionIndex) {
+            if (isset($submittedAnswers[$question->id]) && $submittedAnswers[$question->id] == $correctOptionId) {
                 $score++;
             }
         }
