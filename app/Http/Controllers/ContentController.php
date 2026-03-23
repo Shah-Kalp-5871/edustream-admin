@@ -57,7 +57,7 @@ class ContentController extends Controller
         Course::create([
             'category_id' => $request->category_id,
             'name' => $request->name,
-            'slug' => Str::slug($request->name),
+            'slug' => !empty(Str::slug($request->name)) ? Str::slug($request->name) : (trim(preg_replace('/[^\p{L}\p{N}\-]+/u', '', preg_replace('/[\s]+/u', '-', mb_strtolower($request->name, 'UTF-8'))), '-') ?: uniqid('course-')),
             'description' => $request->description,
             'price' => $request->price,
             'is_free' => $request->has('is_free'),
@@ -101,7 +101,7 @@ class ContentController extends Controller
         $course->update([
             'category_id' => $request->category_id,
             'name' => $request->name,
-            'slug' => Str::slug($request->name),
+            'slug' => !empty(Str::slug($request->name)) ? Str::slug($request->name) : (trim(preg_replace('/[^\p{L}\p{N}\-]+/u', '', preg_replace('/[\s]+/u', '-', mb_strtolower($request->name, 'UTF-8'))), '-') ?: uniqid('course-')),
             'description' => $request->description,
             'price' => $request->price,
             'is_free' => $request->has('is_free'),
@@ -160,7 +160,7 @@ class ContentController extends Controller
         Subject::create([
             'course_id' => $courseId,
             'name' => $request->name,
-            'slug' => Str::slug($request->name),
+            'slug' => !empty(Str::slug($request->name)) ? Str::slug($request->name) : (trim(preg_replace('/[^\p{L}\p{N}\-]+/u', '', preg_replace('/[\s]+/u', '-', mb_strtolower($request->name, 'UTF-8'))), '-') ?: uniqid('subject-')),
             'description' => $request->description,
             'price' => $request->price,
             'is_free' => $request->has('is_free'),
@@ -274,7 +274,7 @@ class ContentController extends Controller
         $subject = Subject::findOrFail($id);
         $subject->update([
             'name' => $request->name,
-            'slug' => Str::slug($request->name),
+            'slug' => !empty(Str::slug($request->name)) ? Str::slug($request->name) : (trim(preg_replace('/[^\p{L}\p{N}\-]+/u', '', preg_replace('/[\s]+/u', '-', mb_strtolower($request->name, 'UTF-8'))), '-') ?: uniqid('subject-')),
             'description' => $request->description,
             'price' => $request->price,
             'is_free' => $request->has('is_free'),

@@ -29,7 +29,7 @@ class CategoryController extends Controller
 
         Category::create([
             'name' => $request->name,
-            'slug' => Str::slug($request->name),
+            'slug' => !empty(Str::slug($request->name)) ? Str::slug($request->name) : (trim(preg_replace('/[^\p{L}\p{N}\-]+/u', '', preg_replace('/[\s]+/u', '-', mb_strtolower($request->name, 'UTF-8'))), '-') ?: uniqid('category-')),
             'icon_url' => $request->icon_url,
             'status' => $request->status,
             'sort_order' => Category::max('sort_order') + 1,
@@ -55,7 +55,7 @@ class CategoryController extends Controller
         $category = Category::findOrFail($id);
         $category->update([
             'name' => $request->name,
-            'slug' => Str::slug($request->name),
+            'slug' => !empty(Str::slug($request->name)) ? Str::slug($request->name) : (trim(preg_replace('/[^\p{L}\p{N}\-]+/u', '', preg_replace('/[\s]+/u', '-', mb_strtolower($request->name, 'UTF-8'))), '-') ?: uniqid('category-')),
             'icon_url' => $request->icon_url,
             'status' => $request->status,
         ]);

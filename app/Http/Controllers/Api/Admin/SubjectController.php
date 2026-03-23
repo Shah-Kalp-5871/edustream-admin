@@ -38,7 +38,7 @@ class SubjectController extends BaseApiController
         $subject = Subject::create([
             'course_id' => $request->course_id,
             'name' => $request->name,
-            'slug' => Str::slug($request->name),
+            'slug' => !empty(Str::slug($request->name)) ? Str::slug($request->name) : (trim(preg_replace('/[^\p{L}\p{N}\-]+/u', '', preg_replace('/[\s]+/u', '-', mb_strtolower($request->name, 'UTF-8'))), '-') ?: uniqid('subject-')),
             'description' => $request->description,
             'price' => $request->price,
             'status' => $request->status,
@@ -75,7 +75,7 @@ class SubjectController extends BaseApiController
 
         $subject->update([
             'name' => $request->name,
-            'slug' => Str::slug($request->name),
+            'slug' => !empty(Str::slug($request->name)) ? Str::slug($request->name) : (trim(preg_replace('/[^\p{L}\p{N}\-]+/u', '', preg_replace('/[\s]+/u', '-', mb_strtolower($request->name, 'UTF-8'))), '-') ?: uniqid('subject-')),
             'description' => $request->description,
             'price' => $request->price,
             'status' => $request->status,

@@ -34,7 +34,7 @@ class CourseController extends BaseApiController
         $course = Course::create([
             'category_id' => $request->category_id,
             'name' => $request->name,
-            'slug' => Str::slug($request->name),
+            'slug' => !empty(Str::slug($request->name)) ? Str::slug($request->name) : (trim(preg_replace('/[^\p{L}\p{N}\-]+/u', '', preg_replace('/[\s]+/u', '-', mb_strtolower($request->name, 'UTF-8'))), '-') ?: uniqid('course-')),
             'description' => $request->description,
             'price' => $request->price,
             'status' => $request->status,
@@ -73,7 +73,7 @@ class CourseController extends BaseApiController
         $course->update([
             'category_id' => $request->category_id,
             'name' => $request->name,
-            'slug' => Str::slug($request->name),
+            'slug' => !empty(Str::slug($request->name)) ? Str::slug($request->name) : (trim(preg_replace('/[^\p{L}\p{N}\-]+/u', '', preg_replace('/[\s]+/u', '-', mb_strtolower($request->name, 'UTF-8'))), '-') ?: uniqid('course-')),
             'description' => $request->description,
             'price' => $request->price,
             'status' => $request->status,
