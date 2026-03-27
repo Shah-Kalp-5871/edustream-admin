@@ -8,21 +8,32 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        \Illuminate\Support\Facades\Schema::disableForeignKeyConstraints();
+
         $this->call([
             AdminsTableSeeder::class,
-            CartItemsTableSeeder::class,
+            StudentsTableSeeder::class,
             CategoriesTableSeeder::class,
             CoursesTableSeeder::class,
-            OrdersTableSeeder::class,
-            OrderItemsTableSeeder::class,
+            SubjectsTableSeeder::class,
+            SettingsTableSeeder::class,
+            BannersTableSeeder::class,
+            NoteFoldersTableSeeder::class,
+            NotesTableSeeder::class,
+            VideoFoldersTableSeeder::class,
+            VideosTableSeeder::class,
+            QaPaperFoldersTableSeeder::class,
             QaPapersTableSeeder::class,
             QuizzesTableSeeder::class,
-            QuizAttemptsTableSeeder::class,
-            QuizOptionsTableSeeder::class,
             QuizQuestionsTableSeeder::class,
-            SettingsTableSeeder::class,
-            StudentsTableSeeder::class,
-            SubjectsTableSeeder::class
+            QuizOptionsTableSeeder::class,
+            OrdersTableSeeder::class,
+            OrderItemsTableSeeder::class,
+            CartItemsTableSeeder::class,
+            EnrollmentsTableSeeder::class,
+            QuizAttemptsTableSeeder::class,
         ]);
+
+        \Illuminate\Support\Facades\Schema::enableForeignKeyConstraints();
     }
 }
