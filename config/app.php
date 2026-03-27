@@ -123,4 +123,8 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'ffmpeg' => env('FFMPEG_BINARIES', '/usr/bin/ffmpeg'),
+
+    'ffprobe' => env('FFPROBE_BINARIES', '/usr/bin/ffprobe'),
+
 ];
