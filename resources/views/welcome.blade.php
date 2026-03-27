@@ -27,10 +27,10 @@
 
     <!-- Navigation -->
     <nav class="fixed top-0 w-full z-[100] glass-nav transition-all duration-300 h-20" id="navbar">
-        <div class="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
-            <a href="/" class="flex items-center gap-3 group">
-                <div class="w-10 h-10 gradient-brand rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg ring-4 ring-orange-50 group-hover:scale-110 transition-transform">GS</div>
-                <span class="text-2xl font-extrabold tracking-tight">Gujju<span class="text-orange-500">Scholar</span></span>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-full flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2 sm:gap-3 group">
+                <div class="w-8 h-8 sm:w-10 sm:h-10 gradient-brand rounded-lg sm:rounded-xl flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-lg ring-4 ring-orange-50 group-hover:scale-110 transition-transform">GS</div>
+                <span class="text-lg sm:text-2xl font-extrabold tracking-tight">Gujju<span class="text-orange-500">Scholar</span></span>
             </a>
             
             <div class="hidden md:flex items-center gap-10 text-sm font-semibold text-zinc-600">
@@ -47,7 +47,7 @@
         </div>
 
         <!-- Mobile Menu Overlay -->
-        <div class="fixed inset-0 bg-white z-[90] flex flex-col items-center justify-center gap-8 -translate-y-full transition-transform duration-500 md:hidden" id="mobile-menu">
+        <div class="fixed inset-0 bg-white z-[90] flex flex-col items-center justify-center gap-8 translate-y-full transition-transform duration-500 md:hidden hidden" id="mobile-menu">
             <a href="#about" class="text-2xl font-bold text-zinc-800 mobile-link">About</a>
             <a href="#features" class="text-2xl font-bold text-zinc-800 mobile-link">Features</a>
             <a href="#download" class="text-2xl font-bold text-zinc-800 mobile-link">App Download</a>
@@ -59,22 +59,22 @@
     </nav>
 
     <!-- Hero Section -->
-    <section class="relative min-h-screen pt-28 pb-12 flex items-center overflow-hidden hero-mesh">
-        <div class="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+    <section class="relative min-h-[90vh] lg:min-h-screen pt-28 pb-12 flex items-center overflow-hidden hero-mesh">
+        <div class="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 lg:gap-16 items-center w-full">
             <div class="z-10 text-center lg:text-left">
                 <div class="reveal inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-50 text-orange-600 text-[10px] font-bold uppercase tracking-[0.2em] mb-6 md:mb-8 border border-orange-100">
                     <span class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
                     Verified Educational Platform
                 </div>
-                <h1 class="reveal text-5xl md:text-7xl lg:text-8xl font-black leading-[0.95] mb-6 md:mb-8 tracking-tighter">
-                    Empowering <br/>
-                    <span class="text-gradient">Potential</span> In <br/>
+                <h1 class="reveal text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-black leading-[1.1] md:leading-[0.95] mb-6 md:mb-8 tracking-tighter">
+                    Empowering <br class="hidden sm:block"/>
+                    <span class="text-gradient">Potential</span> In <br class="hidden sm:block"/>
                     Language.
                 </h1>
-                <p class="reveal text-base md:text-lg text-zinc-500 mb-8 md:mb-12 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium px-4 lg:px-0">
+                <p class="reveal text-sm sm:text-base md:text-lg text-zinc-500 mb-8 md:mb-12 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium px-2">
                     The premium learning platform specifically designed for Gujarati medium students. Master your subjects with confidence and clarity.
                 </p>
-                <div class="reveal flex flex-col sm:flex-row justify-center lg:justify-start gap-4 px-6 sm:px-0">
+                <div class="reveal flex flex-col sm:flex-row justify-center lg:justify-start gap-4 px-4 sm:px-0">
                     <a href="#download" class="gradient-brand px-10 py-5 rounded-2xl text-white font-bold text-lg flex items-center justify-center gap-3 shadow-xl shadow-orange-200 hover:scale-105 active:scale-95 transition-all w-full sm:w-auto">
                         Get Started
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
@@ -85,26 +85,27 @@
                 </div>
             </div>
 
-            <div class="reveal relative h-[400px] md:h-[500px] flex items-center justify-center overflow-visible mt-12 lg:mt-0" id="hero-viz">
-                <!-- Central Core -->
-                <div class="w-24 h-24 md:w-32 md:h-32 gradient-brand rounded-[2rem] flex items-center justify-center text-white font-black text-3xl md:text-4xl shadow-2xl relative z-20 animate-pulse">
-                    GS
-                    <div class="absolute inset-0 rounded-[2rem] border-4 border-orange-500/30 animate-ping"></div>
-                </div>
-                
-                <!-- Orbiting Nodes (Scale down and reduce radius for mobile) -->
-                <div class="absolute w-20 h-20 md:w-24 md:h-24 bg-white border border-orange-100 rounded-2xl shadow-xl flex flex-col items-center justify-center z-10 orbit-node" data-speed="2" data-radius="130" data-md-radius="180" data-angle="0">
-                    <div class="text-orange-500 font-bold text-xs md:text-sm mb-1">ગણિત</div>
-                    <div class="w-6 md:w-8 h-1 bg-orange-100 rounded-full"></div>
-                </div>
-                <div class="absolute w-20 h-20 md:w-24 md:h-24 bg-white border border-orange-100 rounded-2xl shadow-xl flex flex-col items-center justify-center z-10 orbit-node" data-speed="1.5" data-radius="150" data-md-radius="200" data-angle="120">
-                    <div class="text-orange-500 font-bold text-xs md:text-sm mb-1">વિજ્ઞાન</div>
-                     <div class="w-6 md:w-8 h-1 bg-orange-100 rounded-full"></div>
-                </div>
-                <div class="absolute w-20 h-20 md:w-24 md:h-24 bg-white border border-orange-100 rounded-2xl shadow-xl flex flex-col items-center justify-center z-10 orbit-node" data-speed="1.8" data-radius="140" data-md-radius="190" data-angle="240">
-                    <div class="text-orange-500 font-bold text-xs md:text-sm mb-1">અંગ્રેજી</div>
-                     <div class="w-6 md:w-8 h-1 bg-orange-100 rounded-full"></div>
-                </div>
+            <div class="reveal relative h-[350px] md:h-[500px] flex items-center justify-center overflow-visible mt-12 lg:mt-0">
+                <div class="relative w-full h-full flex items-center justify-center" id="hero-viz">
+                    <!-- Central Core -->
+                    <div class="w-20 h-20 md:w-32 md:h-32 gradient-brand rounded-[2rem] flex items-center justify-center text-white font-black text-2xl md:text-4xl shadow-2xl relative z-20 animate-pulse">
+                        GS
+                        <div class="absolute inset-0 rounded-[2rem] border-4 border-orange-500/30 animate-ping"></div>
+                    </div>
+                    
+                    <!-- Orbiting Nodes -->
+                    <div class="absolute w-20 h-20 md:w-24 md:h-24 bg-white border border-orange-100 rounded-2xl shadow-xl flex flex-col items-center justify-center z-10 orbit-node" data-speed="2" data-radius="110" data-md-radius="180" data-angle="0">
+                        <div class="text-orange-500 font-bold text-[10px] md:text-sm mb-1">ગણિત</div>
+                        <div class="w-6 md:w-8 h-1 bg-orange-100 rounded-full"></div>
+                    </div>
+                    <div class="absolute w-20 h-20 md:w-24 md:h-24 bg-white border border-orange-100 rounded-2xl shadow-xl flex flex-col items-center justify-center z-10 orbit-node" data-speed="1.5" data-radius="130" data-md-radius="200" data-angle="120">
+                        <div class="text-orange-500 font-bold text-[10px] md:text-sm mb-1">વિજ્ઞાન</div>
+                         <div class="w-6 md:w-8 h-1 bg-orange-100 rounded-full"></div>
+                    </div>
+                    <div class="absolute w-20 h-20 md:w-24 md:h-24 bg-white border border-orange-100 rounded-2xl shadow-xl flex flex-col items-center justify-center z-10 orbit-node" data-speed="1.8" data-radius="120" data-md-radius="190" data-angle="240">
+                        <div class="text-orange-500 font-bold text-[10px] md:text-sm mb-1">અંગ્રેજી</div>
+                         <div class="w-6 md:w-8 h-1 bg-orange-100 rounded-full"></div>
+                    </div>
 
                     <!-- Decorative Particles -->
                     <div class="absolute w-2 h-2 bg-orange-400 rounded-full opacity-40 float-p" style="top: 10%; left: 20%;"></div>
@@ -309,24 +310,35 @@
         const mobileMenu = document.getElementById('mobile-menu');
         const mobileLinks = document.querySelectorAll('.mobile-link');
 
-        menuToggle.addEventListener('click', () => {
-            mobileMenu.classList.remove('-translate-y-full');
-        });
+        const toggleMenu = (show) => {
+            if (show) {
+                mobileMenu.classList.remove('hidden');
+                setTimeout(() => mobileMenu.classList.remove('translate-y-full'), 10);
+            } else {
+                mobileMenu.classList.add('translate-y-full');
+                setTimeout(() => mobileMenu.classList.add('hidden'), 500);
+            }
+        };
 
-        menuClose.addEventListener('click', () => {
-            mobileMenu.classList.add('-translate-y-full');
-        });
-
+        menuToggle.addEventListener('click', () => toggleMenu(true));
+        menuClose.addEventListener('click', () => toggleMenu(false));
         mobileLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                mobileMenu.classList.add('-translate-y-full');
-            });
+            link.addEventListener('click', () => toggleMenu(false));
         });
 
         // Orbit Animation
-        gsap.utils.toArray('.orbit-node').forEach((node, i) => {
+        let orbitRadius = [];
+        const updateRadii = () => {
             const isMobile = window.innerWidth < 768;
-            const radius = isMobile ? parseInt(node.dataset.radius) : parseInt(node.dataset.mdRadius || node.dataset.radius);
+            gsap.utils.toArray('.orbit-node').forEach((node, i) => {
+                orbitRadius[i] = isMobile ? parseInt(node.dataset.radius) : parseInt(node.dataset.mdRadius || node.dataset.radius);
+            });
+        };
+        
+        updateRadii();
+        window.addEventListener('resize', updateRadii);
+
+        gsap.utils.toArray('.orbit-node').forEach((node, i) => {
             const speed = parseFloat(node.dataset.speed);
             let angle = parseInt(node.dataset.angle);
 
@@ -334,7 +346,8 @@
                 duration: 0.016,
                 repeat: -1,
                 onUpdate: () => {
-                    angle += speed * 0.5;
+                    angle += speed * 0.4;
+                    const radius = orbitRadius[i];
                     const x = Math.cos(angle * Math.PI / 180) * radius;
                     const y = Math.sin(angle * Math.PI / 180) * radius;
                     gsap.set(node, { x, y });
@@ -352,12 +365,13 @@
             ease: "sine.inOut"
         });
 
-        // Individual cards reveal
+        // Content Reveal
         gsap.utils.toArray('.reveal').forEach(section => {
           gsap.to(section, {
             opacity: 1,
             y: 0,
-            duration: 1.2,
+            duration: 1,
+            stagger: 0.1,
             ease: "power2.out",
             scrollTrigger: {
               trigger: section,
