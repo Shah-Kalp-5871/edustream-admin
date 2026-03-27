@@ -16,6 +16,22 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/coming-soon', function () {
+    return view('coming-soon');
+});
+
+Route::get('/privacy-policy', function () {
+    return view('legal.privacy-policy');
+});
+
+Route::get('/terms-of-service', function () {
+    return view('legal.terms-of-service');
+});
+
+Route::get('/refund-policy', function () {
+    return view('legal.refund-policy');
+});
+
 // Auth Routes
 Route::get('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/login', [AuthController::class, 'loginPost']);
