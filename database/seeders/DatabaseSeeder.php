@@ -17,12 +17,7 @@ class DatabaseSeeder extends Seeder
             CoursesTableSeeder::class,
             SubjectsTableSeeder::class,
             SettingsTableSeeder::class,
-            BannersTableSeeder::class,
-            NoteFoldersTableSeeder::class,
-            NotesTableSeeder::class,
-            VideoFoldersTableSeeder::class,
-            VideosTableSeeder::class,
-            QaPaperFoldersTableSeeder::class,
+            // Tables with actual data
             QaPapersTableSeeder::class,
             QuizzesTableSeeder::class,
             QuizQuestionsTableSeeder::class,
@@ -30,7 +25,6 @@ class DatabaseSeeder extends Seeder
             OrdersTableSeeder::class,
             OrderItemsTableSeeder::class,
             CartItemsTableSeeder::class,
-            EnrollmentsTableSeeder::class,
             QuizAttemptsTableSeeder::class,
         ]);
 
