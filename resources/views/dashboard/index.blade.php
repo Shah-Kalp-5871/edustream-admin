@@ -1,6 +1,6 @@
 @extends('layouts.app', ['title' => 'Dashboard'])
 
-@section('subtitle', 'Welcome back! Here\'s what\'s happening with EduStream today.')
+@section('subtitle', 'Welcome back! Here\'s what\'s happening with GujjuScholar today.')
 
 @section('actions')
     <button class="btn btn-secondary">

@@ -3,7 +3,7 @@
         <div class="brand-icon">
             <i class="fas fa-graduation-cap"></i>
         </div>
-        <span class="brand-name">EduStream<sup class="brand-badge">ADMIN</sup></span>
+        <span class="brand-name">GujjuScholar<sup class="brand-badge">ADMIN</sup></span>
     </a>
 
     <nav class="sidebar-nav">

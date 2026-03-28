@@ -91,7 +91,7 @@
         <table class="main" role="presentation">
             <tr>
                 <td class="header">
-                    <h1>EduStream</h1>
+                    <h1>GujjuScholar</h1>
                 </td>
             </tr>
             <tr>
@@ -111,7 +111,7 @@
             </tr>
             <tr>
                 <td class="footer">
-                    &copy; {{ date('Y') }} EduStream Academy. All rights reserved.
+                    &copy; {{ date('Y') }} GujjuScholar Academy. All rights reserved.
                 </td>
             </tr>
         </table>

@@ -53,7 +53,7 @@
             <div class="dropdown-menu" id="userDropdownMenu">
                 <div class="dropdown-header">
                     <strong>Admin User</strong>
-                    <span>admin@edustream.com</span>
+                    <span>admin@gujjuscholar.com</span>
                 </div>
                 <hr>
                 <a href="{{ url('settings') }}" class="dropdown-item">

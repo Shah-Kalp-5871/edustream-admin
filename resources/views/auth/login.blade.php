@@ -49,13 +49,13 @@
     <div class="demo-hint">
         <i class="fas fa-circle-info" style="color:var(--primary);"></i>
         <span>
-            <strong>Email:</strong> admin@edustream.com &nbsp;·&nbsp;
+            <strong>Email:</strong> admin@gujjuscholar.com &nbsp;·&nbsp;
             <strong>Password:</strong> password
         </span>
     </div>
 
     <div class="auth-form-footer">
-        <p>© {{ date('Y') }} EduStream Admin Panel. All rights reserved.</p>
+        <p>© {{ date('Y') }} GujjuScholar Admin Panel. All rights reserved.</p>
     </div>
 </div>
 @endsection

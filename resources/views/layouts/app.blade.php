@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'EduStream') }} — Admin</title>
+    <title>{{ config('app.name', 'GujjuScholar') }} — Admin</title>
 
     <!-- Fonts: Outfit (headings) + Inter (body) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,7 +19,7 @@
 
     <style>
         /* =============================================
-           DESIGN TOKENS — EduStream Admin
+           DESIGN TOKENS — GujjuScholar Admin
         ============================================= */
         :root {
             /* Brand Colors (from Flutter app) */
