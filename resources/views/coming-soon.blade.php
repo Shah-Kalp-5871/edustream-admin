@@ -45,7 +45,7 @@
         <div class="center-content">
             <h2 class="text-orange-500 tracking-[1.2em] text-xs font-bold mb-4 uppercase">Gujju Scholar</h2>
             <div id="timer" class="timer-glow">00:00:00:00</div>
-            <p class="text-gray-500 tracking-[0.5em] mt-6 uppercase text-[10px] font-bold">Evolution starts April 2, 2026</p>
+            <p class="text-gray-500 tracking-[0.5em] mt-6 uppercase text-[10px] font-bold">ક્રાંતિની શરૂઆત ૨ એપ્રિલ, ૨૦૨૬</p>
         </div>
     </div>
 

@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="gu">
 <head>
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Refund & Cancellation Policy - Gujju Scholar</title>
+    <title>રિફંડ અને રદ કરવાની નીતિ - Gujju Scholar</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans">
     <div class="max-w-4xl mx-auto px-4 py-12">
-        <h1 class="text-3xl font-bold mb-8 text-orange-600">Refund & Cancellation Policy</h1>
+        <h1 class="text-3xl font-bold mb-8 text-orange-600">રિફંડ અને રદ કરવાની નીતિ</h1>
         <div class="bg-white p-8 rounded-lg shadow-sm">
-            <p class="mb-4">Last updated: {{ date('F d, Y') }}</p>
+            <p class="mb-4">છેલ્લે અપડેટ કરેલ: {{ date('d F, Y') }}</p>
             
             <section class="mb-8">
                 <h2 class="text-xl font-semibold mb-4 text-gray-900">1. Cancellations</h2>
@@ -44,7 +44,7 @@
             </section>
         </div>
         <div class="mt-8 text-center">
-            <a href="/" class="text-orange-600 hover:underline">Back to Home</a>
+            <a href="/" class="text-orange-600 hover:underline">હોમ પેજ પર પાછા જાઓ</a>
         </div>
     </div>
 </body>
