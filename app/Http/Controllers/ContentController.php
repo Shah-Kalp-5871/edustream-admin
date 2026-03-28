@@ -17,6 +17,7 @@ use App\Jobs\ConvertVideoToHls;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class ContentController extends Controller
 {
@@ -148,7 +149,10 @@ class ContentController extends Controller
     public function storeSubject(Request $request, $courseId)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:subjects,name,NULL,id,deleted_at,NULL',
+            'name' => [
+                'required', 'string', 'max:255',
+                Rule::unique('subjects', 'name')->whereNull('deleted_at'),
+            ],
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'status' => 'required|in:active,inactive',
@@ -157,17 +161,56 @@ class ContentController extends Controller
             'is_free' => 'nullable|boolean',
         ]);
 
+        // Check if a soft-deleted subject with the same name exists → restore it
+        $trashedSubject = Subject::withTrashed()
+            ->where('name', $request->name)
+            ->whereNotNull('deleted_at')
+            ->first();
+
+        if ($trashedSubject) {
+            // Restore and update with new submitted values
+            $trashedSubject->restore();
+            $trashedSubject->update([
+                'course_id'  => $courseId,
+                'description' => $request->description,
+                'price'      => $request->price,
+                'is_free'    => $request->has('is_free'),
+                'status'     => $request->status,
+                'icon_url'   => $request->icon_url ?? 'fa-solid fa-book',
+                'color_code' => $request->color_code ?? '#1565C0',
+                'sort_order' => Subject::where('course_id', $courseId)->max('sort_order') + 1,
+            ]);
+
+            return redirect('/content/course/' . $courseId)->with('success', 'Subject restored and updated successfully!');
+        }
+
+        // Generate a unique slug — for non-ASCII names (e.g. Gujarati) Str::slug() returns
+        // an empty string, so we fall back to a unique ID to avoid a DB UNIQUE collision.
+        $slug = Str::slug($request->name);
+        if (empty($slug)) {
+            $slug = trim(preg_replace('/[^\p{L}\p{N}\-]+/u', '', preg_replace('/[\s]+/u', '-', mb_strtolower($request->name, 'UTF-8'))), '-');
+        }
+        if (empty($slug)) {
+            $slug = uniqid('subject-');
+        }
+        // Ensure slug is unique (including soft-deleted rows, since the DB index covers all rows)
+        $originalSlug = $slug;
+        $counter = 1;
+        while (Subject::withTrashed()->where('slug', $slug)->exists()) {
+            $slug = $originalSlug . '-' . $counter++;
+        }
+
         Subject::create([
-            'course_id' => $courseId,
-            'name' => $request->name,
-            'slug' => !empty(Str::slug($request->name)) ? Str::slug($request->name) : (trim(preg_replace('/[^\p{L}\p{N}\-]+/u', '', preg_replace('/[\s]+/u', '-', mb_strtolower($request->name, 'UTF-8'))), '-') ?: uniqid('subject-')),
+            'course_id'   => $courseId,
+            'name'        => $request->name,
+            'slug'        => $slug,
             'description' => $request->description,
-            'price' => $request->price,
-            'is_free' => $request->has('is_free'),
-            'status' => $request->status,
-            'icon_url' => $request->icon_url ?? 'fa-solid fa-book',
-            'color_code' => $request->color_code ?? '#1565C0',
-            'sort_order' => Subject::where('course_id', $courseId)->max('sort_order') + 1,
+            'price'       => $request->price,
+            'is_free'     => $request->has('is_free'),
+            'status'      => $request->status,
+            'icon_url'    => $request->icon_url ?? 'fa-solid fa-book',
+            'color_code'  => $request->color_code ?? '#1565C0',
+            'sort_order'  => Subject::where('course_id', $courseId)->max('sort_order') + 1,
         ]);
 
         return redirect('/content/course/' . $courseId)->with('success', 'Subject created successfully!');
@@ -262,7 +305,10 @@ class ContentController extends Controller
     public function updateSubject(Request $request, $id)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:subjects,name,' . $id . ',id,deleted_at,NULL',
+            'name' => [
+                'required', 'string', 'max:255',
+                Rule::unique('subjects', 'name')->ignore($id)->whereNull('deleted_at'),
+            ],
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'status' => 'required|in:active,inactive',
@@ -272,15 +318,34 @@ class ContentController extends Controller
         ]);
 
         $subject = Subject::findOrFail($id);
+
+        // Regenerate slug only if name changed, ensuring uniqueness across all rows (incl. soft-deleted)
+        $newSlug = $subject->slug;
+        if ($subject->name !== $request->name) {
+            $slug = Str::slug($request->name);
+            if (empty($slug)) {
+                $slug = trim(preg_replace('/[^\p{L}\p{N}\-]+/u', '', preg_replace('/[\s]+/u', '-', mb_strtolower($request->name, 'UTF-8'))), '-');
+            }
+            if (empty($slug)) {
+                $slug = uniqid('subject-');
+            }
+            $originalSlug = $slug;
+            $counter = 1;
+            while (Subject::withTrashed()->where('slug', $slug)->where('id', '!=', $id)->exists()) {
+                $slug = $originalSlug . '-' . $counter++;
+            }
+            $newSlug = $slug;
+        }
+
         $subject->update([
-            'name' => $request->name,
-            'slug' => !empty(Str::slug($request->name)) ? Str::slug($request->name) : (trim(preg_replace('/[^\p{L}\p{N}\-]+/u', '', preg_replace('/[\s]+/u', '-', mb_strtolower($request->name, 'UTF-8'))), '-') ?: uniqid('subject-')),
+            'name'        => $request->name,
+            'slug'        => $newSlug,
             'description' => $request->description,
-            'price' => $request->price,
-            'is_free' => $request->has('is_free'),
-            'status' => $request->status,
-            'icon_url' => $request->icon_url ?? 'fa-solid fa-book',
-            'color_code' => $request->color_code ?? '#1565C0',
+            'price'       => $request->price,
+            'is_free'     => $request->has('is_free'),
+            'status'      => $request->status,
+            'icon_url'    => $request->icon_url ?? 'fa-solid fa-book',
+            'color_code'  => $request->color_code ?? '#1565C0',
         ]);
 
         return redirect('/content/course/' . $subject->course_id)->with('success', 'Subject updated successfully!');
