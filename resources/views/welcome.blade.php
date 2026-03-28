@@ -8,20 +8,63 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Outfit', sans-serif; }
-        .glass-nav { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(0, 0, 0, 0.05); }
+        .glass-nav { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0, 0, 0, 0.05); }
         .gradient-brand { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); }
         .text-gradient { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
         .hero-mesh { 
-            background: radial-gradient(at 0% 0%, rgba(251, 146, 60, 0.1) 0%, transparent 50%),
-                        radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.05) 0%, transparent 50%);
+            background-color: #fafafa;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(249, 115, 22, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.05) 0px, transparent 50%),
+                radial-gradient(at 50% 50%, rgba(249, 115, 22, 0.02) 0px, transparent 50%);
+            position: relative;
         }
-        .reveal { opacity: 0; transform: translateY(30px); }
-        .card-hover { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .card-hover:hover { transform: translateY(-10px); box-shadow: 0 25px 50px -12px rgba(249, 115, 22, 0.15); }
-        .mockup-frame { box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.25), 0 30px 60px -30px rgba(0, 0, 0, 0.3); }
+
+        .hero-mesh::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.035;
+            pointer-events: none;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        }
+
+        .bento-card {
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .bento-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 20px 40px rgba(249, 115, 22, 0.1); }
+        .bento-card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+        .bento-card:hover::before { left: 100%; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        .float-anim { animation: float 4s ease-in-out infinite; }
+        .reveal { opacity: 0; transform: translateY(40px); }
+        .text-glow {
+            text-shadow: 0 0 30px rgba(249, 115, 22, 0.15);
+        }
     </style>
 </head>
 <body class="bg-[#fafafa] text-zinc-900 selection:bg-orange-100 selection:text-orange-600 overflow-x-hidden">
@@ -60,59 +103,97 @@
     </nav>
 
     <!-- Hero Section -->
-    <section class="relative min-h-[90vh] lg:min-h-screen pt-28 pb-12 flex items-center overflow-hidden hero-mesh">
-        <div class="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 lg:gap-16 items-center w-full">
-            <div class="z-10 text-center lg:text-left">
-                <div class="reveal inline-flex items-center gap-2 px-6 pt-3 pb-2.5 rounded-full bg-orange-50 text-orange-600 text-xs font-bold uppercase tracking-wider leading-loose mb-10 md:mb-12 border border-orange-100">
-                    <span class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
-                    ચકાસાયેલ શૈક્ષણિક પ્લેટફોર્મ
+    <section class="relative min-h-[90vh] lg:min-h-screen pt-32 pb-16 flex items-center overflow-hidden hero-mesh">
+        <div class="max-w-7xl mx-auto px-6 grid lg:grid-cols-12 gap-12 lg:gap-16 items-center w-full">
+            
+            <!-- Left Side: Content -->
+            <div class="lg:col-span-7 z-10 text-center lg:text-left">
+                <div class="hero-reveal inline-flex items-center gap-2 px-6 pt-3 pb-2.5 rounded-full bg-orange-50 text-orange-600 text-xs font-black uppercase tracking-widest mb-10 md:mb-12 border border-orange-100/50 shadow-sm">
+                    <span class="w-1.5 h-1.5 rounded-full bg-orange-500 animate-ping"></span>
+                    ગુજરાતનું ભરોસાપાત્ર પ્લેટફોર્મ
                 </div>
-                <h1 class="reveal text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-normal leading-snug overflow-visible">
-                    <span class="block mb-6 sm:mb-8 md:mb-10 pt-2 pb-2">માતૃભાષામાં</span>
-                    <span class="block mb-6 sm:mb-8 md:mb-10 pt-2 pb-2 text-gradient">શક્તિશાળી</span>
-                    <span class="block pt-2 pb-2">શિક્ષણ.</span>
+                
+                <h1 class="hero-reveal text-5xl sm:text-7xl md:text-8xl lg:text-[9.5rem] font-black tracking-tighter leading-[0.9] text-zinc-900 mb-8 text-glow">
+                    <span class="block mb-2">માતૃભાષામાં</span>
+                    <span class="block mb-2 text-gradient">શક્તિશાળી</span>
+                    <span class="block">શિક્ષણ.</span>
                 </h1>
-                <p class="reveal text-sm sm:text-base md:text-lg text-zinc-500 mb-8 md:mb-12 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium px-2">
-                    ગુજરાતી માધ્યમના વિદ્યાર્થીઓ માટે ખાસ તૈયાર કરાયેલ પ્રીમિયમ લર્નિંગ પ્લેટફોર્મ. તમારા વિષયો પર આત્મવિશ્વાસ અને સ્પષ્ટતા સાથે પકડ મેળવો.
+                
+                <p class="hero-reveal text-lg sm:text-xl text-zinc-500 mb-12 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-semibold">
+                    ગુજરાતી વિદ્યાર્થીઓ માટે એક આધુનિક લર્નિંગ યુનિવર્સ. શ્રેષ્ઠ શિક્ષકો, ઇન્ટરેક્ટિવ મટીરીયલ અને આત્મવિશ્વાસ - હવે તમારા ફોનમાં.
                 </p>
-                <div class="reveal flex flex-col sm:flex-row justify-center lg:justify-start gap-4 px-4 sm:px-0">
-                    <a href="#download" class="gradient-brand px-10 py-5 rounded-2xl text-white font-bold text-lg flex items-center justify-center gap-3 shadow-xl shadow-orange-200 hover:scale-105 active:scale-95 transition-all w-full sm:w-auto">
-                        એપ ડાઉનલોડ કરો
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                
+                <div class="hero-reveal flex flex-col sm:flex-row justify-center lg:justify-start gap-5">
+                    <a href="#download" class="gradient-brand group px-10 py-6 rounded-3xl text-white font-extrabold text-xl flex items-center justify-center gap-4 shadow-2xl shadow-orange-200 hover:scale-105 active:scale-95 transition-all w-full sm:w-auto">
+                        એપ મેળવો
+                        <svg class="w-6 h-6 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                     </a>
-                    <a href="/coming-soon" class="px-10 py-5 rounded-2xl border-2 border-zinc-200 font-bold text-lg text-zinc-600 hover:bg-zinc-100 transition-all w-full sm:w-auto text-center">
-                        રોડમેપ
+                    <a href="/coming-soon" class="px-10 py-6 rounded-3xl bg-white/50 backdrop-blur-md border border-zinc-200 font-extrabold text-xl text-zinc-700 hover:bg-zinc-50 transition-all w-full sm:w-auto text-center shadow-sm">
+                        વિશેષ જાણો
                     </a>
+                </div>
+
+                <div class="hero-reveal mt-16 flex items-center justify-center lg:justify-start gap-6">
+                    <div class="flex -space-x-4">
+                        <div class="w-12 h-12 rounded-full border-4 border-white bg-zinc-200 overflow-hidden shadow-sm flex items-center justify-center font-bold text-zinc-400">GS</div>
+                        <div class="w-12 h-12 rounded-full border-4 border-white bg-zinc-100 overflow-hidden shadow-sm flex items-center justify-center font-bold text-zinc-400">GS</div>
+                        <div class="w-12 h-12 rounded-full border-4 border-white bg-zinc-300 overflow-hidden shadow-sm flex items-center justify-center font-bold text-zinc-400">GS</div>
+                    </div>
+                    <div class="text-left">
+                        <div class="text-zinc-900 font-black text-lg leading-tight line-clamp-1">૧૦,૦૦૦+ વિદ્યાર્થીઓ</div>
+                        <div class="text-zinc-500 font-bold text-sm">ભરોસો અને સફળતાનું પ્રતિક</div>
+                    </div>
                 </div>
             </div>
 
-            <div class="reveal relative h-[350px] md:h-[500px] flex items-center justify-center overflow-visible mt-12 lg:mt-0">
-                <div class="relative w-full h-full flex items-center justify-center" id="hero-viz">
-                    <!-- Central Core -->
-                    <div class="w-20 h-20 md:w-32 md:h-32 gradient-brand rounded-[2rem] flex items-center justify-center text-white font-black text-2xl md:text-4xl shadow-2xl relative z-20 animate-pulse">
-                        GS
-                        <div class="absolute inset-0 rounded-[2rem] border-4 border-orange-500/30 animate-ping"></div>
-                    </div>
+            <!-- Right Side: Bento Visualization -->
+            <div class="lg:col-span-5 relative h-[600px] flex items-center justify-center perspective-[2000px]">
+                <div class="grid grid-cols-2 grid-rows-6 gap-4 w-full h-full max-w-sm lg:max-w-md mx-auto relative overflow-visible" id="bento-viz">
                     
-                    <!-- Orbiting Nodes -->
-                    <div class="absolute w-20 h-20 md:w-24 md:h-24 bg-white border border-orange-100 rounded-2xl shadow-xl flex flex-col items-center justify-center z-10 orbit-node" data-speed="2" data-radius="110" data-md-radius="180" data-angle="0">
-                        <div class="text-orange-500 font-bold text-[10px] md:text-sm mb-1">ગણિત</div>
-                        <div class="w-6 md:w-8 h-1 bg-orange-100 rounded-full"></div>
-                    </div>
-                    <div class="absolute w-20 h-20 md:w-24 md:h-24 bg-white border border-orange-100 rounded-2xl shadow-xl flex flex-col items-center justify-center z-10 orbit-node" data-speed="1.5" data-radius="130" data-md-radius="200" data-angle="120">
-                        <div class="text-orange-500 font-bold text-[10px] md:text-sm mb-1">વિજ્ઞાન</div>
-                         <div class="w-6 md:w-8 h-1 bg-orange-100 rounded-full"></div>
-                    </div>
-                    <div class="absolute w-20 h-20 md:w-24 md:h-24 bg-white border border-orange-100 rounded-2xl shadow-xl flex flex-col items-center justify-center z-10 orbit-node" data-speed="1.8" data-radius="120" data-md-radius="190" data-angle="240">
-                        <div class="text-orange-500 font-bold text-[10px] md:text-sm mb-1">અંગ્રેજી</div>
-                         <div class="w-6 md:w-8 h-1 bg-orange-100 rounded-full"></div>
+                    <!-- Feature Card 1: Math -->
+                    <div class="row-span-3 glass-card bento-card rounded-[2.5rem] p-8 flex flex-col justify-between float-anim" style="animation-delay: 0s;">
+                        <div class="w-14 h-14 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-600 mb-6 group-hover:scale-110 transition-transform">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                        </div>
+                        <div>
+                            <h4 class="text-2xl font-black text-zinc-900 mb-2">ગણિત</h4>
+                            <p class="text-zinc-500 text-sm font-bold leading-tight">તાર્કિક વિચારધારા અને ઝડપી ગણતરી.</p>
+                        </div>
                     </div>
 
-                    <!-- Decorative Particles -->
-                    <div class="absolute w-2 h-2 bg-orange-400 rounded-full opacity-40 float-p" style="top: 10%; left: 20%;"></div>
-                    <div class="absolute w-3 h-3 bg-orange-300 rounded-full opacity-30 float-p" style="top: 80%; left: 10%;"></div>
-                    <div class="absolute w-2 h-2 bg-orange-500 rounded-full opacity-40 float-p" style="top: 30%; left: 80%;"></div>
+                    <!-- Feature Card 2: Science -->
+                    <div class="row-span-2 glass-card bento-card rounded-[2.5rem] p-8 flex flex-col justify-center float-anim" style="animation-delay: 0.5s;">
+                        <div class="w-12 h-12 gradient-brand rounded-2xl flex items-center justify-center text-white mb-4 shadow-lg">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.691.31a6 6 0 01-3.86.517l-2.387-.477a2 2 0 00-1.022.547l-1.162 1.162a2 2 0 00.518 3.292C4.192 20.306 5.56 21 7 21s2.808-.694 3.486-1.741a2 2 0 00.518-3.292l-1.162-1.162z"></path></svg>
+                        </div>
+                        <h4 class="text-xl font-black text-zinc-900 leading-none">વિજ્ઞાન</h4>
+                    </div>
+
+                    <!-- Feature Card 3: Interactive -->
+                    <div class="row-span-4 lg:row-span-3 glass-card bento-card rounded-[2.5rem] p-8 flex flex-col items-center justify-center text-center float-anim" style="animation-delay: 1s;">
+                         <div class="relative w-24 h-24 mb-6">
+                            <div class="absolute inset-0 bg-orange-500/10 rounded-full animate-pulse"></div>
+                            <div class="absolute inset-4 gradient-brand rounded-3xl rotate-12 animate-bounce"></div>
+                            <div class="absolute inset-6 bg-white rounded-3xl flex items-center justify-center text-orange-600 shadow-xl">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                            </div>
+                         </div>
+                        <h4 class="text-xl font-black text-zinc-900 mb-1">લાઈવ બેચ</h4>
+                        <p class="text-[10px] font-black text-orange-600 uppercase tracking-tighter">દરોજ નવું શીખો</p>
+                    </div>
+
+                    <!-- Feature Card 4: Support -->
+                    <div class="row-span-1 lg:row-span-1 glass-card bento-card rounded-3xl p-4 flex items-center gap-4 float-anim" style="animation-delay: 1.5s;">
+                         <div class="w-8 h-8 bg-zinc-900 rounded-lg flex items-center justify-center text-white shrink-0">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                         </div>
+                         <span class="text-sm font-black text-zinc-800">સપોર્ટ</span>
+                    </div>
+
                 </div>
+
+                <!-- Decorative Blur Background -->
+                <div class="absolute -z-10 w-[500px] h-[500px] bg-orange-400/10 blur-[120px] rounded-full"></div>
             </div>
         </div>
     </section>
@@ -292,19 +373,6 @@
             }
         });
 
-        // Animations
-        gsap.to(".reveal", {
-            opacity: 1,
-            y: 0,
-            duration: 1,
-            stagger: 0.1,
-            ease: "power4.out",
-            scrollTrigger: {
-                trigger: ".reveal",
-                start: "top 90%",
-            }
-        });
-
         // Mobile Menu Logic
         const menuToggle = document.getElementById('menu-toggle');
         const menuClose = document.getElementById('menu-close');
@@ -327,46 +395,33 @@
             link.addEventListener('click', () => toggleMenu(false));
         });
 
-        // Orbit Animation
-        let orbitRadius = [];
-        const updateRadii = () => {
-            const isMobile = window.innerWidth < 768;
-            gsap.utils.toArray('.orbit-node').forEach((node, i) => {
-                orbitRadius[i] = isMobile ? parseInt(node.dataset.radius) : parseInt(node.dataset.mdRadius || node.dataset.radius);
-            });
-        };
-        
-        updateRadii();
-        window.addEventListener('resize', updateRadii);
 
-        gsap.utils.toArray('.orbit-node').forEach((node, i) => {
-            const speed = parseFloat(node.dataset.speed);
-            let angle = parseInt(node.dataset.angle);
-
-            gsap.to({}, {
-                duration: 0.016,
-                repeat: -1,
-                onUpdate: () => {
-                    angle += speed * 0.4;
-                    const radius = orbitRadius[i];
-                    const x = Math.cos(angle * Math.PI / 180) * radius;
-                    const y = Math.sin(angle * Math.PI / 180) * radius;
-                    gsap.set(node, { x, y });
-                }
-            });
+        // GSAP Animations
+        gsap.to(".hero-reveal", {
+            opacity: 1,
+            y: 0,
+            duration: 1.2,
+            stagger: 0.15,
+            ease: "power4.out",
+            delay: 0.2
         });
 
-        // Float Particles
-        gsap.to(".float-p", {
-            y: 30,
-            x: 20,
-            duration: "random(2, 4)",
-            repeat: -1,
-            yoyo: true,
-            ease: "sine.inOut"
-        });
+        // Interactive Bento Tilt
+        const bentoViz = document.getElementById('bento-viz');
+        if (bentoViz) {
+            window.addEventListener('mousemove', (e) => {
+                const x = (e.clientX - window.innerWidth / 2) / 50;
+                const y = (e.clientY - window.innerHeight / 2) / 50;
+                gsap.to(bentoViz, {
+                    rotationY: x,
+                    rotationX: -y,
+                    duration: 1,
+                    ease: "power2.out"
+                });
+            });
+        }
 
-        // Content Reveal
+        // Section Reveals
         gsap.utils.toArray('.reveal').forEach(section => {
           gsap.to(section, {
             opacity: 1,
