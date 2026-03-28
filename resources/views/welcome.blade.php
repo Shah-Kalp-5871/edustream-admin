@@ -63,13 +63,14 @@
     <section class="relative min-h-[90vh] lg:min-h-screen pt-28 pb-12 flex items-center overflow-hidden hero-mesh">
         <div class="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 lg:gap-16 items-center w-full">
             <div class="z-10 text-center lg:text-left">
-                <div class="reveal inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-orange-50 text-orange-600 text-xs font-bold uppercase tracking-wider leading-normal mb-6 md:mb-8 border border-orange-100">
+                <div class="reveal inline-flex items-center gap-2 px-6 pt-3 pb-2.5 rounded-full bg-orange-50 text-orange-600 text-xs font-bold uppercase tracking-wider leading-loose mb-10 md:mb-12 border border-orange-100">
                     <span class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
                     ચકાસાયેલ શૈક્ષણિક પ્લેટફોર્મ
                 </div>
-                <h1 class="reveal text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-black leading-[1.6] md:leading-[1.5] mb-6 md:mb-8 tracking-tight">
-                    માતૃભાષામાં <br class="hidden sm:block"/>
-                    શક્તિશાળી <span class="text-gradient">શિક્ષણ.</span>
+                <h1 class="reveal text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-normal leading-none">
+                    <span class="block mb-4 sm:mb-6 md:mb-8">માતૃભાષામાં</span>
+                    <span class="block mb-4 sm:mb-6 md:mb-8 text-gradient">શક્તિશાળી</span>
+                    <span class="block">શિક્ષણ.</span>
                 </h1>
                 <p class="reveal text-sm sm:text-base md:text-lg text-zinc-500 mb-8 md:mb-12 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium px-2">
                     ગુજરાતી માધ્યમના વિદ્યાર્થીઓ માટે ખાસ તૈયાર કરાયેલ પ્રીમિયમ લર્નિંગ પ્લેટફોર્મ. તમારા વિષયો પર આત્મવિશ્વાસ અને સ્પષ્ટતા સાથે પકડ મેળવો.
