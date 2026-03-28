@@ -12,8 +12,8 @@
             <div class="inp-wrap">
                 <i class="fas fa-envelope inp-icon"></i>
                 <input type="email" class="inp" name="email"
-                       value="{{ old('email', 'admin@edustream.com') }}"
-                       placeholder="admin@edustream.com" required>
+                       value="{{ old('email', 'admin@gujjuscholar.com') }}"
+                       placeholder="admin@gujjuscholar.com" required>
             </div>
         </div>
 

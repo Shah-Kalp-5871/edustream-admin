@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="gu">
 <head>
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     <meta charset="UTF-8">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
