@@ -188,7 +188,7 @@
                 <p class="text-zinc-400 text-lg mb-12 max-w-lg leading-relaxed font-medium">Take the entire library of Gujju Scholar with you. Download offline, track progress, and learn anywhere in the world.</p>
                 
                 <div class="flex flex-col sm:flex-row gap-5">
-                    <a href="/downloads/app-release.apk" class="group flex items-center gap-4 bg-white px-8 py-5 rounded-[2rem] hover:scale-105 active:scale-95 transition-all shadow-2xl">
+                    <a href="/downloads/gujjuscholar.apk" download="GujjuScholar.apk" class="group flex items-center gap-4 bg-white px-8 py-5 rounded-[2rem] hover:scale-105 active:scale-95 transition-all shadow-2xl">
                         <svg class="w-10 h-10 text-zinc-900" fill="currentColor" viewBox="0 0 24 24"><path d="M17.523 15.3414C17.7944 14.8643 18 14.3033 18 13.75C18 12.0152 16.4848 10.5 14.75 10.5C14.1967 10.5 13.6357 10.7056 13.1586 10.977C12.4497 9.47525 10.8711 8.5 9.08333 8.5C6.44684 8.5 4.25 10.6968 4.25 13.3333C4.25 13.6276 4.27892 13.916 4.33383 14.1953C2.95542 14.8143 2 16.2736 2 17.9167C2 20.3117 3.93833 22.25 6.33333 22.25H17.6667C20.0617 22.25 22 20.3117 22 17.9167C22 15.9084 20.2155 14.2372 17.523 15.3414Z"></path></svg>
                         <div class="text-left text-zinc-900">
                             <div class="text-[10px] uppercase font-bold tracking-widest opacity-60">Available For</div>
