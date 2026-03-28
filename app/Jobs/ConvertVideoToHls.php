@@ -58,7 +58,6 @@ class ConvertVideoToHls implements ShouldQueue
                     '-preset', 'veryfast',
                     '-crf', '23',
                     '-vf', 'scale=1280:-2',
-                    '-threads', '1'
                 ]);
 
             // Path to save HLS files: videos/hls/{video_id}
