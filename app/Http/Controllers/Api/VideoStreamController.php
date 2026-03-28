@@ -28,8 +28,19 @@ class VideoStreamController extends Controller
         }
 
         // Check if student has access
-        $isEnrolled = $student->enrollments()->where('subject_id', $video->subject_id)->exists();
-        if (!$video->is_free && !$isEnrolled) {
+        $subject = $video->subject;
+        $isSubjectFree = $subject->is_free ?? false;
+        $isCourseFree = $subject->course->is_free ?? false;
+        
+        $isEnrolled = $student->enrollments()
+            ->where(function($q) use ($subject) {
+                $q->where('subject_id', $subject->id)
+                  ->orWhere('course_id', $subject->course_id);
+            })
+            ->where('status', 'active')
+            ->exists();
+
+        if (!$video->is_free && !$isSubjectFree && !$isCourseFree && !$isEnrolled) {
             return response()->json(['success' => false, 'message' => 'Not enrolled in this subject or course.'], 403);
         }
 
