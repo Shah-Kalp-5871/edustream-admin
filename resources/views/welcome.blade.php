@@ -67,10 +67,10 @@
                     <span class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
                     ચકાસાયેલ શૈક્ષણિક પ્લેટફોર્મ
                 </div>
-                <h1 class="reveal text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-normal leading-snug overflow-visible">
-                    <span class="block mb-6 sm:mb-8 md:mb-10 pt-2 pb-2">માતૃભાષામાં</span>
-                    <span class="block mb-6 sm:mb-8 md:mb-10 pt-2 pb-2 text-gradient">શક્તિશાળી</span>
-                    <span class="block pt-2 pb-2">શિક્ષણ.</span>
+                <h1 class="reveal text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[1.1] overflow-visible">
+                    <span class="block">માતૃભાષામાં</span>
+                    <span class="block text-gradient">શક્તિશાળી</span>
+                    <span class="block">શિક્ષણ.</span>
                 </h1>
                 <p class="reveal text-sm sm:text-base md:text-lg text-zinc-500 mb-8 md:mb-12 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium px-2">
                     ગુજરાતી માધ્યમના વિદ્યાર્થીઓ માટે ખાસ તૈયાર કરાયેલ પ્રીમિયમ લર્નિંગ પ્લેટફોર્મ. તમારા વિષયો પર આત્મવિશ્વાસ અને સ્પષ્ટતા સાથે પકડ મેળવો.
