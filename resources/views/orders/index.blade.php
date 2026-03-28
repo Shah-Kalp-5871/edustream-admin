@@ -183,18 +183,18 @@
                     <td style="font-weight:700; color:var(--primary);">#ENR-{{ $e->id }}</td>
                     <td>
                         <div class="student-cell">
-                            <img src="{{ $e->student->avatar_url ?? 'https://ui-avatars.com/api/?name='.urlencode($e->student->name).'&background=1565C0&color=fff' }}" alt="">
+                            <img src="{{ $e->student?->avatar_url ?? 'https://ui-avatars.com/api/?name='.urlencode($e->student?->name ?? 'Unknown').'&background=1565C0&color=fff' }}" alt="">
                             <div>
-                                <span style="display:block; font-weight:600; font-size:13.5px;">{{ $e->student->name }}</span>
-                                <small style="color:var(--text-muted);">{{ $e->student->email }}</small>
+                                <span style="display:block; font-weight:600; font-size:13.5px;">{{ $e->student?->name ?? 'Unknown Student' }}</span>
+                                <small style="color:var(--text-muted);">{{ $e->student?->email ?? 'N/A' }}</small>
                             </div>
                         </div>
                     </td>
-                    <td style="font-weight:500;">{{ $e->course->title ?? $e->subject->name }}</td>
+                    <td style="font-weight:500;">{{ $e->course?->title ?? $e->subject?->name ?? 'N/A' }}</td>
                     <td style="color:var(--text-muted);">{{ $e->created_at->format('M d, Y') }}</td>
-                    <td style="font-weight:700;">₹{{ number_format($order->total_amount ?? 0) }}</td>
+                    <td style="font-weight:700;">₹{{ number_format($order?->total_amount ?? 0) }}</td>
                     <td>
-                        <span class="badge badge-neutral">{{ $order->payment_method ?? 'N/A' }}</span>
+                        <span class="badge badge-neutral">{{ $order?->payment_method ?? 'N/A' }}</span>
                     </td>
                     <td>
                         <span class="badge {{ $badgeClass }}">{{ $label === 'Active' ? 'Enrolled' : $label }}</span>
