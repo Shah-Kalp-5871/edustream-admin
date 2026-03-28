@@ -1,6 +1,6 @@
-@extends('layouts.app', ['title' => 'Enrollment Management'])
+@extends('layouts.app', ['title' => 'Order Management'])
 
-@section('subtitle', 'Track and manage all course enrollments and payments.')
+@section('subtitle', 'Track and manage all orders, payments, and purchased items.')
 
 @section('actions')
     <button class="btn btn-secondary">
@@ -90,8 +90,8 @@
             <i class="fas fa-ticket"></i>
         </div>
         <div>
-            <div class="es-val">{{ number_format($totalEnrollments) }}</div>
-            <div class="es-label">Total Enrollments</div>
+            <div class="es-val">{{ number_format($totalOrders) }}</div>
+            <div class="es-label">Total Orders</div>
         </div>
     </div>
     <div class="enroll-stat stagger-2">
@@ -117,10 +117,10 @@
 <!-- Filters -->
 <div class="enroll-filters">
     <div>
-        <label class="form-label">Search Enrollment</label>
+        <label class="form-label">Search Order</label>
         <div style="display:flex;align-items:center;gap:8px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:9px 14px;">
             <i class="fas fa-search" style="color:var(--text-muted); font-size:13px;"></i>
-            <input type="text" placeholder="Enrollment ID, student name or course…" style="background:none;border:none;outline:none;font-family:inherit;font-size:13.5px;width:100%;color:var(--text);">
+            <input type="text" placeholder="Order ID, student name or item…" style="background:none;border:none;outline:none;font-family:inherit;font-size:13.5px;width:100%;color:var(--text);">
         </div>
     </div>
     <div>
@@ -156,9 +156,9 @@
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Enrollment ID</th>
+                    <th>Order ID</th>
                     <th>Student</th>
-                    <th>Course</th>
+                    <th>Items Bought</th>
                     <th>Date</th>
                     <th>Amount</th>
                     <th>Payment</th>
@@ -167,42 +167,48 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($enrollments as $e)
+                @foreach($orders as $order)
                 @php
-                    $badgeClass = match($e->status) {
-                        'active' => 'badge-success',
+                    $badgeClass = match($order->payment_status) {
+                        'paid' => 'badge-success',
                         'pending'  => 'badge-warning',
-                        'cancelled' => 'badge-danger',
-                        'expired' => 'badge-neutral',
+                        'failed' => 'badge-danger',
                         default => 'badge-info',
                     };
-                    $label = ucfirst($e->status);
-                    $order = $e->order;
+                    $label = ucfirst($order->payment_status ?? 'Pending');
                 @endphp
                 <tr>
-                    <td style="font-weight:700; color:var(--primary);">#ENR-{{ $e->id }}</td>
+                    <td style="font-weight:700; color:var(--primary);">{{ $order->order_number ?? '#ORD-'.$order->id }}</td>
                     <td>
                         <div class="student-cell">
-                            <img src="{{ $e->student?->avatar_url ?? 'https://ui-avatars.com/api/?name='.urlencode($e->student?->name ?? 'Unknown').'&background=1565C0&color=fff' }}" alt="">
+                            <img src="{{ $order->student?->avatar_url ?? 'https://ui-avatars.com/api/?name='.urlencode($order->student?->name ?? 'Unknown').'&background=1565C0&color=fff' }}" alt="">
                             <div>
-                                <span style="display:block; font-weight:600; font-size:13.5px;">{{ $e->student?->name ?? 'Unknown Student' }}</span>
-                                <small style="color:var(--text-muted);">{{ $e->student?->email ?? 'N/A' }}</small>
+                                <span style="display:block; font-weight:600; font-size:13.5px;">{{ $order->student?->name ?? 'Unknown Student' }}</span>
+                                <small style="color:var(--text-muted);">{{ $order->student?->email ?? 'N/A' }}</small>
                             </div>
                         </div>
                     </td>
-                    <td style="font-weight:500;">{{ $e->course?->title ?? $e->subject?->name ?? 'N/A' }}</td>
-                    <td style="color:var(--text-muted);">{{ $e->created_at->format('M d, Y') }}</td>
-                    <td style="font-weight:700;">₹{{ number_format($order?->total_amount ?? 0) }}</td>
+                    <td style="font-weight:500;">
+                        @if($order->items && $order->items->count() > 0)
+                            @foreach($order->items as $orderItem)
+                                <span style="display:inline-block; margin-bottom: 2px;">• {{ $orderItem->item?->title ?? $orderItem->item?->name ?? ucfirst($orderItem->item_type) }}</span><br>
+                            @endforeach
+                        @else
+                            <span style="color:var(--text-muted);">N/A</span>
+                        @endif
+                    </td>
+                    <td style="color:var(--text-muted);">{{ $order->created_at->format('M d, Y') }}</td>
+                    <td style="font-weight:700;">₹{{ number_format($order->total_amount ?? 0) }}</td>
                     <td>
-                        <span class="badge badge-neutral">{{ $order?->payment_method ?? 'N/A' }}</span>
+                        <span class="badge badge-neutral" style="text-transform:uppercase;">{{ $order->payment_method ?? 'N/A' }}</span>
                     </td>
                     <td>
-                        <span class="badge {{ $badgeClass }}">{{ $label === 'Active' ? 'Enrolled' : $label }}</span>
+                        <span class="badge {{ $badgeClass }}">{{ $label }}</span>
                     </td>
                     <td style="text-align:right;">
-                        <button class="btn btn-ghost btn-sm">
-                            <i class="fas fa-ellipsis-h"></i>
-                        </button>
+                        <a href="/orders/{{ $order->id }}" class="btn btn-ghost btn-sm" title="View Order Details">
+                            <i class="fas fa-eye"></i> View
+                        </a>
                     </td>
                 </tr>
                 @endforeach
@@ -212,9 +218,9 @@
 
     <!-- Pagination -->
     <div class="flex-between" style="padding:14px 20px; border-top: 1px solid var(--border);">
-        <p style="font-size:13px; color:var(--text-muted);">Showing {{ $enrollments->firstItem() ?? 0 }}–{{ $enrollments->lastItem() ?? 0 }} of {{ $enrollments->total() }} enrollments</p>
+        <p style="font-size:13px; color:var(--text-muted);">Showing {{ $orders->firstItem() ?? 0 }}–{{ $orders->lastItem() ?? 0 }} of {{ $orders->total() }} orders</p>
         <div style="display:flex; gap:6px;">
-            {{ $enrollments->links('pagination::bootstrap-4') }}
+            {{ $orders->links('pagination::bootstrap-4') }}
         </div>
     </div>
 </div>

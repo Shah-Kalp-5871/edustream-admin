@@ -10,20 +10,22 @@ class OrderController extends Controller
 {
     public function index()
     {
-        $enrollments = Enrollment::with(['student', 'course', 'subject', 'order'])
+        $orders = Order::with(['student', 'items.item'])
             ->orderBy('created_at', 'desc')
             ->paginate(15);
 
-        $totalEnrollments = Enrollment::count();
+        $totalOrders = Order::count();
         $totalRevenue = Order::where('payment_status', 'paid')->sum('total_amount');
         $pendingPayments = Order::where('payment_status', 'pending')->count();
 
-        return view('orders.index', compact('enrollments', 'totalEnrollments', 'totalRevenue', 'pendingPayments'));
+        return view('orders.index', compact('orders', 'totalOrders', 'totalRevenue', 'pendingPayments'));
     }
 
     public function show($id)
     {
-        return view('orders.show');
+        $order = Order::with(['student', 'items.item', 'enrollments'])->findOrFail($id);
+        
+        return view('orders.show', compact('order'));
     }
 
     public function invoice($id)
