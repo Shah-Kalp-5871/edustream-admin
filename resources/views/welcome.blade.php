@@ -67,7 +67,7 @@
                     <span class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
                     ચકાસાયેલ શૈક્ષણિક પ્લેટફોર્મ
                 </div>
-                <h1 class="reveal text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[1.6] overflow-visible">
+                <h1 class="reveal text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[1.8] overflow-visible">
                     <span class="block">માતૃભાષામાં</span>
                     <span class="block text-gradient">શક્તિશાળી</span>
                     <span class="block">શિક્ષણ.</span>
