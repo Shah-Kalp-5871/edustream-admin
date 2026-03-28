@@ -63,11 +63,11 @@
     <section class="relative min-h-[90vh] lg:min-h-screen pt-28 pb-12 flex items-center overflow-hidden hero-mesh">
         <div class="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 lg:gap-16 items-center w-full">
             <div class="z-10 text-center lg:text-left">
-                <div class="reveal inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-50 text-orange-600 text-[10px] font-bold uppercase tracking-[0.2em] mb-6 md:mb-8 border border-orange-100">
+                <div class="reveal inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-50 text-orange-600 text-[10px] font-bold uppercase tracking-[0.2em] leading-loose mb-6 md:mb-8 border border-orange-100">
                     <span class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
                     ચકાસાયેલ શૈક્ષણિક પ્લેટફોર્મ
                 </div>
-                <h1 class="reveal text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-black leading-[1.1] md:leading-[0.95] mb-6 md:mb-8 tracking-tighter">
+                <h1 class="reveal text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-black leading-[1.3] md:leading-[1.15] mb-6 md:mb-8 tracking-tighter">
                     માતૃભાષામાં <br class="hidden sm:block"/>
                     શક્તિશાળી <span class="text-gradient">શિક્ષણ.</span>
                 </h1>
