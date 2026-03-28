@@ -4,7 +4,7 @@
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gujju Scholar - શીખવાની નવી રીત</title>
+    <title>ગુજ્જુ સ્કોલર - શીખવાની નવી રીત</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
@@ -31,7 +31,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 h-full flex items-center justify-between">
             <a href="/" class="flex items-center gap-2 sm:gap-3 group">
                 <div class="w-8 h-8 sm:w-10 sm:h-10 gradient-brand rounded-lg sm:rounded-xl flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-lg ring-4 ring-orange-50 group-hover:scale-110 transition-transform">GS</div>
-                <span class="text-lg sm:text-2xl font-extrabold tracking-tight">Gujju<span class="text-orange-500">Scholar</span></span>
+                <span class="text-lg sm:text-2xl font-extrabold tracking-tight">ગુજ્જુ<span class="text-orange-500">સ્કોલર</span></span>
             </a>
             
             <div class="hidden md:flex items-center gap-10 text-sm font-semibold text-zinc-600">
@@ -186,7 +186,7 @@
         <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-20 items-center">
             <div class="reveal">
                 <h2 class="text-4xl md:text-5xl font-black mb-8 tracking-tight text-white leading-tight">તમારા ખિસ્સામાંથી <span class="text-orange-500">બધું જ</span> શીખો.</h2>
-                <p class="text-zinc-400 text-lg mb-12 max-w-lg leading-relaxed font-medium">Gujju Scholar ની આખી લાઈબ્રેરી તમારી સાથે રાખો. ઓફલાઇન ડાઉનલોડ કરો, પ્રગતિ ટ્રૅક કરો અને વિશ્વમાં ગમે ત્યાં શીખો.</p>
+                <p class="text-zinc-400 text-lg mb-12 max-w-lg leading-relaxed font-medium">ગુજ્જુ સ્કોલરની આખી લાઈબ્રેરી તમારી સાથે રાખો. ઓફલાઇન ડાઉનલોડ કરો, પ્રગતિ ટ્રૅક કરો અને વિશ્વમાં ગમે ત્યાં શીખો.</p>
                 
                 <div class="flex flex-col sm:flex-row gap-5">
                     <a href="/downloads/gujjuscholar.apk" download="GujjuScholar.apk" class="group flex items-center gap-4 bg-white px-8 py-5 rounded-[2rem] hover:scale-105 active:scale-95 transition-all shadow-2xl">
@@ -234,7 +234,7 @@
             <div class="md:col-span-5">
                 <a href="/" class="flex items-center gap-3 mb-8">
                     <div class="w-10 h-10 gradient-brand rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg ring-4 ring-orange-100">GS</div>
-                    <span class="text-2xl font-extrabold tracking-tight">Gujju<span class="text-orange-500">Scholar</span></span>
+                    <span class="text-2xl font-extrabold tracking-tight">ગુજ્જુ<span class="text-orange-500">સ્કોલર</span></span>
                 </a>
                 <p class="text-zinc-500 leading-relaxed font-semibold max-w-sm mb-10">દરેક વિદ્યાર્થી માટે શિક્ષણને બહેતર બનાવવું. સ્થાનિક શિક્ષણની ક્રાંતિમાં જોડાઓ.</p>
                 <div class="flex gap-4">
@@ -273,7 +273,7 @@
         </div>
         
         <div class="max-w-7xl mx-auto px-6 pt-12 border-t border-zinc-200 text-center">
-            <p class="text-zinc-400 text-xs font-bold leading-relaxed tracking-widest uppercase">&copy; {{ date('Y') }} Gujju Scholar Ecosystems. શ્રેષ્ઠતા સાથે નિર્મિત.</p>
+            <p class="text-zinc-400 text-xs font-bold leading-relaxed tracking-widest uppercase">&copy; {{ date('Y') }} ગુજ્જુ સ્કોલર Ecosystems. શ્રેષ્ઠતા સાથે નિર્મિત.</p>
         </div>
     </footer>
 
