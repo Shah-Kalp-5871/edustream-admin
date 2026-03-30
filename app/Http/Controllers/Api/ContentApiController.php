@@ -18,6 +18,7 @@ use App\Models\VideoFolder;
 use App\Models\QaPaperFolder;
 use App\Models\Video;
 use App\Models\Note;
+use App\Models\AppVersion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -751,5 +752,21 @@ class ContentApiController extends Controller
             ->get();
             
         return response()->json($orders);
+    }
+
+    public function getAppVersion()
+    {
+        $latest = AppVersion::orderBy('version_code', 'desc')->first();
+        
+        if (!$latest) {
+            return response()->json([
+                'version_name' => '1.0.0',
+                'version_code' => 1,
+                'apk_url' => url('/downloads/gujjuscholar.apk'),
+                'force_update' => false,
+            ]);
+        }
+
+        return response()->json($latest);
     }
 }

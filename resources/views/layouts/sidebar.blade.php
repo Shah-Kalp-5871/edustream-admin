@@ -54,9 +54,14 @@
 
         <span class="nav-section">System</span>
 
-        <a href="{{ url('settings') }}" class="nav-link {{ request()->is('settings*') ? 'active' : '' }}">
+        <a href="{{ url('settings') }}" class="nav-link {{ request()->is('settings') ? 'active' : '' }}">
             <span class="nav-icon"><i class="fas fa-lock"></i></span>
             Settings
+        </a>
+
+        <a href="{{ route('settings.app-release') }}" class="nav-link {{ request()->is('settings/app-release') ? 'active' : '' }}">
+            <span class="nav-icon"><i class="fas fa-mobile-screen-button"></i></span>
+            App Release
         </a>
     </nav>
 

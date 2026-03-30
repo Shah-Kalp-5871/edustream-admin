@@ -10,6 +10,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\AppVersionController;
 use App\Http\Controllers\BannerWebController;
 
 Route::get('/', function () {
@@ -130,6 +131,8 @@ Route::get('/orders/{id}/invoice', [OrderController::class, 'invoice']);
     Route::get('/analytics', [AnalyticsController::class, 'index']);
     Route::get('/settings', [SettingsController::class, 'index']);
     Route::post('/settings/password', [SettingsController::class, 'updatePassword'])->name('settings.update-password');
+    Route::get('/settings/app-release', [AppVersionController::class, 'index'])->name('settings.app-release');
+    Route::post('/settings/app-release', [AppVersionController::class, 'store'])->name('settings.app-release.store');
 
     // Banner Routes
     Route::get('/banners', [BannerWebController::class, 'index']);
