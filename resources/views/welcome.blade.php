@@ -69,7 +69,7 @@
                 </div>
                 <h1 class="reveal text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[1.8] overflow-visible">
                     <span class="block">માતૃભાષામાં</span>
-                    <span class="block text-gradient">શક્તિશાળી</span>
+                    <span class="block text-gradient">સર્વોત્તમ</span>
                     <span class="block">શિક્ષણ.</span>
                 </h1>
                 <p class="reveal text-sm sm:text-base md:text-lg text-zinc-500 mb-8 md:mb-12 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium px-2">
