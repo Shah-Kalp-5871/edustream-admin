@@ -48,20 +48,30 @@
         </div>
 
         <!-- Mobile Menu Overlay -->
-        <div class="fixed inset-0 bg-white z-[110] flex flex-col items-center justify-center gap-10 translate-y-full transition-transform duration-500 md:hidden hidden" id="mobile-menu">
-            <div class="absolute top-8 left-8 flex items-center gap-3">
-                <div class="w-10 h-10 gradient-brand rounded-xl flex items-center justify-center text-white font-bold text-xl">GS</div>
-                <span class="text-2xl font-extrabold tracking-tight italic">Menu</span>
+        <div class="fixed inset-0 bg-white z-[2000] flex flex-col items-center justify-center gap-10 translate-y-full transition-transform duration-500 md:hidden hidden overflow-y-auto" id="mobile-menu">
+            <!-- Branded Header inside menu -->
+            <div class="absolute top-10 left-10 flex items-center gap-3">
+                <div class="w-12 h-12 gradient-brand rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-xl shadow-orange-200">GS</div>
+                <div class="flex flex-col">
+                    <span class="text-xl font-black text-zinc-900 leading-none">GUJJU</span>
+                    <span class="text-xl font-black text-orange-500 leading-none">SCHOLAR</span>
+                </div>
             </div>
             
-            <a href="#about" class="text-3xl font-black text-zinc-900 mobile-link hover:text-orange-600 transition-colors uppercase tracking-tight">About Us</a>
-            <a href="#features" class="text-3xl font-black text-zinc-900 mobile-link hover:text-orange-600 transition-colors uppercase tracking-tight">Features</a>
-            <a href="#download" class="text-3xl font-black text-zinc-900 mobile-link hover:text-orange-600 transition-colors uppercase tracking-tight">Download App</a>
-            <a href="/login" class="text-3xl font-black text-orange-600 mobile-link hover:scale-110 transition-transform uppercase tracking-tight">Admin Login</a>
+            <nav class="flex flex-col items-center gap-8 px-6 text-center">
+                <a href="#about" class="text-4xl font-black text-zinc-900 mobile-link hover:text-orange-500 transition-all uppercase tracking-tighter">About Us</a>
+                <a href="#features" class="text-4xl font-black text-zinc-900 mobile-link hover:text-orange-500 transition-all uppercase tracking-tighter">Features</a>
+                <a href="#download" class="text-4xl font-black text-zinc-900 mobile-link hover:text-orange-500 transition-all uppercase tracking-tighter">Download App</a>
+                <a href="/login" class="text-4xl font-black text-orange-600 mobile-link hover:scale-110 transition-transform uppercase tracking-tighter">Admin Login</a>
+            </nav>
             
-            <button class="absolute top-8 right-8 bg-zinc-100 text-zinc-900 p-4 rounded-2xl hover:bg-zinc-200 transition-all shadow-sm" id="menu-close">
+            <!-- Close Button -->
+            <button class="absolute top-10 right-10 bg-zinc-950 text-white p-5 rounded-3xl hover:bg-zinc-800 transition-all shadow-2xl active:scale-95" id="menu-close">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
+
+            <!-- Bottom Note -->
+            <div class="absolute bottom-12 text-zinc-400 font-bold text-xs uppercase tracking-[0.3em]">Build for Excellence</div>
         </div>
     </nav>
 
