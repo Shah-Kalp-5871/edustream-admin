@@ -47,31 +47,56 @@
             </button>
         </div>
 
-        <!-- Mobile Menu Overlay -->
-        <div class="fixed inset-0 bg-white z-[2000] flex flex-col items-center justify-center gap-10 translate-y-full transition-transform duration-500 md:hidden hidden overflow-y-auto" id="mobile-menu">
-            <!-- Branded Header inside menu -->
-            <div class="absolute top-10 left-10 flex items-center gap-3">
-                <div class="w-12 h-12 gradient-brand rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-xl shadow-orange-200">GS</div>
-                <div class="flex flex-col">
-                    <span class="text-xl font-black text-zinc-900 leading-none">GUJJU</span>
-                    <span class="text-xl font-black text-orange-500 leading-none">SCHOLAR</span>
+        <!-- Mobile Menu -->
+        <div class="fixed inset-0 z-[2000] md:hidden hidden" id="mobile-menu-container">
+            <!-- Backdrop -->
+            <div class="absolute inset-0 bg-zinc-900/60 backdrop-blur-sm opacity-0" id="mobile-menu-backdrop"></div>
+            
+            <!-- Side Panel -->
+            <div class="absolute top-0 right-0 h-full w-[85%] max-w-sm bg-white shadow-2xl translate-x-full flex flex-col p-8" id="mobile-menu-panel">
+                <!-- Branded Header inside menu -->
+                <div class="flex items-center justify-between mb-12">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 gradient-brand rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-orange-100">GS</div>
+                        <div class="flex flex-col">
+                            <span class="text-sm font-black text-zinc-900 leading-none">GUJJU</span>
+                            <span class="text-sm font-black text-orange-500 leading-none">SCHOLAR</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Close Button -->
+                    <button class="bg-zinc-100 text-zinc-900 p-3 rounded-xl hover:bg-zinc-200 transition-all active:scale-95" id="menu-close">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                
+                <nav class="flex flex-col gap-6">
+                    <a href="#about" class="text-2xl font-bold text-zinc-900 mobile-link hover:text-orange-500 transition-all flex items-center justify-between group">
+                        About Us
+                        <svg class="w-5 h-5 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
+                    </a>
+                    <a href="#features" class="text-2xl font-bold text-zinc-900 mobile-link hover:text-orange-500 transition-all flex items-center justify-between group">
+                        Features
+                        <svg class="w-5 h-5 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
+                    </a>
+                    <a href="#download" class="text-2xl font-bold text-zinc-900 mobile-link hover:text-orange-500 transition-all flex items-center justify-between group">
+                        Download App
+                        <svg class="w-5 h-5 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
+                    </a>
+                    <div class="h-px bg-zinc-100 my-4"></div>
+                    <a href="/login" class="text-2xl font-bold text-orange-600 mobile-link hover:scale-105 origin-left transition-transform">
+                        Admin Login
+                    </a>
+                </nav>
+                
+                <!-- Bottom Branding -->
+                <div class="mt-auto">
+                    <div class="p-6 bg-orange-50 rounded-2xl border border-orange-100">
+                        <div class="text-orange-600 font-bold text-xs uppercase tracking-widest mb-1">Revolutionizing</div>
+                        <div class="text-zinc-900 font-black text-lg leading-tight">Local Learning</div>
+                    </div>
                 </div>
             </div>
-            
-            <nav class="flex flex-col items-center gap-8 px-6 text-center">
-                <a href="#about" class="text-4xl font-black text-zinc-900 mobile-link hover:text-orange-500 transition-all uppercase tracking-tighter">About Us</a>
-                <a href="#features" class="text-4xl font-black text-zinc-900 mobile-link hover:text-orange-500 transition-all uppercase tracking-tighter">Features</a>
-                <a href="#download" class="text-4xl font-black text-zinc-900 mobile-link hover:text-orange-500 transition-all uppercase tracking-tighter">Download App</a>
-                <a href="/login" class="text-4xl font-black text-orange-600 mobile-link hover:scale-110 transition-transform uppercase tracking-tighter">Admin Login</a>
-            </nav>
-            
-            <!-- Close Button -->
-            <button class="absolute top-10 right-10 bg-zinc-950 text-white p-5 rounded-3xl hover:bg-zinc-800 transition-all shadow-2xl active:scale-95" id="menu-close">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-
-            <!-- Bottom Note -->
-            <div class="absolute bottom-12 text-zinc-400 font-bold text-xs uppercase tracking-[0.3em]">Build for Excellence</div>
         </div>
     </nav>
 
@@ -448,26 +473,35 @@
             }
         });
 
-        // Mobile Menu Logic
+        // Mobile Menu Logic with GSAP
         const menuToggle = document.getElementById('menu-toggle');
         const menuClose = document.getElementById('menu-close');
-        const mobileMenu = document.getElementById('mobile-menu');
+        const menuContainer = document.getElementById('mobile-menu-container');
+        const menuBackdrop = document.getElementById('mobile-menu-backdrop');
+        const menuPanel = document.getElementById('mobile-menu-panel');
         const mobileLinks = document.querySelectorAll('.mobile-link');
 
-        const toggleMenu = (show) => {
-            if (show) {
-                mobileMenu.classList.remove('hidden');
-                setTimeout(() => mobileMenu.classList.remove('translate-y-full'), 10);
-            } else {
-                mobileMenu.classList.add('translate-y-full');
-                setTimeout(() => mobileMenu.classList.add('hidden'), 500);
-            }
-        };
+        // Create a timeline for the menu
+        const menuTl = gsap.timeline({ paused: true });
 
-        menuToggle.addEventListener('click', () => toggleMenu(true));
-        menuClose.addEventListener('click', () => toggleMenu(false));
+        menuTl
+            .set(menuContainer, { display: 'block' })
+            .to(menuBackdrop, { opacity: 1, duration: 0.4, ease: "power2.out" })
+            .to(menuPanel, { x: 0, duration: 0.6, ease: "expo.out" }, "-=0.2")
+            .from(".mobile-link", { 
+                x: 40, 
+                opacity: 0, 
+                duration: 0.4, 
+                stagger: 0.1, 
+                ease: "back.out(1.7)" 
+            }, "-=0.3");
+
+        menuToggle.addEventListener('click', () => menuTl.play());
+        menuClose.addEventListener('click', () => menuTl.reverse());
+        menuBackdrop.addEventListener('click', () => menuTl.reverse());
+        
         mobileLinks.forEach(link => {
-            link.addEventListener('click', () => toggleMenu(false));
+            link.addEventListener('click', () => menuTl.reverse());
         });
 
         // Orbit Animation
