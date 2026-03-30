@@ -224,6 +224,23 @@ class ContentApiController extends Controller
         $noteFolders->each(function($f) { $f->is_free = $f->notes()->active()->free()->exists(); });
         $paperFolders->each(function($f) { $f->is_free = $f->qaPapers()->active()->free()->exists(); });
 
+        // Apply item-level locking/free logic to root items
+        $rootVideos->each(function($v) use ($isEnrolled) {
+            $v->is_locked = !$v->is_free && !$isEnrolled;
+            if ($v->is_locked) unset($v->video_url, $v->file_path);
+            $v->processing_status = $v->processing_status ?? 'completed';
+        });
+
+        $rootNotes->each(function($n) use ($isEnrolled) {
+            $n->is_locked = !$n->is_free && !$isEnrolled;
+            if ($n->is_locked) unset($n->file_path);
+        });
+
+        $rootPapers->each(function($p) use ($isEnrolled) {
+            $p->is_locked = !$p->is_free && !$isEnrolled;
+            if ($p->is_locked) unset($p->file_path);
+        });
+
         return response()->json([
             'subject' => $subject,
             'is_enrolled' => $isEnrolled,
@@ -238,10 +255,10 @@ class ContentApiController extends Controller
                 'quizzes' => $quizzes,
             ],
             'content_summary' => [
-                'notes_count' => $subject->notes()->count(),
-                'videos_count' => $subject->videos()->count(),
-                'papers_count' => $subject->qaPapers()->count(),
-                'quizzes_count' => $subject->quizzes()->count(),
+                'notes_count' => $subject->notes()->active()->count(),
+                'videos_count' => $subject->videos()->active()->count(),
+                'papers_count' => $subject->qaPapers()->active()->count(),
+                'quizzes_count' => $subject->quizzes()->active()->count(),
             ]
         ]);
     }
