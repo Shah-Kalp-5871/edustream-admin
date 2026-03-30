@@ -41,36 +41,37 @@
                 <a href="/login" class="bg-zinc-900 text-white px-6 py-2.5 rounded-full hover:bg-zinc-800 transition-all shadow-md active:scale-95">Admin Portal</a>
             </div>
 
-            <!-- Modern Hamburger Menu Toggle -->
-            <button class="md:hidden relative z-[3000] w-12 h-12 flex flex-col items-center justify-center gap-1.5 focus:outline-none bg-zinc-900 rounded-2xl shadow-lg hover:scale-105 active:scale-95 transition-all" id="menu-toggle" aria-label="Toggle Menu">
-                <span class="w-6 h-0.5 bg-white rounded-full transition-all duration-300 origin-center" id="line1"></span>
-                <span class="w-6 h-0.5 bg-white rounded-full transition-all duration-300 origin-center" id="line2"></span>
-                <span class="w-6 h-0.5 bg-white rounded-full transition-all duration-300 origin-center" id="line3"></span>
+            <!-- Mobile Menu Toggle -->
+            <button class="md:hidden bg-zinc-900 text-white p-3 rounded-2xl shadow-lg hover:scale-105 active:scale-95 transition-all" id="menu-toggle">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="menu-icon"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
         </div>
 
-        <!-- Premium Mobile Menu Overlay -->
-        <div class="fixed inset-0 bg-white/95 backdrop-blur-2xl z-[2500] flex flex-col items-center justify-center translate-y-full transition-transform duration-700 ease-[cubic-bezier(0.85,0,0.15,1)] md:hidden pointer-events-none" id="mobile-menu">
-            <!-- Branded Logo in Menu -->
-            <div class="absolute top-8 left-8 flex items-center gap-3 opacity-0" id="menu-logo">
-                <div class="w-10 h-10 gradient-brand rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">GS</div>
-                <span class="text-xl font-black tracking-tight text-zinc-900">GUJJU<span class="text-orange-500">SCHOLAR</span></span>
-            </div>
-
-            <nav class="flex flex-col items-center gap-6 sm:gap-8 text-center">
-                <a href="#about" class="mobile-link text-4xl sm:text-5xl font-black text-zinc-900 hover:text-orange-500 transition-colors uppercase tracking-tighter opacity-0 translate-y-10">About Us</a>
-                <a href="#features" class="mobile-link text-4xl sm:text-5xl font-black text-zinc-900 hover:text-orange-500 transition-colors uppercase tracking-tighter opacity-0 translate-y-10">Features</a>
-                <a href="#download" class="mobile-link text-4xl sm:text-5xl font-black text-zinc-900 hover:text-orange-500 transition-colors uppercase tracking-tighter opacity-0 translate-y-10">Download</a>
-                <a href="/login" class="mobile-link text-4xl sm:text-5xl font-black text-orange-600 hover:scale-110 transition-transform uppercase tracking-tighter opacity-0 translate-y-10">Admin Login</a>
-            </nav>
-
-            <div class="absolute bottom-12 w-full text-center px-6 opacity-0" id="menu-footer">
-                <div class="h-px w-20 bg-zinc-200 mx-auto mb-8"></div>
-                <p class="text-zinc-400 font-bold text-xs uppercase tracking-[0.3em] mb-2">Build for Excellence</p>
-                <div class="flex justify-center gap-4 text-zinc-300">
-                    <!-- Placeholder for small social icons if needed -->
+        <!-- Mobile Menu Overlay -->
+        <div class="fixed inset-0 bg-white z-[2000] flex flex-col items-center justify-center gap-10 translate-y-full transition-transform duration-500 md:hidden hidden overflow-y-auto" id="mobile-menu">
+            <!-- Branded Header inside menu -->
+            <div class="absolute top-10 left-10 flex items-center gap-3">
+                <div class="w-12 h-12 gradient-brand rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-xl shadow-orange-200">GS</div>
+                <div class="flex flex-col">
+                    <span class="text-xl font-black text-zinc-900 leading-none">GUJJU</span>
+                    <span class="text-xl font-black text-orange-500 leading-none">SCHOLAR</span>
                 </div>
             </div>
+            
+            <nav class="flex flex-col items-center gap-8 px-6 text-center">
+                <a href="#about" class="text-4xl font-black text-zinc-900 mobile-link hover:text-orange-500 transition-all uppercase tracking-tighter">About Us</a>
+                <a href="#features" class="text-4xl font-black text-zinc-900 mobile-link hover:text-orange-500 transition-all uppercase tracking-tighter">Features</a>
+                <a href="#download" class="text-4xl font-black text-zinc-900 mobile-link hover:text-orange-500 transition-all uppercase tracking-tighter">Download App</a>
+                <a href="/login" class="text-4xl font-black text-orange-600 mobile-link hover:scale-110 transition-transform uppercase tracking-tighter">Admin Login</a>
+            </nav>
+            
+            <!-- Close Button -->
+            <button class="absolute top-10 right-10 bg-zinc-950 text-white p-5 rounded-3xl hover:bg-zinc-800 transition-all shadow-2xl active:scale-95" id="menu-close">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+
+            <!-- Bottom Note -->
+            <div class="absolute bottom-12 text-zinc-400 font-bold text-xs uppercase tracking-[0.3em]">Build for Excellence</div>
         </div>
     </nav>
 
@@ -447,55 +448,26 @@
             }
         });
 
-        // Premium Mobile Menu Logic (GSAP)
-        let isMenuOpen = false;
+        // Mobile Menu Logic
         const menuToggle = document.getElementById('menu-toggle');
+        const menuClose = document.getElementById('menu-close');
         const mobileMenu = document.getElementById('mobile-menu');
-        const line1 = document.getElementById('line1');
-        const line2 = document.getElementById('line2');
-        const line3 = document.getElementById('line3');
         const mobileLinks = document.querySelectorAll('.mobile-link');
-        const menuLogo = document.getElementById('menu-logo');
-        const menuFooter = document.getElementById('menu-footer');
 
-        const menuTl = gsap.timeline({ paused: true, defaults: { ease: "power4.inOut", duration: 0.6 } });
-
-        menuTl.to(mobileMenu, { 
-            y: 0,
-            pointerEvents: "auto",
-            duration: 0.8,
-            ease: "expo.inOut"
-        })
-        .to(line1, { y: 8, rotation: 45, duration: 0.3 }, "<")
-        .to(line2, { opacity: 0, scale: 0, duration: 0.2 }, "<")
-        .to(line3, { y: -8, rotation: -45, duration: 0.3 }, "<")
-        .to(menuLogo, { opacity: 1, y: 0, duration: 0.4 }, "-=0.4")
-        .to(mobileLinks, { 
-            opacity: 1, 
-            y: 0, 
-            stagger: 0.1, 
-            duration: 0.5,
-            ease: "back.out(1.7)"
-        }, "-=0.2")
-        .to(menuFooter, { opacity: 1, y: 0, duration: 0.4 }, "-=0.3");
-
-        menuToggle.addEventListener('click', () => {
-            isMenuOpen = !isMenuOpen;
-            if (isMenuOpen) {
-                menuTl.play();
-                document.body.style.overflow = 'hidden';
+        const toggleMenu = (show) => {
+            if (show) {
+                mobileMenu.classList.remove('hidden');
+                setTimeout(() => mobileMenu.classList.remove('translate-y-full'), 10);
             } else {
-                menuTl.reverse();
-                document.body.style.overflow = '';
+                mobileMenu.classList.add('translate-y-full');
+                setTimeout(() => mobileMenu.classList.add('hidden'), 500);
             }
-        });
+        };
 
+        menuToggle.addEventListener('click', () => toggleMenu(true));
+        menuClose.addEventListener('click', () => toggleMenu(false));
         mobileLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                isMenuOpen = false;
-                menuTl.reverse();
-                document.body.style.overflow = '';
-            });
+            link.addEventListener('click', () => toggleMenu(false));
         });
 
         // Orbit Animation
