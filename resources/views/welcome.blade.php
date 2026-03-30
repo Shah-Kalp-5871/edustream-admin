@@ -16,7 +16,7 @@
         .text-gradient { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .hero-mesh { 
             background: radial-gradient(at 0% 0%, rgba(251, 146, 60, 0.1) 0%, transparent 50%),
-                        radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.05) 0%, transparent 50%);
+                radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.05) 0%, transparent 50%);
         }
         .reveal { opacity: 0; transform: translateY(30px); }
         .card-hover { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
@@ -118,7 +118,7 @@
     </section>
 
     <!-- Stats Section -->
-    <section class="py-12 border-y border-zinc-100 bg-white">
+    <section id="about" class="py-12 border-y border-zinc-100 bg-white">
         <div class="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
             <div class="text-center group">
                 <div class="text-4xl font-extrabold text-zinc-900 mb-1 group-hover:text-orange-500 transition-colors">10K+</div>
@@ -228,91 +228,126 @@
         </div>
     </section>
 
-    <!-- Roadmap Section -->
+    <!-- User Journey Section -->
     <section id="roadmap" class="py-32 bg-white relative overflow-hidden">
         <div class="max-w-7xl mx-auto px-6">
             <div class="text-center mb-20">
-                <h2 class="reveal text-4xl md:text-5xl font-extrabold mb-6 tracking-tight">રોડમેપ - <span class="text-orange-500">ભવિષ્યનું</span> શિક્ષણ</h2>
-                <p class="reveal text-zinc-500 text-lg font-medium max-w-2xl mx-auto">અમે દરેક વિદ્યાર્થી માટે શિક્ષણને બહેતર બનાવવા માટે સતત નવીનતાઓ લાવી રહ્યા છીએ.</p>
+                <h2 class="reveal text-4xl md:text-5xl font-extrabold mb-6 tracking-tight">તમારી <span class="text-orange-500">સફળતાની</span> યાત્રા</h2>
+                <p class="reveal text-zinc-500 text-lg font-medium max-w-2xl mx-auto">ગુજ્જુ સ્કોલર સાથે તમારા શ્રેષ્ઠ પરિણામ સુધી પહોંચવાના ૪ સરળ ડગલાં.</p>
             </div>
 
             <div class="relative max-w-4xl mx-auto">
                 <!-- Timeline Vertical Line -->
                 <div class="absolute left-[20px] md:left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-orange-100 via-orange-500 to-orange-100 transform -translate-x-1/2 hidden md:block"></div>
                 
-                <!-- Roadmap Item 1 -->
+                <!-- Step 1 -->
                 <div class="roadmap-item relative mb-24 md:mb-32 flex flex-col md:flex-row md:justify-between items-start md:items-center w-full">
                     <div class="hidden md:block w-1/2 pr-12 text-right">
                         <div>
-                            <h3 class="text-2xl font-black text-zinc-900 mb-2">ફેઝ ૧ (Launch)</h3>
-                            <p class="text-zinc-500 font-semibold leading-relaxed">સ્માર્ટ વિડિયો લેક્ચર્સ, એચડી ક્વોલિટી સોલ્યુશન્સ અને પાયાની ક્વિઝ ફીચર શરૂ કરવામાં આવી.</p>
+                            <h3 class="text-2xl font-black text-zinc-900 mb-2">પગલું ૧: સચોટ પસંદગી</h3>
+                            <p class="text-zinc-500 font-semibold leading-relaxed">તમારા ધોરણ અને વિષય મુજબ અમારા વિશાળ અભ્યાસક્રમમાંથી સૌથી યોગ્ય કોર્સ પસંદ કરો.</p>
+                        </div>
+                    </div>
+                    <div class="absolute left-0 md:left-1/2 top-0 md:top-auto w-10 h-10 gradient-brand rounded-full border-4 border-white shadow-xl z-20 flex items-center justify-center transform -translate-x-[15px] md:-translate-x-1/2">
+                        <span class="text-white font-bold">૧</span>
+                    </div>
+                    <div class="md:w-1/2 pl-12">
+                        <div class="md:hidden mb-4">
+                            <h3 class="text-xl font-black text-zinc-900 mb-1">પગલું ૧: સચોટ પસંદગી</h3>
+                        </div>
+                        <div class="bg-zinc-50 p-8 rounded-[2rem] border border-zinc-100 shadow-sm card-hover">
+                            <div class="flex items-center gap-4 mb-4">
+                                <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center text-orange-600">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                                </div>
+                                <div class="text-zinc-400 font-bold text-xs uppercase tracking-widest">રજીસ્ટ્રેશન</div>
+                            </div>
+                            <p class="text-zinc-600 font-medium md:hidden">તમારા ધોરણ અને વિષય મુજબ સૌથી યોગ્ય કોર્સ પસંદ કરો.</p>
+                            <p class="text-zinc-500 text-sm font-semibold leading-relaxed hidden md:block">સરળ ઈન્ટરફેસ દ્વારા તમારા પસંદગીના વિષયોને એક ક્લિકમાં શોધો અને શીખવાનું શરૂ કરો.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="roadmap-item relative mb-24 md:mb-32 flex flex-col md:flex-row-reverse md:justify-between items-start md:items-center w-full">
+                    <div class="hidden md:block w-1/2 pl-12 text-left">
+                        <div>
+                            <h3 class="text-2xl font-black text-zinc-900 mb-2">પગલું ૨: સ્પષ્ટ અભ્યાસ</h3>
+                            <p class="text-zinc-500 font-semibold leading-relaxed">નિષ્ણાત શિક્ષકો દ્વારા તૈયાર કરાયેલ હાઈ-ડેફિનેશન વિડિયો લેક્ચર્સ દ્વારા દરેક ટોપિકને સ્ફટિક જેવો સ્પષ્ટ કરો.</p>
+                        </div>
+                    </div>
+                    <div class="absolute left-0 md:left-1/2 top-0 md:top-auto w-10 h-10 gradient-brand rounded-full border-4 border-white shadow-xl z-20 flex items-center justify-center transform -translate-x-[15px] md:-translate-x-1/2">
+                        <span class="text-white font-bold">૨</span>
+                    </div>
+                    <div class="md:w-1/2 pr-12 text-right">
+                        <div class="md:hidden mb-4 text-left pl-12">
+                            <h3 class="text-xl font-black text-zinc-900 mb-1">પગલું ૨: સ્પષ્ટ અભ્યાસ</h3>
+                        </div>
+                        <div class="bg-zinc-50 p-8 rounded-[2rem] border border-zinc-100 shadow-sm card-hover text-left md:text-right">
+                            <div class="flex items-center justify-start md:justify-end gap-4 mb-4">
+                                <div class="text-zinc-400 font-bold text-xs uppercase tracking-widest order-2 md:order-1">લર્નિંગ</div>
+                                <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center text-orange-600 order-1 md:order-2">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </div>
+                            </div>
+                            <p class="text-zinc-600 font-medium md:hidden text-left">હાઈ-ડેફિનેશન વિડિયો લેક્ચર્સ દ્વારા દરેક ટોપિકને સ્ફટિક જેવો સ્પષ્ટ કરો.</p>
+                            <p class="text-zinc-500 text-sm font-semibold leading-relaxed hidden md:block">દરેક વિષયની ઊંડાણપૂર્વક સમજૂતી અને વિઝ્યુઅલ લર્નિંગ જે યાદ રાખવામાં સરળતા કરી દેશે.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="roadmap-item relative mb-24 md:mb-32 flex flex-col md:flex-row md:justify-between items-start md:items-center w-full">
+                    <div class="hidden md:block w-1/2 pr-12 text-right">
+                        <div>
+                            <h3 class="text-2xl font-black text-zinc-900 mb-2">પગલું ૩: સચોટ મૂલ્યાંકન</h3>
+                            <p class="text-zinc-500 font-semibold leading-relaxed">ડિજિટલ ક્વિઝ અને જૂના પ્રશ્નપત્રોના સોલ્યુશન્સ દ્વારા તમારી પકડ કેટલી છે તે ચકાસો.</p>
+                        </div>
+                    </div>
+                    <div class="absolute left-0 md:left-1/2 top-0 md:top-auto w-10 h-10 gradient-brand rounded-full border-4 border-white shadow-xl z-20 flex items-center justify-center transform -translate-x-[15px] md:-translate-x-1/2">
+                        <span class="text-white font-bold">૩</span>
+                    </div>
+                    <div class="md:w-1/2 pl-12">
+                        <div class="md:hidden mb-4">
+                            <h3 class="text-xl font-black text-zinc-900 mb-1">પગલું ૩: સચોટ મૂલ્યાંકન</h3>
+                        </div>
+                        <div class="bg-zinc-50 p-8 rounded-[2rem] border border-zinc-100 shadow-sm card-hover">
+                            <div class="flex items-center gap-4 mb-4">
+                                <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center text-orange-600">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </div>
+                                <div class="text-zinc-400 font-bold text-xs uppercase tracking-widest">ટેસ્ટિંગ</div>
+                            </div>
+                            <p class="text-zinc-600 font-medium md:hidden text-left">ડિજિટલ ક્વિઝ અને પ્રશ્નપત્રો દ્વારા તમારી પકડ ચકાસો.</p>
+                            <p class="text-zinc-500 text-sm font-semibold leading-relaxed hidden md:block">તમારા નબળા વિભાગોને ઓળખો અને તેને સુધારવા માટે ત્વરિત ફીડબેક મેળવો.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="roadmap-item relative flex flex-col md:flex-row-reverse md:justify-between items-start md:items-center w-full">
+                    <div class="hidden md:block w-1/2 pl-12 text-left">
+                        <div>
+                            <h3 class="text-2xl font-black text-zinc-900 mb-2">પગલું ૪: અંતિમ લક્ષ્ય - સફળતા</h3>
+                            <p class="text-zinc-500 font-semibold leading-relaxed">આત્મવિશ્વાસ સાથે પરીક્ષાઓ આપો અને ગુજરાતભરના ટોપ સ્કોલર્સની યાદીમાં તમારું સ્થાન મેળવો.</p>
                         </div>
                     </div>
                     <div class="absolute left-0 md:left-1/2 top-0 md:top-auto w-10 h-10 gradient-brand rounded-full border-4 border-white shadow-xl z-20 flex items-center justify-center transform -translate-x-[15px] md:-translate-x-1/2">
                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
                     </div>
-                    <div class="md:w-1/2 pl-12">
-                        <div class="md:hidden mb-4">
-                            <h3 class="text-xl font-black text-zinc-900 mb-1">ફેઝ ૧ (Launch)</h3>
-                        </div>
-                        <div class="bg-zinc-50 p-8 rounded-[2rem] border border-zinc-100 shadow-sm card-hover">
-                            <span class="inline-block px-3 py-1 bg-green-100 text-green-600 text-[10px] font-bold rounded-full uppercase tracking-tighter mb-4">સક્રિય</span>
-                            <p class="text-zinc-600 font-medium md:hidden">સ્માર્ટ વિડિયો લેક્ચર્સ, એચડી ક્વોલિટી સોલ્યુશન્સ અને પાયાની ક્વિઝ શરૂ કરવામાં આવી.</p>
-                            <ul class="space-y-3 mt-4 text-sm font-bold text-zinc-500">
-                                <li class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-green-500"></div>૫૦૦+ વિડિયો લેક્ચર્સ</li>
-                                <li class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-green-500"></div>ઝડપી વિડિયો પ્લેયર</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Roadmap Item 2 -->
-                <div class="roadmap-item relative mb-24 md:mb-32 flex flex-col md:flex-row-reverse md:justify-between items-start md:items-center w-full">
-                    <div class="hidden md:block w-1/2 pl-12 text-left">
-                        <div>
-                            <h3 class="text-2xl font-black text-zinc-900 mb-2">ફેઝ ૨ (Upcoming)</h3>
-                            <p class="text-zinc-500 font-semibold leading-relaxed">લાઈવ શંકા નિવારણ સત્રો અને પ્રીમિયમ પીડીએફ નોટ્સ, જે વિદ્યાર્થીઓને વધુ ઊંડાણપૂર્વક સમજવામાં મદદ કરશે.</p>
-                        </div>
-                    </div>
-                    <div class="absolute left-0 md:left-1/2 top-0 md:top-auto w-10 h-10 bg-white border-4 border-orange-100 rounded-full shadow-xl z-20 flex items-center justify-center transform -translate-x-[15px] md:-translate-x-1/2">
-                         <div class="w-3 h-3 bg-orange-500 rounded-full animate-pulse"></div>
-                    </div>
                     <div class="md:w-1/2 pr-12 text-right">
                         <div class="md:hidden mb-4 text-left pl-12">
-                            <h3 class="text-xl font-black text-zinc-900 mb-1">ફેઝ ૨ (Upcoming)</h3>
+                            <h3 class="text-xl font-black text-zinc-900 mb-1">પગલું ૪: સફળતા</h3>
                         </div>
-                        <div class="bg-zinc-50 p-8 rounded-[2rem] border border-zinc-100 shadow-sm card-hover text-left md:text-right">
-                            <span class="inline-block px-3 py-1 bg-orange-100 text-orange-600 text-[10px] font-bold rounded-full uppercase tracking-tighter mb-4">ટૂંક સમયમાં</span>
-                            <p class="text-zinc-600 font-medium md:hidden text-left">લાઈવ શંકા નિવારણ સત્રો અને પ્રીમિયમ પીડીએફ નોટ્સ.</p>
-                            <ul class="space-y-3 mt-4 text-sm font-bold text-zinc-500">
-                                <li class="flex items-center justify-start md:justify-end gap-2 text-left md:text-right"><div class="w-1.5 h-1.5 rounded-full bg-orange-400"></div>લાઈવ ડાઉટ સેશન્સ</li>
-                                <li class="flex items-center justify-start md:justify-end gap-2 text-left md:text-right"><div class="w-1.5 h-1.5 rounded-full bg-orange-400"></div>પ્રીમિયમ ડાઉનલોડ્સ</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Roadmap Item 3 -->
-                <div class="roadmap-item relative mb-24 md:mb-32 flex flex-col md:flex-row md:justify-between items-start md:items-center w-full">
-                    <div class="hidden md:block w-1/2 pr-12 text-right">
-                        <div>
-                            <h3 class="text-2xl font-black text-zinc-900 mb-2">ફેઝ ૩ (Technology)</h3>
-                            <p class="text-zinc-500 font-semibold leading-relaxed">એઆઈ-આધારિત પર્સનલાઈઝ્ડ શીખવાની રીત, જે દરેક વિદ્યાર્થીની જરૂરિયાત મુજબ અભ્યાસક્રમ તૈયાર કરશે.</p>
-                        </div>
-                    </div>
-                    <div class="absolute left-0 md:left-1/2 top-0 md:top-auto w-10 h-10 bg-white border-4 border-zinc-100 rounded-full shadow-xl z-20 flex items-center justify-center transform -translate-x-[15px] md:-translate-x-1/2">
-                        <div class="w-3 h-3 bg-zinc-300 rounded-full"></div>
-                    </div>
-                    <div class="md:w-1/2 pl-12">
-                         <div class="md:hidden mb-4">
-                            <h3 class="text-xl font-black text-zinc-900 mb-1">ફેઝ ૩ (Expansion)</h3>
-                        </div>
-                        <div class="bg-zinc-50 p-8 rounded-[2rem] border border-zinc-100 shadow-sm card-hover">
-                           <p class="text-zinc-600 font-medium md:hidden">એઆઈ-આધારિત પર્સનલાઈઝ્ડ અને સ્માર્ટ લર્નિંગ સિસ્ટમ.</p>
-                            <ul class="space-y-3 mt-4 text-sm font-bold text-zinc-500">
-                                <li class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-zinc-300"></div>AI લર્નિંગ આસિસ્ટન્ટ</li>
-                                <li class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-zinc-300"></div>પરફોર્મન્સ એનાલિટિક્સ</li>
-                            </ul>
+                        <div class="bg-orange-600 p-8 rounded-[2rem] shadow-2xl shadow-orange-200 card-hover text-left md:text-right text-white">
+                            <div class="flex items-center justify-start md:justify-end gap-4 mb-4">
+                                <div class="text-orange-200 font-bold text-xs uppercase tracking-widest order-2 md:order-1">પરિણામ</div>
+                                <div class="w-12 h-12 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center text-white order-1 md:order-2">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-7.714 2.143L11 21l-2.286-6.857L1 12l7.714-2.143L11 3z"></path></svg>
+                                </div>
+                            </div>
+                            <p class="text-white font-medium md:hidden text-left">આત્મવિશ્વાસ સાથે પરીક્ષાઓ આપો અને ગુજરાતભરના ટોપ સ્કોલર્સમાં સ્થાન મેળવો.</p>
+                            <p class="text-orange-100 text-sm font-semibold leading-relaxed hidden md:block">શ્રેષ્ઠ શિક્ષણની સાથે અંતે શ્રેષ્ઠ પરિણામ - જે તમારું અને માતા-પિતાનું ગર્વ વધારશે.</p>
                         </div>
                     </div>
                 </div>
@@ -338,28 +373,28 @@
             </div>
 
             <div class="md:col-span-2">
-                <h4 class="font-black text-zinc-900 mb-8 uppercase tracking-[0.2em] text-[10px]">પ્રોડક્ટ</h4>
+                <h4 class="font-black text-zinc-900 mb-8 uppercase tracking-[0.2em] text-[10px]">Product</h4>
                 <ul class="space-y-4 text-sm font-bold text-zinc-500">
-                    <li><a href="#about" class="hover:text-orange-500">અમારા વિશે</a></li>
-                    <li><a href="#features" class="hover:text-orange-500">સુવિધાઓ</a></li>
-                    <li><a href="#download" class="hover:text-orange-500">એપ ડાઉનલોડ કરો</a></li>
+                    <li><a href="#about" class="hover:text-orange-500">About Us</a></li>
+                    <li><a href="#features" class="hover:text-orange-500">Features</a></li>
+                    <li><a href="#download" class="hover:text-orange-500">Download App</a></li>
                 </ul>
             </div>
 
             <div class="md:col-span-2">
-                <h4 class="font-black text-zinc-900 mb-8 uppercase tracking-[0.2em] text-[10px]">કંપની</h4>
+                <h4 class="font-black text-zinc-900 mb-8 uppercase tracking-[0.2em] text-[10px]">Company</h4>
                 <ul class="space-y-4 text-sm font-bold text-zinc-500">
-                    <li><a href="/login" class="hover:text-orange-500">એડમિન રોગિન</a></li>
-                    <li><a href="/coming-soon" class="hover:text-orange-500">ટૂંક સમયમાં</a></li>
+                    <li><a href="/login" class="hover:text-orange-500">Admin Login</a></li>
+                    <li><a href="/coming-soon" class="hover:text-orange-500">Coming Soon</a></li>
                 </ul>
             </div>
 
             <div class="md:col-span-3">
-                <h4 class="font-black text-zinc-900 mb-8 uppercase tracking-[0.2em] text-[10px]">લીગલ</h4>
+                <h4 class="font-black text-zinc-900 mb-8 uppercase tracking-[0.2em] text-[10px]">Legal</h4>
                 <ul class="space-y-4 text-sm font-bold text-zinc-500">
-                    <li><a href="/privacy-policy" class="hover:text-orange-500">ગોપનીયતા નીતિ</a></li>
-                    <li><a href="/terms-of-service" class="hover:text-orange-500">સેવાની શરતો</a></li>
-                    <li><a href="/refund-policy" class="hover:text-orange-500">રિફંડ નીતિ</a></li>
+                    <li><a href="/privacy-policy" class="hover:text-orange-500">Privacy Policy</a></li>
+                    <li><a href="/terms-of-service" class="hover:text-orange-500">Terms of Service</a></li>
+                    <li><a href="/refund-policy" class="hover:text-orange-500">Refund Policy</a></li>
                 </ul>
             </div>
         </div>
@@ -471,6 +506,19 @@
               start: "top 90%",
             }
           })
+        });
+
+        // Roadmap Journey Step-by-Step Reveal
+        gsap.utils.toArray('.roadmap-item').forEach((item, i) => {
+            gsap.from(item, {
+                opacity: 0,
+                y: 50,
+                duration: 1,
+                scrollTrigger: {
+                    trigger: item,
+                    start: "top 85%",
+                }
+            });
         });
     </script>
 </body>
