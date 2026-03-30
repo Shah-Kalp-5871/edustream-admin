@@ -80,7 +80,7 @@
                         એપ ડાઉનલોડ કરો
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                     </a>
-                    <a href="/coming-soon" class="px-10 py-5 rounded-2xl border-2 border-zinc-200 font-bold text-lg text-zinc-600 hover:bg-zinc-100 transition-all w-full sm:w-auto text-center">
+                    <a href="#roadmap" class="px-10 py-5 rounded-2xl border-2 border-zinc-200 font-bold text-lg text-zinc-600 hover:bg-zinc-100 transition-all w-full sm:w-auto text-center">
                         રોડમેપ
                     </a>
                 </div>
@@ -223,6 +223,98 @@
                         <div class="w-12 h-12 bg-white rounded-lg -rotate-45"></div>
                     </div>
                     <div class="absolute text-white/40 text-8xl font-black select-none pointer-events-none">શીખો</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Roadmap Section -->
+    <section id="roadmap" class="py-32 bg-white relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-20">
+                <h2 class="reveal text-4xl md:text-5xl font-extrabold mb-6 tracking-tight">રોડમેપ - <span class="text-orange-500">ભવિષ્યનું</span> શિક્ષણ</h2>
+                <p class="reveal text-zinc-500 text-lg font-medium max-w-2xl mx-auto">અમે દરેક વિદ્યાર્થી માટે શિક્ષણને બહેતર બનાવવા માટે સતત નવીનતાઓ લાવી રહ્યા છીએ.</p>
+            </div>
+
+            <div class="relative max-w-4xl mx-auto">
+                <!-- Timeline Vertical Line -->
+                <div class="absolute left-[20px] md:left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-orange-100 via-orange-500 to-orange-100 transform -translate-x-1/2 hidden md:block"></div>
+                
+                <!-- Roadmap Item 1 -->
+                <div class="roadmap-item relative mb-24 md:mb-32 flex flex-col md:flex-row md:justify-between items-start md:items-center w-full">
+                    <div class="hidden md:block w-1/2 pr-12 text-right">
+                        <div>
+                            <h3 class="text-2xl font-black text-zinc-900 mb-2">ફેઝ ૧ (Launch)</h3>
+                            <p class="text-zinc-500 font-semibold leading-relaxed">સ્માર્ટ વિડિયો લેક્ચર્સ, એચડી ક્વોલિટી સોલ્યુશન્સ અને પાયાની ક્વિઝ ફીચર શરૂ કરવામાં આવી.</p>
+                        </div>
+                    </div>
+                    <div class="absolute left-0 md:left-1/2 top-0 md:top-auto w-10 h-10 gradient-brand rounded-full border-4 border-white shadow-xl z-20 flex items-center justify-center transform -translate-x-[15px] md:-translate-x-1/2">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                    </div>
+                    <div class="md:w-1/2 pl-12">
+                        <div class="md:hidden mb-4">
+                            <h3 class="text-xl font-black text-zinc-900 mb-1">ફેઝ ૧ (Launch)</h3>
+                        </div>
+                        <div class="bg-zinc-50 p-8 rounded-[2rem] border border-zinc-100 shadow-sm card-hover">
+                            <span class="inline-block px-3 py-1 bg-green-100 text-green-600 text-[10px] font-bold rounded-full uppercase tracking-tighter mb-4">સક્રિય</span>
+                            <p class="text-zinc-600 font-medium md:hidden">સ્માર્ટ વિડિયો લેક્ચર્સ, એચડી ક્વોલિટી સોલ્યુશન્સ અને પાયાની ક્વિઝ શરૂ કરવામાં આવી.</p>
+                            <ul class="space-y-3 mt-4 text-sm font-bold text-zinc-500">
+                                <li class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-green-500"></div>૫૦૦+ વિડિયો લેક્ચર્સ</li>
+                                <li class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-green-500"></div>ઝડપી વિડિયો પ્લેયર</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Roadmap Item 2 -->
+                <div class="roadmap-item relative mb-24 md:mb-32 flex flex-col md:flex-row-reverse md:justify-between items-start md:items-center w-full">
+                    <div class="hidden md:block w-1/2 pl-12 text-left">
+                        <div>
+                            <h3 class="text-2xl font-black text-zinc-900 mb-2">ફેઝ ૨ (Upcoming)</h3>
+                            <p class="text-zinc-500 font-semibold leading-relaxed">લાઈવ શંકા નિવારણ સત્રો અને પ્રીમિયમ પીડીએફ નોટ્સ, જે વિદ્યાર્થીઓને વધુ ઊંડાણપૂર્વક સમજવામાં મદદ કરશે.</p>
+                        </div>
+                    </div>
+                    <div class="absolute left-0 md:left-1/2 top-0 md:top-auto w-10 h-10 bg-white border-4 border-orange-100 rounded-full shadow-xl z-20 flex items-center justify-center transform -translate-x-[15px] md:-translate-x-1/2">
+                         <div class="w-3 h-3 bg-orange-500 rounded-full animate-pulse"></div>
+                    </div>
+                    <div class="md:w-1/2 pr-12 text-right">
+                        <div class="md:hidden mb-4 text-left pl-12">
+                            <h3 class="text-xl font-black text-zinc-900 mb-1">ફેઝ ૨ (Upcoming)</h3>
+                        </div>
+                        <div class="bg-zinc-50 p-8 rounded-[2rem] border border-zinc-100 shadow-sm card-hover text-left md:text-right">
+                            <span class="inline-block px-3 py-1 bg-orange-100 text-orange-600 text-[10px] font-bold rounded-full uppercase tracking-tighter mb-4">ટૂંક સમયમાં</span>
+                            <p class="text-zinc-600 font-medium md:hidden text-left">લાઈવ શંકા નિવારણ સત્રો અને પ્રીમિયમ પીડીએફ નોટ્સ.</p>
+                            <ul class="space-y-3 mt-4 text-sm font-bold text-zinc-500">
+                                <li class="flex items-center justify-start md:justify-end gap-2 text-left md:text-right"><div class="w-1.5 h-1.5 rounded-full bg-orange-400"></div>લાઈવ ડાઉટ સેશન્સ</li>
+                                <li class="flex items-center justify-start md:justify-end gap-2 text-left md:text-right"><div class="w-1.5 h-1.5 rounded-full bg-orange-400"></div>પ્રીમિયમ ડાઉનલોડ્સ</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Roadmap Item 3 -->
+                <div class="roadmap-item relative mb-24 md:mb-32 flex flex-col md:flex-row md:justify-between items-start md:items-center w-full">
+                    <div class="hidden md:block w-1/2 pr-12 text-right">
+                        <div>
+                            <h3 class="text-2xl font-black text-zinc-900 mb-2">ફેઝ ૩ (Technology)</h3>
+                            <p class="text-zinc-500 font-semibold leading-relaxed">એઆઈ-આધારિત પર્સનલાઈઝ્ડ શીખવાની રીત, જે દરેક વિદ્યાર્થીની જરૂરિયાત મુજબ અભ્યાસક્રમ તૈયાર કરશે.</p>
+                        </div>
+                    </div>
+                    <div class="absolute left-0 md:left-1/2 top-0 md:top-auto w-10 h-10 bg-white border-4 border-zinc-100 rounded-full shadow-xl z-20 flex items-center justify-center transform -translate-x-[15px] md:-translate-x-1/2">
+                        <div class="w-3 h-3 bg-zinc-300 rounded-full"></div>
+                    </div>
+                    <div class="md:w-1/2 pl-12">
+                         <div class="md:hidden mb-4">
+                            <h3 class="text-xl font-black text-zinc-900 mb-1">ફેઝ ૩ (Expansion)</h3>
+                        </div>
+                        <div class="bg-zinc-50 p-8 rounded-[2rem] border border-zinc-100 shadow-sm card-hover">
+                           <p class="text-zinc-600 font-medium md:hidden">એઆઈ-આધારિત પર્સનલાઈઝ્ડ અને સ્માર્ટ લર્નિંગ સિસ્ટમ.</p>
+                            <ul class="space-y-3 mt-4 text-sm font-bold text-zinc-500">
+                                <li class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-zinc-300"></div>AI લર્નિંગ આસિસ્ટન્ટ</li>
+                                <li class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-zinc-300"></div>પરફોર્મન્સ એનાલિટિક્સ</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
