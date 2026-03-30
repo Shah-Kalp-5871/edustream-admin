@@ -52,48 +52,59 @@
             <!-- Backdrop -->
             <div class="absolute inset-0 bg-zinc-900/60 backdrop-blur-sm opacity-0" id="mobile-menu-backdrop"></div>
             
-            <!-- Side Panel -->
-            <div class="absolute top-0 right-0 h-full w-[85%] max-w-sm bg-white shadow-2xl translate-x-full flex flex-col p-8" id="mobile-menu-panel">
+            <!-- Side Panel (Full Width Solid) -->
+            <div class="absolute top-0 right-0 h-full w-full bg-white shadow-2xl translate-x-full flex flex-col p-8 overflow-y-auto" id="mobile-menu-panel">
                 <!-- Branded Header inside menu -->
-                <div class="flex items-center justify-between mb-12">
+                <div class="flex items-center justify-between mb-16">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 gradient-brand rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-orange-100">GS</div>
+                        <div class="w-12 h-12 gradient-brand rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-xl shadow-orange-200">GS</div>
                         <div class="flex flex-col">
-                            <span class="text-sm font-black text-zinc-900 leading-none">GUJJU</span>
-                            <span class="text-sm font-black text-orange-500 leading-none">SCHOLAR</span>
+                            <span class="text-xl font-black text-zinc-900 leading-none">GUJJU</span>
+                            <span class="text-xl font-black text-orange-500 leading-none">SCHOLAR</span>
                         </div>
                     </div>
                     
                     <!-- Close Button -->
-                    <button class="bg-zinc-100 text-zinc-900 p-3 rounded-xl hover:bg-zinc-200 transition-all active:scale-95" id="menu-close">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    <button class="bg-zinc-100 text-zinc-900 p-4 rounded-2xl hover:bg-zinc-200 transition-all active:scale-95 shadow-sm" id="menu-close">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
                 
-                <nav class="flex flex-col gap-6">
-                    <a href="#about" class="text-2xl font-bold text-zinc-900 mobile-link hover:text-orange-500 transition-all flex items-center justify-between group">
-                        About Us
-                        <svg class="w-5 h-5 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
-                    </a>
-                    <a href="#features" class="text-2xl font-bold text-zinc-900 mobile-link hover:text-orange-500 transition-all flex items-center justify-between group">
-                        Features
-                        <svg class="w-5 h-5 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
-                    </a>
-                    <a href="#download" class="text-2xl font-bold text-zinc-900 mobile-link hover:text-orange-500 transition-all flex items-center justify-between group">
-                        Download App
-                        <svg class="w-5 h-5 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
-                    </a>
-                    <div class="h-px bg-zinc-100 my-4"></div>
-                    <a href="/login" class="text-2xl font-bold text-orange-600 mobile-link hover:scale-105 origin-left transition-transform">
+                <!-- Menu Content -->
+                <div class="flex flex-col items-center text-center flex-grow">
+                    <!-- Verification Badge -->
+                    <div class="menu-item inline-flex items-center gap-2 px-6 pt-3 pb-2.5 rounded-full bg-orange-50 text-orange-600 text-[10px] font-bold uppercase tracking-wider mb-8 border border-orange-100">
+                        <span class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
+                        ચકાસાયેલ શૈક્ષણિક પ્લેટફોર્મ
+                    </div>
+
+                    <!-- Main Heading -->
+                    <h2 class="menu-item text-4xl font-black text-zinc-900 mb-4 tracking-tight leading-tight">
+                        માતૃભાષામાં <br>
+                        <span class="text-orange-500">સર્વોત્તમ</span> <br>
+                        શિક્ષણ.
+                    </h2>
+
+                    <!-- Admin Login -->
+                    <a href="/login" class="menu-item text-2xl font-black text-orange-600 hover:scale-110 transition-transform mb-10 py-2">
                         Admin Login
                     </a>
-                </nav>
-                
-                <!-- Bottom Branding -->
-                <div class="mt-auto">
-                    <div class="p-6 bg-orange-50 rounded-2xl border border-orange-100">
-                        <div class="text-orange-600 font-bold text-xs uppercase tracking-widest mb-1">Revolutionizing</div>
-                        <div class="text-zinc-900 font-black text-lg leading-tight">Local Learning</div>
+
+                    <!-- Revolutionizing Card -->
+                    <div class="menu-item p-8 bg-orange-50 rounded-[2.5rem] border border-orange-100 mb-10 w-full max-w-xs shadow-sm shadow-orange-100/50">
+                        <div class="text-orange-600 font-bold text-xs uppercase tracking-[0.2em] mb-2">Revolutionizing</div>
+                        <div class="text-zinc-900 font-black text-2xl leading-none">Local Learning</div>
+                    </div>
+
+                    <!-- CTA Buttons -->
+                    <div class="menu-item flex flex-col gap-4 w-full mt-auto">
+                        <a href="#download" class="gradient-brand px-10 py-5 rounded-[2rem] text-white font-bold text-lg flex items-center justify-center gap-3 shadow-2xl shadow-orange-200 hover:scale-[1.02] active:scale-95 transition-all text-center">
+                            એપ ડાઉનલોડ કરો
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </a>
+                        <a href="#roadmap" class="bg-white border-2 border-zinc-100 px-10 py-5 rounded-[2rem] text-zinc-600 font-bold text-lg hover:bg-zinc-50 transition-all text-center">
+                            રોડમેપ
+                        </a>
                     </div>
                 </div>
             </div>
@@ -479,6 +490,7 @@
         const menuContainer = document.getElementById('mobile-menu-container');
         const menuBackdrop = document.getElementById('mobile-menu-backdrop');
         const menuPanel = document.getElementById('mobile-menu-panel');
+        const menuItems = document.querySelectorAll('.menu-item');
         const mobileLinks = document.querySelectorAll('.mobile-link');
 
         // Create a timeline for the menu
@@ -488,20 +500,25 @@
             .set(menuContainer, { display: 'block' })
             .to(menuBackdrop, { opacity: 1, duration: 0.4, ease: "power2.out" })
             .to(menuPanel, { x: 0, duration: 0.6, ease: "expo.out" }, "-=0.2")
-            .from(".mobile-link", { 
-                x: 40, 
+            .from(menuItems, { 
+                y: 20, 
                 opacity: 0, 
                 duration: 0.4, 
-                stagger: 0.1, 
-                ease: "back.out(1.7)" 
+                stagger: 0.08, 
+                ease: "power2.out" 
             }, "-=0.3");
 
         menuToggle.addEventListener('click', () => menuTl.play());
         menuClose.addEventListener('click', () => menuTl.reverse());
         menuBackdrop.addEventListener('click', () => menuTl.reverse());
         
-        mobileLinks.forEach(link => {
-            link.addEventListener('click', () => menuTl.reverse());
+        [...menuItems, ...mobileLinks].forEach(link => {
+            link.addEventListener('click', () => {
+                // Only reverse if it's actually a clickable link/button
+                if (link.tagName === 'A' || link.tagName === 'BUTTON') {
+                    menuTl.reverse();
+                }
+            });
         });
 
         // Orbit Animation
