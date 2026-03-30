@@ -90,7 +90,7 @@ class Student extends Authenticatable implements JWTSubject
     protected function avatarUrl(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => $value ? Storage::url($value) : null,
+            get: fn ($value) => $value ? Storage::disk('public')->url($value) : null,
         );
     }
 }
