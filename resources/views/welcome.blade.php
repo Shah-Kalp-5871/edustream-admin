@@ -48,7 +48,11 @@
         </div>
 
         <!-- Mobile Menu Overlay -->
-        <div class="fixed inset-0 bg-white z-[2000] flex flex-col items-center justify-center gap-10 translate-y-full transition-transform duration-500 md:hidden hidden overflow-y-auto" id="mobile-menu">
+        <!-- Mobile Menu Overlay -->
+        <div class="fixed inset-0 bg-white z-[2000] flex flex-col items-center justify-center gap-10 transition-all duration-500 md:hidden"
+             id="mobile-menu"
+             style="transform: translateY(-100%); pointer-events: none; opacity: 0;">
+            
             <!-- Branded Header inside menu -->
             <div class="absolute top-10 left-10 flex items-center gap-3">
                 <div class="w-12 h-12 gradient-brand rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-xl shadow-orange-200">GS</div>
@@ -70,7 +74,6 @@
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
 
-            <!-- Bottom Note -->
             <div class="absolute bottom-12 text-zinc-400 font-bold text-xs uppercase tracking-[0.3em]">Build for Excellence</div>
         </div>
     </nav>
@@ -456,11 +459,15 @@
 
         const toggleMenu = (show) => {
             if (show) {
-                mobileMenu.classList.remove('hidden');
-                setTimeout(() => mobileMenu.classList.remove('translate-y-full'), 10);
+                mobileMenu.style.transform = 'translateY(0)';
+                mobileMenu.style.opacity = '1';
+                mobileMenu.style.pointerEvents = 'all';
+                document.body.style.overflow = 'hidden';
             } else {
-                mobileMenu.classList.add('translate-y-full');
-                setTimeout(() => mobileMenu.classList.add('hidden'), 500);
+                mobileMenu.style.transform = 'translateY(-100%)';
+                mobileMenu.style.opacity = '0';
+                mobileMenu.style.pointerEvents = 'none';
+                document.body.style.overflow = '';
             }
         };
 
