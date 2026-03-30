@@ -35,26 +35,32 @@
             </a>
             
             <div class="hidden md:flex items-center gap-10 text-sm font-semibold text-zinc-600">
-                <a href="#about" class="hover:text-orange-600 transition-colors">અમારા વિશે</a>
-                <a href="#features" class="hover:text-orange-600 transition-colors">સુવિધાઓ</a>
-                <a href="#download" class="hover:text-orange-600 transition-colors">એપ</a>
-                <a href="/login" class="bg-zinc-900 text-white px-6 py-2.5 rounded-full hover:bg-zinc-800 transition-all shadow-md active:scale-95">એડમિન પોર્ટલ</a>
+                <a href="#about" class="hover:text-orange-600 transition-colors">About Us</a>
+                <a href="#features" class="hover:text-orange-600 transition-colors">Features</a>
+                <a href="#download" class="hover:text-orange-600 transition-colors">App</a>
+                <a href="/login" class="bg-zinc-900 text-white px-6 py-2.5 rounded-full hover:bg-zinc-800 transition-all shadow-md active:scale-95">Admin Portal</a>
             </div>
 
             <!-- Mobile Menu Toggle -->
-            <button class="md:hidden text-zinc-900 p-2" id="menu-toggle">
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="menu-icon"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            <button class="md:hidden bg-zinc-900 text-white p-3 rounded-2xl shadow-lg hover:scale-105 active:scale-95 transition-all" id="menu-toggle">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="menu-icon"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
         </div>
 
         <!-- Mobile Menu Overlay -->
-        <div class="fixed inset-0 bg-white z-[90] flex flex-col items-center justify-center gap-8 translate-y-full transition-transform duration-500 md:hidden hidden" id="mobile-menu">
-            <a href="#about" class="text-2xl font-bold text-zinc-800 mobile-link">અમારા વિશે</a>
-            <a href="#features" class="text-2xl font-bold text-zinc-800 mobile-link">સુવિધાઓ</a>
-            <a href="#download" class="text-2xl font-bold text-zinc-800 mobile-link">એપ ડાઉનલોડ</a>
-            <a href="/login" class="text-2xl font-bold text-orange-600 mobile-link">એડમિન લોગિન</a>
-            <button class="absolute top-6 right-6 text-zinc-900" id="menu-close">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        <div class="fixed inset-0 bg-white z-[110] flex flex-col items-center justify-center gap-10 translate-y-full transition-transform duration-500 md:hidden hidden" id="mobile-menu">
+            <div class="absolute top-8 left-8 flex items-center gap-3">
+                <div class="w-10 h-10 gradient-brand rounded-xl flex items-center justify-center text-white font-bold text-xl">GS</div>
+                <span class="text-2xl font-extrabold tracking-tight italic">Menu</span>
+            </div>
+            
+            <a href="#about" class="text-3xl font-black text-zinc-900 mobile-link hover:text-orange-600 transition-colors uppercase tracking-tight">About Us</a>
+            <a href="#features" class="text-3xl font-black text-zinc-900 mobile-link hover:text-orange-600 transition-colors uppercase tracking-tight">Features</a>
+            <a href="#download" class="text-3xl font-black text-zinc-900 mobile-link hover:text-orange-600 transition-colors uppercase tracking-tight">Download App</a>
+            <a href="/login" class="text-3xl font-black text-orange-600 mobile-link hover:scale-110 transition-transform uppercase tracking-tight">Admin Login</a>
+            
+            <button class="absolute top-8 right-8 bg-zinc-100 text-zinc-900 p-4 rounded-2xl hover:bg-zinc-200 transition-all shadow-sm" id="menu-close">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
         </div>
     </nav>
