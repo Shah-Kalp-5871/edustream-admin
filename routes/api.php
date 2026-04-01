@@ -26,7 +26,6 @@ Route::group(['prefix' => 'auth'], function () {
 
 Route::group(['prefix' => 'public'], function () {
     Route::get('/courses', [ContentApiController::class, 'allCourses']);
-    Route::get('/app-version', [ContentApiController::class, 'getAppVersion']);
 });
 
 // Protected Routes (Student JWT)

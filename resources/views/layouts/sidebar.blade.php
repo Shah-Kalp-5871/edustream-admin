@@ -59,10 +59,6 @@
             Settings
         </a>
 
-        <a href="{{ route('settings.app-release') }}" class="nav-link {{ request()->is('settings/app-release') ? 'active' : '' }}">
-            <span class="nav-icon"><i class="fas fa-mobile-screen-button"></i></span>
-            App Release
-        </a>
     </nav>
 
     <div class="sidebar-footer">

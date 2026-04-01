@@ -22,6 +22,99 @@
         .card-hover { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .card-hover:hover { transform: translateY(-10px); box-shadow: 0 25px 50px -12px rgba(249, 115, 22, 0.15); }
         .mockup-frame { box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.25), 0 30px 60px -30px rgba(0, 0, 0, 0.3); }
+
+        /* ── Download Progress Modal ── */
+        #apk-download-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: rgba(10, 20, 50, 0.75);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            align-items: center;
+            justify-content: center;
+        }
+        #apk-download-modal.show {
+            display: flex;
+        }
+        .apk-modal-card {
+            background: #f3f4f6;
+            border-radius: 20px;
+            padding: 36px 32px 32px;
+            width: 320px;
+            max-width: 90vw;
+            text-align: left;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+            position: relative;
+            overflow: hidden;
+            animation: modalPop 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
+        }
+        @keyframes modalPop {
+            from { opacity: 0; transform: scale(0.85) translateY(20px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .apk-modal-icon {
+            width: 52px;
+            height: 52px;
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 24px rgba(249,115,22,0.35);
+        }
+        .apk-modal-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: #111827;
+            margin-bottom: 20px;
+            line-height: 1.25;
+        }
+        .apk-progress-track {
+            width: 100%;
+            height: 5px;
+            background: #d1d5db;
+            border-radius: 99px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+        .apk-progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #f97316, #ea580c);
+            border-radius: 99px;
+            transition: width 0.2s ease;
+        }
+        .apk-progress-pct {
+            font-size: 14px;
+            font-weight: 600;
+            color: #6b7280;
+            text-align: center;
+        }
+        .apk-modal-done {
+            display: none;
+            margin-top: 16px;
+            padding: 12px;
+            background: #f0fdf4;
+            border-radius: 12px;
+            color: #16a34a;
+            font-size: 13px;
+            font-weight: 700;
+            text-align: center;
+        }
+        .apk-modal-error {
+            display: none;
+            margin-top: 16px;
+            padding: 12px;
+            background: #fef2f2;
+            border-radius: 12px;
+            color: #dc2626;
+            font-size: 13px;
+            font-weight: 700;
+            text-align: center;
+        }
     </style>
 </head>
 <body class="bg-[#fafafa] text-zinc-900 selection:bg-orange-100 selection:text-orange-600 overflow-x-hidden">
@@ -241,7 +334,7 @@
                 <p class="text-zinc-400 text-lg mb-12 max-w-lg leading-relaxed font-medium">ગુજ્જુ સ્કોલરની આખી લાઈબ્રેરી તમારી સાથે રાખો. ઓફલાઇન ડાઉનલોડ કરો, પ્રગતિ ટ્રૅક કરો અને વિશ્વમાં ગમે ત્યાં શીખો.</p>
                 
                 <div class="flex flex-col sm:flex-row gap-5">
-                    <a href="/downloads/gujjuscholar.apk" download="GujjuScholar.apk" class="group flex items-center gap-4 bg-white px-8 py-5 rounded-[2rem] hover:scale-105 active:scale-95 transition-all shadow-2xl">
+                    <a id="apk-download-btn" href="/downloads/gujjuscholar.apk" class="group flex items-center gap-4 bg-white px-8 py-5 rounded-[2rem] hover:scale-105 active:scale-95 transition-all shadow-2xl cursor-pointer">
                         <svg class="w-10 h-10 text-zinc-900" fill="currentColor" viewBox="0 0 24 24"><path d="M17.523 15.3414C17.7944 14.8643 18 14.3033 18 13.75C18 12.0152 16.4848 10.5 14.75 10.5C14.1967 10.5 13.6357 10.7056 13.1586 10.977C12.4497 9.47525 10.8711 8.5 9.08333 8.5C6.44684 8.5 4.25 10.6968 4.25 13.3333C4.25 13.6276 4.27892 13.916 4.33383 14.1953C2.95542 14.8143 2 16.2736 2 17.9167C2 20.3117 3.93833 22.25 6.33333 22.25H17.6667C20.0617 22.25 22 20.3117 22 17.9167C22 15.9084 20.2155 14.2372 17.523 15.3414Z"></path></svg>
                         <div class="text-left text-zinc-900">
                             <div class="text-[10px] uppercase font-bold tracking-widest opacity-60">માટે ઉપલબ્ધ</div>
@@ -456,6 +549,24 @@
         </div>
     </footer>
 
+    <!-- APK Download Progress Modal -->
+    <div id="apk-download-modal" role="dialog" aria-modal="true" aria-label="Downloading APK">
+        <div class="apk-modal-card">
+            <div class="apk-modal-icon">
+                <svg width="28" height="28" fill="none" viewBox="0 0 24 24">
+                    <path d="M12 16L7 11l1.4-1.4 2.6 2.6V4h2v8.2l2.6-2.6L17 11l-5 5zm-6 2h12v2H6v-2z" fill="white"/>
+                </svg>
+            </div>
+            <div class="apk-modal-title" id="apk-modal-title">Downloading App...</div>
+            <div class="apk-progress-track">
+                <div class="apk-progress-fill" id="apk-progress-fill"></div>
+            </div>
+            <div class="apk-progress-pct" id="apk-progress-pct">0%</div>
+            <div class="apk-modal-done" id="apk-modal-done">✓ Download complete! Saving file...</div>
+            <div class="apk-modal-error" id="apk-modal-error">Download failed. Please try again.</div>
+        </div>
+    </div>
+
     <script>
         gsap.registerPlugin(ScrollTrigger);
 
@@ -587,6 +698,106 @@
                 }
             });
         });
+        // ── APK Download with Progress Modal ──
+        (function () {
+            const btn = document.getElementById('apk-download-btn');
+            const modal = document.getElementById('apk-download-modal');
+            const fill = document.getElementById('apk-progress-fill');
+            const pct = document.getElementById('apk-progress-pct');
+            const title = document.getElementById('apk-modal-title');
+            const doneMsg = document.getElementById('apk-modal-done');
+            const errMsg = document.getElementById('apk-modal-error');
+
+            if (!btn) return;
+
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                // Reset modal state
+                fill.style.width = '0%';
+                pct.textContent = '0%';
+                title.textContent = 'Downloading App...';
+                doneMsg.style.display = 'none';
+                errMsg.style.display = 'none';
+                modal.classList.add('show');
+
+                const apkUrl = '/downloads/gujjuscholar.apk';
+                const filename = 'GujjuScholar.apk';
+
+                fetch(apkUrl)
+                    .then(function (response) {
+                        if (!response.ok) throw new Error('Server error: ' + response.status);
+
+                        const contentLength = response.headers.get('Content-Length');
+                        const total = contentLength ? parseInt(contentLength, 10) : null;
+                        let loaded = 0;
+                        const chunks = [];
+
+                        const reader = response.body.getReader();
+
+                        function pump() {
+                            return reader.read().then(function (result) {
+                                if (result.done) return;
+
+                                const chunk = result.value;
+                                chunks.push(chunk);
+                                loaded += chunk.length;
+
+                                if (total) {
+                                    const progress = Math.min(Math.round((loaded / total) * 100), 99);
+                                    fill.style.width = progress + '%';
+                                    pct.textContent = progress + '%';
+                                } else {
+                                    // No Content-Length — simulate indeterminate progress
+                                    const mb = (loaded / (1024 * 1024)).toFixed(1);
+                                    pct.textContent = mb + ' MB downloaded...';
+                                    fill.style.width = Math.min((loaded / (70 * 1024 * 1024)) * 100, 95) + '%';
+                                }
+
+                                return pump();
+                            });
+                        }
+
+                        return pump().then(function () {
+                            // All chunks received — assemble blob
+                            const blob = new Blob(chunks, { type: 'application/vnd.android.package-archive' });
+                            const blobUrl = URL.createObjectURL(blob);
+
+                            fill.style.width = '100%';
+                            pct.textContent = '100%';
+                            title.textContent = 'Download Complete!';
+                            doneMsg.style.display = 'block';
+
+                            // Trigger browser save
+                            const a = document.createElement('a');
+                            a.href = blobUrl;
+                            a.download = filename;
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+
+                            // Clean up and close modal after short delay
+                            setTimeout(function () {
+                                URL.revokeObjectURL(blobUrl);
+                                modal.classList.remove('show');
+                            }, 2500);
+                        });
+                    })
+                    .catch(function (err) {
+                        console.error('APK download error:', err);
+                        errMsg.textContent = 'Download failed. Please try again.';
+                        errMsg.style.display = 'block';
+                        title.textContent = 'Download Failed';
+                        fill.style.background = '#ef4444';
+
+                        // Let user dismiss after error
+                        setTimeout(function () {
+                            modal.classList.remove('show');
+                            fill.style.background = '';
+                        }, 3500);
+                    });
+            });
+        })();
     </script>
 </body>
 </html>
