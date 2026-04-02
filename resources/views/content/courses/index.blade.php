@@ -86,9 +86,6 @@
     <a href="{{ url('/content/course/create') }}" class="quick-action-btn" style="text-decoration: none;">
         <i class="fa-solid fa-plus"></i> Add New Course
     </a>
-    <button class="quick-action-btn" onclick="openModal('importModal')">
-        <i class="fa-solid fa-upload"></i> Import
-    </button>
 @endsection
 
 @section('content')

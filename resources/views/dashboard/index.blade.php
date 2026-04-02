@@ -3,9 +3,9 @@
 @section('subtitle', 'Welcome back! Here\'s what\'s happening with GujjuScholar today.')
 
 @section('actions')
-    <button class="btn btn-secondary">
+    <a href="{{ route('dashboard.export') }}" class="btn btn-secondary">
         <i class="fas fa-download"></i> Export Report
-    </button>
+    </a>
     <a href="{{ url('content') }}" class="btn btn-primary">
         <i class="fas fa-plus"></i> Add Content
     </a>

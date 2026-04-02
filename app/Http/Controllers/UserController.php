@@ -36,4 +36,40 @@ class UserController extends Controller
     {
         return view('users.edit');
     }
+    public function export()
+    {
+        $fileName = 'users_report_' . date('Y-m-d') . '.csv';
+        $students = Student::orderBy('created_at', 'desc')->get();
+
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        $columns = ['ID', 'Name', 'Email', 'Mobile', 'Plan', 'Status', 'Joined Date'];
+
+        $callback = function() use($students, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            foreach ($students as $student) {
+                fputcsv($file, [
+                    $student->id,
+                    $student->name,
+                    $student->email,
+                    $student->mobile,
+                    ucfirst($student->plan),
+                    ucfirst($student->status),
+                    $student->created_at->format('Y-m-d H:i:s')
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 }

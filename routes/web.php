@@ -43,6 +43,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::middleware(['auth'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index']);
+    Route::get('/dashboard/export', [DashboardController::class, 'exportReport'])->name('dashboard.export');
 
 // Category Routes
 Route::get('/content/categories', [CategoryController::class, 'index']);
@@ -117,6 +118,7 @@ Route::delete('/quiz/option/{id}', [QuizController::class, 'deleteOption']);
 
 // User Routes
 Route::get('/users', [UserController::class, 'index']);
+Route::get('/users/export', [UserController::class, 'export'])->name('users.export');
 Route::post('/users/{id}/toggle-status', [UserController::class, 'toggleStatus']);
 Route::get('/users/{id}', [UserController::class, 'show']);
 Route::get('/users/{id}/edit', [UserController::class, 'edit']);

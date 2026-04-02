@@ -3,9 +3,9 @@
 @section('subtitle', 'Manage your student community, track progress and activity.')
 
 @section('actions')
-    <button class="btn btn-secondary">
+    <a href="{{ route('users.export') }}" class="btn btn-secondary">
         <i class="fas fa-download"></i> Export
-    </button>
+    </a>
     <button class="btn btn-primary">
         <i class="fas fa-user-plus"></i> Add Student
     </button>
