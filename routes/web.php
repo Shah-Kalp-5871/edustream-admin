@@ -125,6 +125,7 @@ Route::get('/users/{id}/edit', [UserController::class, 'edit']);
 
 // Order Routes
 Route::get('/orders', [OrderController::class, 'index']);
+Route::get('/orders/export', [OrderController::class, 'export'])->name('orders.export');
 Route::get('/orders/{id}', [OrderController::class, 'show']);
 Route::get('/orders/{id}/invoice', [OrderController::class, 'invoice']);
 

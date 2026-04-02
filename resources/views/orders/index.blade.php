@@ -3,9 +3,9 @@
 @section('subtitle', 'Track and manage all orders, payments, and purchased items.')
 
 @section('actions')
-    <button class="btn btn-secondary">
+    <a href="{{ route('orders.export') }}" class="btn btn-secondary">
         <i class="fas fa-file-invoice"></i> Export CSV
-    </button>
+    </a>
     <button class="btn btn-primary">
         <i class="fas fa-plus"></i> Manual Enrollment
     </button>

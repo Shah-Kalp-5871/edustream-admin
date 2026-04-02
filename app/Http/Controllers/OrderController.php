@@ -32,4 +32,47 @@ class OrderController extends Controller
     {
         return view('orders.invoice');
     }
+    public function export()
+    {
+        $fileName = 'orders_report_' . date('Y-m-d') . '.csv';
+        $orders = Order::with(['student', 'items.item'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        $columns = ['Order ID', 'Student', 'Email', 'Items', 'Amount', 'Payment Status', 'Method', 'Date'];
+
+        $callback = function() use($orders, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            foreach ($orders as $order) {
+                $items = $order->items->map(function($item) {
+                    return $item->item?->name ?? $item->item?->title ?? ucfirst($item->item_type);
+                })->implode(', ');
+
+                fputcsv($file, [
+                    $order->order_number ?? '#ORD-'.$order->id,
+                    $order->student?->name ?? 'N/A',
+                    $order->student?->email ?? 'N/A',
+                    $items,
+                    '₹' . number_format($order->total_amount ?? 0),
+                    ucfirst($order->payment_status),
+                    strtoupper($order->payment_method ?? 'N/A'),
+                    $order->created_at->format('Y-m-d H:i:s')
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 }
