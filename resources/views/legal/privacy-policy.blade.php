@@ -17,6 +17,7 @@
                 <ul class="list-disc pl-5 space-y-2">
                     <li><strong>Personal Information:</strong> Name, email address, and phone number when you register for an account.</li>
                     <li><strong>Usage Data:</strong> Information about how you use our app and website.</li>
+                    <li><strong>Camera and Photos:</strong> We request access to your device's camera and gallery to allow you to upload or capture a profile picture. These images are only collected to personalize your profile and are not shared with any third party.</li>
                 </ul>
             </div>
         </section>
@@ -78,6 +79,7 @@
                 <ul class="list-disc pl-5 space-y-2">
                     <li><strong>વ્યક્તિગત માહિતી:</strong> જ્યારે તમે એકાઉન્ટ માટે નોંધણી કરો છો ત્યારે નામ, ઈમેલ સરનામું અને ફોન નંબર.</li>
                     <li><strong>વપરાશ ડેટા:</strong> તમે અમારી એપ્લિકેશન અને વેબસાઇટનો ઉપયોગ કેવી રીતે કરો છો તે વિશેની માહિતી.</li>
+                    <li><strong>કેમેરા અને ફોટા:</strong> અમે તમારા ઉપકરણના કેમેરા અને ગેલેરીની ઍક્સેસની વિનંતી કરીએ છીએ જેથી તમે પ્રોફાઇલ પિક્ચર અપલોડ અથવા કેપ્ચર કરી શકો. આ છબીઓ ફક્ત તમારી પ્રોફાઇલને વ્યક્તિગત કરવા માટે એકત્રિત કરવામાં આવે છે અને કોઈ તૃતીય પક્ષ સાથે શેર કરવામાં આવતી નથી.</li>
                 </ul>
             </div>
         </section>
