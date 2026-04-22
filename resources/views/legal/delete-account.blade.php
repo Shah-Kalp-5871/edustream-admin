@@ -73,24 +73,21 @@
                     <span x-show="lang === 'en'">We've sent a code to <span class="text-zinc-900 font-bold" x-text="email"></span></span>
                     <span x-show="lang === 'gu'">અમે <span class="text-zinc-900 font-bold" x-text="email"></span> પર કોડ મોકલ્યો છે</span>
                 </p>
-                <button @click="step = 1; errorMessage = ''" class="mt-2 text-orange-600 font-bold text-sm hover:underline">
+                <button @click="step = 1; errorMessage = ''; otp = ''" class="mt-2 text-orange-600 font-bold text-sm hover:underline">
                     <span x-show="lang === 'en'">Change Email</span>
                     <span x-show="lang === 'gu'">ઈમેલ બદલો</span>
                 </button>
             </section>
 
-            <form action="{{ route('delete-account.request') }}" method="POST" class="space-y-6">
-                @csrf
-                <input type="hidden" name="email" :value="email">
-                
+            <div class="space-y-6">
                 <div>
                     <label class="block text-sm font-bold text-zinc-700 mb-2">
                         <span x-show="lang === 'en'">Enter 6-Digit OTP</span>
                         <span x-show="lang === 'gu'">૬-આંકડાનો OTP દાખલ કરો</span>
                     </label>
-                    <input type="text" name="otp" maxlength="6" required placeholder="000000" 
+                    <input type="text" x-model="otp" maxlength="6" placeholder="000000" 
                            class="w-full px-5 py-4 text-center text-2xl tracking-[0.5em] font-black rounded-2xl bg-zinc-50 border border-zinc-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition-all outline-none">
-                    @error('otp') <p class="text-red-500 text-xs mt-2 font-bold">{{ $message }}</p> @enderror
+                    <p x-show="otpError" x-text="otpError" class="text-red-500 text-xs mt-2 font-bold"></p>
                 </div>
 
                 <div>
@@ -98,7 +95,7 @@
                         <span x-show="lang === 'en'">Reason for Deletion (Optional)</span>
                         <span x-show="lang === 'gu'">ડિલીટ કરવાનું કારણ (વૈકલ્પિક)</span>
                     </label>
-                    <textarea name="reason" rows="3" 
+                    <textarea x-model="reason" rows="3" 
                               class="w-full px-5 py-4 rounded-2xl bg-zinc-50 border border-zinc-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition-all outline-none font-medium"></textarea>
                 </div>
 
@@ -110,11 +107,17 @@
                     </p>
                 </div>
 
-                <button type="submit" class="w-full py-4 bg-red-600 text-white rounded-2xl font-black text-lg shadow-xl shadow-red-600/20 hover:bg-red-700 hover:-translate-y-1 transition-all active:scale-95">
-                    <span x-show="lang === 'en'">Confirm & Submit Deletion</span>
-                    <span x-show="lang === 'gu'">પુષ્ટિ કરો અને સબમિટ કરો</span>
+                <button @click="submitDeletion" :disabled="loading"
+                        class="w-full py-4 bg-red-600 text-white rounded-2xl font-black text-lg shadow-xl shadow-red-600/20 hover:bg-red-700 hover:-translate-y-1 transition-all active:scale-95 disabled:opacity-50">
+                    <span x-show="!loading">
+                        <span x-show="lang === 'en'">Confirm & Submit Deletion</span>
+                        <span x-show="lang === 'gu'">પુષ્ટિ કરો અને સબમિટ કરો</span>
+                    </span>
+                    <span x-show="loading" class="flex items-center justify-center gap-2">
+                         <svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    </span>
                 </button>
-            </form>
+            </div>
         </div>
     </div>
 
@@ -124,27 +127,11 @@
             return {
                 step: 1,
                 email: '',
+                otp: '',
+                reason: '',
                 loading: false,
                 errorMessage: '',
-                init() {
-                    @if(session('success'))
-                        let successMsg = document.documentElement.lang === 'gu' 
-                            ? "{{ session('success')['gu'] }}" 
-                            : "{{ session('success')['en'] }}";
-                        
-                        Swal.fire({
-                            title: document.documentElement.lang === 'gu' ? 'સફળ!' : 'Success!',
-                            text: successMsg,
-                            icon: 'success',
-                            confirmButtonColor: '#ea580c',
-                            confirmButtonText: document.documentElement.lang === 'gu' ? 'બરાબર' : 'Okay',
-                            customClass: {
-                                popup: 'rounded-[1.5rem]',
-                                confirmButton: 'rounded-xl font-bold px-8 py-3'
-                            }
-                        });
-                    @endif
-                },
+                otpError: '',
                 sendOtp() {
                     if (!this.email) return;
                     this.loading = true;
@@ -154,7 +141,8 @@
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
                         },
                         body: JSON.stringify({ email: this.email })
                     })
@@ -177,6 +165,56 @@
                     })
                     .catch(error => {
                         this.errorMessage = 'No account found with this email.';
+                    })
+                    .finally(() => {
+                        this.loading = false;
+                    });
+                },
+                submitDeletion() {
+                    if (!this.otp) {
+                        this.otpError = document.documentElement.lang === 'gu' ? 'OTP આવશ્યક છે' : 'OTP is required';
+                        return;
+                    }
+                    this.loading = true;
+                    this.otpError = '';
+
+                    fetch('{{ route("delete-account.request") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ 
+                            email: this.email,
+                            otp: this.otp,
+                            reason: this.reason
+                        })
+                    })
+                    .then(async response => {
+                        const data = await response.json();
+                        if (response.ok && data.success) {
+                            let successMsg = document.documentElement.lang === 'gu' ? data.message.gu : data.message.en;
+                            
+                            Swal.fire({
+                                title: document.documentElement.lang === 'gu' ? 'સફળ!' : 'Success!',
+                                text: successMsg,
+                                icon: 'success',
+                                confirmButtonColor: '#ea580c',
+                                confirmButtonText: document.documentElement.lang === 'gu' ? 'બરાબર' : 'Okay',
+                                customClass: {
+                                    popup: 'rounded-[1.5rem]',
+                                    confirmButton: 'rounded-xl font-bold px-8 py-3'
+                                }
+                            }).then(() => {
+                                window.location.href = '/';
+                            });
+                        } else {
+                            this.otpError = data.message || 'Verification failed.';
+                        }
+                    })
+                    .catch(error => {
+                        this.otpError = 'Error submitting request. Please try again.';
                     })
                     .finally(() => {
                         this.loading = false;

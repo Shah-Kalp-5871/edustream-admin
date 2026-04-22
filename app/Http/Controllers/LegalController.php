@@ -48,13 +48,16 @@ class LegalController extends Controller
         ]);
 
         $verification = \App\Models\OtpVerification::where('email', $request->email)
-            ->where('purpose', 'reset') // Reusing reset purpose for convenience
+            ->where('purpose', 'reset')
             ->where('otp', $request->otp)
             ->where('expires_at', '>', now())
             ->whereNull('verified_at')
             ->first();
 
         if (!$verification) {
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'Invalid or expired OTP.'], 422);
+            }
             return back()->withErrors(['otp' => 'Invalid or expired OTP.'])->withInput();
         }
 
@@ -62,6 +65,16 @@ class LegalController extends Controller
         $verification->update(['verified_at' => now()]);
 
         AccountDeletionRequest::create($request->only('email', 'reason'));
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true, 
+                'message' => [
+                    'gu' => 'તમારી એકાઉન્ટ ડિલીટ કરવાની વિનંતી સફળતાપૂર્વક ચકાસવામાં આવી છે અને સબમિટ કરવામાં આવી છે.',
+                    'en' => 'Your account deletion request has been verified and submitted successfully.'
+                ]
+            ]);
+        }
 
         return back()->with('success', [
             'gu' => 'તમારી એકાઉન્ટ ડિલીટ કરવાની વિનંતી સફળતાપૂર્વક ચકાસવામાં આવી છે અને સબમિટ કરવામાં આવી છે.',
