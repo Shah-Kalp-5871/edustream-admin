@@ -16,117 +16,157 @@
         </div>
     @endif
 
-    <!-- English Content -->
-    <div x-show="lang === 'en'" x-cloak class="space-y-10 animate-fade-in translate-y-0 opacity-100 transition-all">
-        <section>
-            <p class="text-zinc-600 leading-relaxed font-medium mb-8">
-                At Gujju Scholar, we respect your privacy and give you full control over your data.
-            </p>
-
-            <h2 class="text-xl font-black text-zinc-900 mb-4 flex items-center gap-3">
-                <span class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-sm font-bold">1</span>
-                How to request account deletion
-            </h2>
-            <div class="text-zinc-600 space-y-4 leading-relaxed font-medium pl-11">
-                <ul class="list-disc pl-5 space-y-2 text-zinc-600">
-                    <li>Send an email to: <a href="mailto:info@stockpredictor.in" class="text-orange-600 font-bold hover:underline">info@stockpredictor.in</a></li>
-                    <li>Use your registered email ID</li>
-                    <li>Mention "Account Deletion Request" in the subject</li>
-                </ul>
-                <p class="mt-4 text-sm text-zinc-500 italic">OR use the form below to submit a request directly.</p>
+    <div x-data="deletionForm()" class="space-y-10">
+        <!-- Step 1: Info & Email Verification -->
+        <div x-show="step === 1" x-cloak class="space-y-10 animate-fade-in">
+            <!-- English Info -->
+            <div x-show="lang === 'en'" class="space-y-6">
+                <section>
+                    <p class="text-zinc-600 leading-relaxed font-medium mb-8">
+                        At Gujju Scholar, we respect your privacy. To request account deletion, we first need to verify your identity by sending an OTP to your registered email.
+                    </p>
+                    <h2 class="text-xl font-black text-zinc-900 mb-4 flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-sm font-bold">1</span>
+                        Verify your account
+                    </h2>
+                </section>
             </div>
-        </section>
 
-        <section>
-            <h2 class="text-xl font-black text-zinc-900 mb-4 flex items-center gap-3">
-                <span class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-sm font-bold">2</span>
-                What happens after request
-            </h2>
-            <div class="text-zinc-600 space-y-4 leading-relaxed font-medium pl-11">
-                <ul class="list-disc pl-5 space-y-2">
-                    <li>Your account will be permanently deleted within 7 working days</li>
-                    <li>All personal data including profile and activity will be removed</li>
-                    <li>Some data may be retained for legal or security purposes for a limited period</li>
-                </ul>
+            <!-- Gujarati Info -->
+            <div x-show="lang === 'gu'" class="space-y-6">
+                <section>
+                    <p class="text-zinc-600 leading-relaxed font-medium mb-8">
+                        ગુજ્જુ સ્કોલર પર, અમે તમારી ગોપનીયતાનું સન્માન કરીએ છીએ. એકાઉન્ટ ડિલીટ કરવાની વિનંતી કરવા માટે, અમારે પહેલા તમારા રજિસ્ટર્ડ ઈમેલ પર OTP મોકલીને તમારી ઓળખ ચકાસવી પડશે.
+                    </p>
+                    <h2 class="text-xl font-black text-zinc-900 mb-4 flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-sm font-bold">૧</span>
+                        તમારા એકાઉન્ટની ચકાસણી કરો
+                    </h2>
+                </section>
             </div>
-        </section>
 
-        <section class="mt-12 pt-12 border-t border-zinc-100">
-            <h2 class="text-2xl font-black text-zinc-900 mb-6">Submit Deletion Request</h2>
+            <section class="mt-8">
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-bold text-zinc-700 mb-2">
+                            <span x-show="lang === 'en'">Registered Email ID</span>
+                            <span x-show="lang === 'gu'">રજિસ્ટર્ડ ઈમેલ આઈડી</span>
+                        </label>
+                        <input type="email" x-model="email" required placeholder="example@email.com" 
+                               class="w-full px-5 py-4 rounded-2xl bg-zinc-50 border border-zinc-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition-all outline-none font-medium">
+                        <p x-show="errorMessage" x-text="errorMessage" class="text-red-500 text-xs mt-2 font-bold"></p>
+                    </div>
+                    <button @click="sendOtp" :disabled="loading" 
+                            class="w-full py-4 bg-orange-600 text-white rounded-2xl font-black text-lg shadow-xl shadow-orange-600/20 hover:bg-orange-700 hover:-translate-y-1 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <span x-show="!loading">
+                            <span x-show="lang === 'en'">Send Verification OTP</span>
+                            <span x-show="lang === 'gu'">વેરિફિકેશન OTP મોકલો</span>
+                        </span>
+                        <span x-show="loading" class="flex items-center justify-center gap-2">
+                             <svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        </span>
+                    </button>
+                </div>
+            </section>
+        </div>
+
+        <!-- Step 2: OTP & Reason Submission -->
+        <div x-show="step === 2" x-cloak class="space-y-10 animate-fade-in">
+            <section class="text-center">
+                <div class="w-16 h-16 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                </div>
+                <h2 class="text-2xl font-black text-zinc-900 mb-2">
+                    <span x-show="lang === 'en'">Check your email</span>
+                    <span x-show="lang === 'gu'">તમારો ઈમેલ તપાસો</span>
+                </h2>
+                <p class="text-zinc-500 font-medium">
+                    <span x-show="lang === 'en'">We've sent a code to <span class="text-zinc-900 font-bold" x-text="email"></span></span>
+                    <span x-show="lang === 'gu'">અમે <span class="text-zinc-900 font-bold" x-text="email"></span> પર કોડ મોકલ્યો છે</span>
+                </p>
+                <button @click="step = 1; errorMessage = ''" class="mt-2 text-orange-600 font-bold text-sm hover:underline">
+                    <span x-show="lang === 'en'">Change Email</span>
+                    <span x-show="lang === 'gu'">ઈમેલ બદલો</span>
+                </button>
+            </section>
+
             <form action="{{ route('delete-account.request') }}" method="POST" class="space-y-6">
                 @csrf
+                <input type="hidden" name="email" :value="email">
+                
                 <div>
-                    <label class="block text-sm font-bold text-zinc-700 mb-2">Registered Email ID</label>
-                    <input type="email" name="email" required placeholder="example@email.com" 
-                           class="w-full px-5 py-4 rounded-2xl bg-zinc-50 border border-zinc-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition-all outline-none font-medium">
-                    @error('email') <p class="text-red-500 text-xs mt-1 font-bold">{{ $message }}</p> @enderror
+                    <label class="block text-sm font-bold text-zinc-700 mb-2">
+                        <span x-show="lang === 'en'">Enter 6-Digit OTP</span>
+                        <span x-show="lang === 'gu'">૬-આંકડાનો OTP દાખલ કરો</span>
+                    </label>
+                    <input type="text" name="otp" maxlength="6" required placeholder="000000" 
+                           class="w-full px-5 py-4 text-center text-2xl tracking-[0.5em] font-black rounded-2xl bg-zinc-50 border border-zinc-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition-all outline-none">
+                    @error('otp') <p class="text-red-500 text-xs mt-2 font-bold">{{ $message }}</p> @enderror
                 </div>
+
                 <div>
-                    <label class="block text-sm font-bold text-zinc-700 mb-2">Reason for Deletion (Optional)</label>
-                    <textarea name="reason" rows="4" placeholder="Please tell us why you want to delete your account..."
+                    <label class="block text-sm font-bold text-zinc-700 mb-2">
+                        <span x-show="lang === 'en'">Reason for Deletion (Optional)</span>
+                        <span x-show="lang === 'gu'">ડિલીટ કરવાનું કારણ (વૈકલ્પિક)</span>
+                    </label>
+                    <textarea name="reason" rows="3" 
                               class="w-full px-5 py-4 rounded-2xl bg-zinc-50 border border-zinc-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition-all outline-none font-medium"></textarea>
                 </div>
-                <button type="submit" class="w-full py-4 bg-orange-600 text-white rounded-2xl font-black text-lg shadow-xl shadow-orange-600/20 hover:bg-orange-700 hover:-translate-y-1 transition-all active:scale-95">
-                    Request Deletion
+
+                <div class="bg-red-50 p-4 rounded-2xl border border-red-100 flex items-start gap-3">
+                    <svg class="w-5 h-5 text-red-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <p class="text-xs text-red-600 font-bold leading-relaxed">
+                        <span x-show="lang === 'en'">Warning: This action is permanent. Once your request is processed, all your data will be permanently removed.</span>
+                        <span x-show="lang === 'gu'">ચેતવણી: આ પ્રક્રિયા કાયમી છે. એકવાર તમારી વિનંતી પર પ્રક્રિયા થઈ જાય પછી, તમારો તમામ ડેટા કાયમી ધોરણે દૂર કરવામાં આવશે.</span>
+                    </p>
+                </div>
+
+                <button type="submit" class="w-full py-4 bg-red-600 text-white rounded-2xl font-black text-lg shadow-xl shadow-red-600/20 hover:bg-red-700 hover:-translate-y-1 transition-all active:scale-95">
+                    <span x-show="lang === 'en'">Confirm & Submit Deletion</span>
+                    <span x-show="lang === 'gu'">પુષ્ટિ કરો અને સબમિટ કરો</span>
                 </button>
             </form>
-        </section>
+        </div>
     </div>
 
-    <!-- Gujarati Content -->
-    <div x-show="lang === 'gu'" x-cloak class="space-y-10 animate-fade-in translate-y-0 opacity-100 transition-all">
-        <section>
-            <p class="text-zinc-600 leading-relaxed font-medium mb-8">
-                ગુજ્જુ સ્કોલર પર, અમે તમારી ગોપનીયતાનું સન્માન કરીએ છીએ અને તમને તમારા ડેટા પર સંપૂર્ણ નિયંત્રણ આપીએ છીએ.
-            </p>
+    @push('scripts')
+    <script>
+        function deletionForm() {
+            return {
+                step: 1,
+                email: '',
+                loading: false,
+                errorMessage: '',
+                sendOtp() {
+                    if (!this.email) return;
+                    this.loading = true;
+                    this.errorMessage = '';
 
-            <h2 class="text-xl font-black text-zinc-900 mb-4 flex items-center gap-3">
-                <span class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-sm font-bold">૧</span>
-                એકાઉન્ટ ડિલીટ કરવાની વિનંતી કેવી રીતે કરવી
-            </h2>
-            <div class="text-zinc-600 space-y-4 leading-relaxed font-medium pl-11">
-                <ul class="list-disc pl-5 space-y-2 text-zinc-600">
-                    <li><a href="mailto:info@stockpredictor.in" class="text-orange-600 font-bold hover:underline">info@stockpredictor.in</a> પર ઈમેલ મોકલો</li>
-                    <li>તમારા રજિસ્ટર્ડ ઈમેલ આઈડીનો ઉપયોગ કરો</li>
-                    <li>વિષયમાં "એકાઉન્ટ ડિલીટ કરવાની વિનંતી" લખો</li>
-                </ul>
-                <p class="mt-4 text-sm text-zinc-500 italic">અથવા સીધી વિનંતી સબમિટ કરવા માટે નીચેના ફોર્મનો ઉપયોગ કરો.</p>
-            </div>
-        </section>
-
-        <section>
-            <h2 class="text-xl font-black text-zinc-900 mb-4 flex items-center gap-3">
-                <span class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-sm font-bold">૨</span>
-                વિનંતી પછી શું થાય છે
-            </h2>
-            <div class="text-zinc-600 space-y-4 leading-relaxed font-medium pl-11">
-                <ul class="list-disc pl-5 space-y-2">
-                    <li>તમારું એકાઉન્ટ ૭ કાર્યકારી દિવસોમાં કાયમી ધોરણે ડિલીટ કરવામાં આવશે</li>
-                    <li>પ્રોફાઇલ અને પ્રવૃત્તિ સહિતનો તમામ વ્યક્તિગત ડેટા દૂર કરવામાં આવશે</li>
-                    <li>કાયદાકીય અથવા સુરક્ષા હેતુઓ માટે મર્યાદિત સમયગાળા માટે અમુક ડેટા જાળવી રાખવામાં આવી શકે છે</li>
-                </ul>
-            </div>
-        </section>
-
-        <section class="mt-12 pt-12 border-t border-zinc-100">
-            <h2 class="text-2xl font-black text-zinc-900 mb-6">વિનંતી સબમિટ કરો</h2>
-            <form action="{{ route('delete-account.request') }}" method="POST" class="space-y-6">
-                @csrf
-                <div>
-                    <label class="block text-sm font-bold text-zinc-700 mb-2">રજિસ્ટર્ડ ઈમેલ આઈડી</label>
-                    <input type="email" name="email" required placeholder="example@email.com" 
-                           class="w-full px-5 py-4 rounded-2xl bg-zinc-50 border border-zinc-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition-all outline-none font-medium">
-                    @error('email') <p class="text-red-500 text-xs mt-1 font-bold">{{ $message }}</p> @enderror
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-zinc-700 mb-2">ડિલીટ કરવાનું કારણ (વૈકલ્પિક)</label>
-                    <textarea name="reason" rows="4" placeholder="કૃપા કરીને અમને જણાવો કે તમે તમારું એકાઉન્ટ કેમ ડિલીટ કરવા માંગો છો..."
-                              class="w-full px-5 py-4 rounded-2xl bg-zinc-50 border border-zinc-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition-all outline-none font-medium"></textarea>
-                </div>
-                <button type="submit" class="w-full py-4 bg-orange-600 text-white rounded-2xl font-black text-lg shadow-xl shadow-orange-600/20 hover:bg-orange-700 hover:-translate-y-1 transition-all active:scale-95">
-                    વિનંતી સબમિટ કરો
-                </button>
-            </form>
-        </section>
-    </div>
+                    fetch('{{ route("delete-account.send-otp") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ email: this.email })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            this.step = 2;
+                        } else {
+                            this.errorMessage = data.message || 'Something went wrong.';
+                        }
+                    })
+                    .catch(error => {
+                        this.errorMessage = 'No account found with this email.';
+                    })
+                    .finally(() => {
+                        this.loading = false;
+                    });
+                }
+            }
+        }
+    </script>
+    @endpush
 @endsection

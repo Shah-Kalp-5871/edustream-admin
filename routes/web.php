@@ -33,7 +33,8 @@ Route::get('/refund-policy', function () {
     return view('legal.refund-policy');
 });
 
-Route::get('/delete-account', [LegalController::class, 'deleteAccount']);
+Route::get('/delete-account', [LegalController::class, 'deleteAccount'])->name('delete-account');
+Route::post('/delete-account/send-otp', [LegalController::class, 'requestDeletionOtp'])->name('delete-account.send-otp');
 Route::post('/delete-account', [LegalController::class, 'storeDeletionRequest'])->name('delete-account.request');
 
 // Auth Routes

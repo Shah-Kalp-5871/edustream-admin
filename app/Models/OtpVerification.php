@@ -10,7 +10,7 @@ class OtpVerification extends Model
     use HasFactory;
 
     protected $fillable = [
-        'mobile',
+        'email',
         'otp',
         'purpose',
         'attempts',
