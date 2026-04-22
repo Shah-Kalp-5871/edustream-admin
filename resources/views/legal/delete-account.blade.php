@@ -29,7 +29,7 @@
             </h2>
             <div class="text-zinc-600 space-y-4 leading-relaxed font-medium pl-11">
                 <ul class="list-disc pl-5 space-y-2 text-zinc-600">
-                    <li>Send an email to: <a href="mailto:support@gujjuscholar.in" class="text-orange-600 font-bold hover:underline">support@gujjuscholar.in</a></li>
+                    <li>Send an email to: <a href="mailto:info@stockpredictor.in" class="text-orange-600 font-bold hover:underline">info@stockpredictor.in</a></li>
                     <li>Use your registered email ID</li>
                     <li>Mention "Account Deletion Request" in the subject</li>
                 </ul>
@@ -86,7 +86,7 @@
             </h2>
             <div class="text-zinc-600 space-y-4 leading-relaxed font-medium pl-11">
                 <ul class="list-disc pl-5 space-y-2 text-zinc-600">
-                    <li><a href="mailto:support@gujjuscholar.in" class="text-orange-600 font-bold hover:underline">support@gujjuscholar.in</a> પર ઈમેલ મોકલો</li>
+                    <li><a href="mailto:info@stockpredictor.in" class="text-orange-600 font-bold hover:underline">info@stockpredictor.in</a> પર ઈમેલ મોકલો</li>
                     <li>તમારા રજિસ્ટર્ડ ઈમેલ આઈડીનો ઉપયોગ કરો</li>
                     <li>વિષયમાં "એકાઉન્ટ ડિલીટ કરવાની વિનંતી" લખો</li>
                 </ul>

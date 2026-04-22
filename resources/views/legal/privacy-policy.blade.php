@@ -72,7 +72,7 @@
                 Contact
             </h2>
             <div class="text-zinc-600 space-y-4 leading-relaxed font-medium pl-11">
-                <p>If you have any questions about this Privacy Policy, please contact us at support@gujjuscholar.com</p>
+                <p>If you have any questions about this Privacy Policy, please contact us at info@stockpredictor.in</p>
             </div>
         </section>
     </div>
@@ -144,7 +144,7 @@
                 સંપર્ક કરો
             </h2>
             <div class="text-zinc-600 space-y-4 leading-relaxed font-medium pl-11">
-                <p>જો તમને આ ગોપનીયતા નીતિ વિશે કોઈ પ્રશ્નો હોય, તો કૃપા કરીને support@gujjuscholar.com પર અમારો સંપર્ક કરો</p>
+                <p>જો તમને આ ગોપનીયતા નીતિ વિશે કોઈ પ્રશ્નો હોય, તો કૃપા કરીને info@stockpredictor.in પર અમારો સંપર્ક કરો</p>
             </div>
         </section>
     </div>
