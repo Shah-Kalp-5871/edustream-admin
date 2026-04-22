@@ -5,17 +5,6 @@
 @section('title_en', 'Delete Account')
 
 @section('content')
-    <!-- Success Message -->
-    @if(session('success'))
-        <div class="mb-8 p-4 rounded-2xl bg-green-50 border border-green-100 flex items-center gap-3 text-green-600 animate-fade-in">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-            <p class="font-bold text-sm">
-                <template x-if="lang === 'gu'"><span>{{ session('success')['gu'] }}</span></template>
-                <template x-if="lang === 'en'"><span>{{ session('success')['en'] }}</span></template>
-            </p>
-        </div>
-    @endif
-
     <div x-data="deletionForm()" class="space-y-10">
         <!-- Step 1: Info & Email Verification -->
         <div x-show="step === 1" x-cloak class="space-y-10 animate-fade-in">
@@ -137,6 +126,25 @@
                 email: '',
                 loading: false,
                 errorMessage: '',
+                init() {
+                    @if(session('success'))
+                        let successMsg = document.documentElement.lang === 'gu' 
+                            ? "{{ session('success')['gu'] }}" 
+                            : "{{ session('success')['en'] }}";
+                        
+                        Swal.fire({
+                            title: document.documentElement.lang === 'gu' ? 'સફળ!' : 'Success!',
+                            text: successMsg,
+                            icon: 'success',
+                            confirmButtonColor: '#ea580c',
+                            confirmButtonText: document.documentElement.lang === 'gu' ? 'બરાબર' : 'Okay',
+                            customClass: {
+                                popup: 'rounded-[1.5rem]',
+                                confirmButton: 'rounded-xl font-bold px-8 py-3'
+                            }
+                        });
+                    @endif
+                },
                 sendOtp() {
                     if (!this.email) return;
                     this.loading = true;
@@ -154,6 +162,15 @@
                     .then(data => {
                         if (data.success) {
                             this.step = 2;
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'success',
+                                title: document.documentElement.lang === 'gu' ? 'OTP મોકલવામાં આવ્યો છે' : 'OTP sent to your email',
+                                showConfirmButton: false,
+                                timer: 3000,
+                                timerProgressBar: true
+                            });
                         } else {
                             this.errorMessage = data.message || 'Something went wrong.';
                         }
