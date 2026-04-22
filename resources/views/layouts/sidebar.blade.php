@@ -54,6 +54,11 @@
 
         <span class="nav-section">System</span>
 
+        <a href="{{ route('admin.deletion-requests') }}" class="nav-link {{ request()->is('admin/deletion-requests*') ? 'active' : '' }}">
+            <span class="nav-icon"><i class="fas fa-trash-can"></i></span>
+            Deletion Requests
+        </a>
+
         <a href="{{ url('settings') }}" class="nav-link {{ request()->is('settings') ? 'active' : '' }}">
             <span class="nav-icon"><i class="fas fa-lock"></i></span>
             Settings

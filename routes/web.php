@@ -11,6 +11,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\BannerWebController;
+use App\Http\Controllers\LegalController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -31,6 +32,9 @@ Route::get('/terms-of-service', function () {
 Route::get('/refund-policy', function () {
     return view('legal.refund-policy');
 });
+
+Route::get('/delete-account', [LegalController::class, 'deleteAccount']);
+Route::post('/delete-account', [LegalController::class, 'storeDeletionRequest'])->name('delete-account.request');
 
 // Auth Routes
 Route::get('/login', [AuthController::class, 'login'])->name('login');
@@ -139,4 +143,8 @@ Route::get('/orders/{id}/invoice', [OrderController::class, 'invoice']);
     Route::post('/banners', [BannerWebController::class, 'store']);
     Route::patch('/banners/{banner}/toggle', [BannerWebController::class, 'toggleStatus']);
     Route::delete('/banners/{banner}', [BannerWebController::class, 'destroy']);
+
+    // Account Deletion Requests (Admin)
+    Route::get('/admin/deletion-requests', [LegalController::class, 'adminDeletionRequests'])->name('admin.deletion-requests');
+    Route::post('/admin/deletion-requests/{id}/status', [LegalController::class, 'updateDeletionStatus'])->name('admin.deletion-requests.update-status');
 });

@@ -70,6 +70,12 @@
 
     <footer class="py-12 border-t border-zinc-100 bg-white">
         <div class="max-w-4xl mx-auto px-6 text-center">
+            <div class="flex flex-wrap justify-center gap-6 mb-8 text-xs font-bold text-zinc-400 uppercase tracking-widest">
+                <a href="/privacy-policy" class="hover:text-orange-600 transition-colors">Privacy Policy</a>
+                <a href="/terms-of-service" class="hover:text-orange-600 transition-colors">Terms</a>
+                <a href="/refund-policy" class="hover:text-orange-600 transition-colors">Refund</a>
+                <a href="/delete-account" class="hover:text-orange-600 transition-colors text-orange-500">Delete Account</a>
+            </div>
             <p class="text-zinc-400 text-[10px] font-bold uppercase tracking-[0.2em]">&copy; {{ date('Y') }} Gujju Scholar. Build for Excellence.</p>
         </div>
     </footer>

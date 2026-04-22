@@ -59,6 +59,16 @@
         <section>
             <h2 class="text-xl font-black text-zinc-900 mb-4 flex items-center gap-3">
                 <span class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-sm font-bold">5</span>
+                Data Deletion
+            </h2>
+            <div class="text-zinc-600 space-y-4 leading-relaxed font-medium pl-11">
+                <p>You have the right to request the deletion of your personal data. For instructions on how to request account deletion, please visit our <a href="/delete-account" class="text-orange-600 font-bold hover:underline">Delete Account</a> page.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="text-xl font-black text-zinc-900 mb-4 flex items-center gap-3">
+                <span class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-sm font-bold">6</span>
                 Contact
             </h2>
             <div class="text-zinc-600 space-y-4 leading-relaxed font-medium pl-11">
@@ -121,6 +131,16 @@
         <section>
             <h2 class="text-xl font-black text-zinc-900 mb-4 flex items-center gap-3">
                 <span class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-sm font-bold">૫</span>
+                ડેટા ડિલીટ કરવો
+            </h2>
+            <div class="text-zinc-600 space-y-4 leading-relaxed font-medium pl-11">
+                <p>તમારી પાસે તમારા વ્યક્તિગત ડેટાને ડિલીટ કરવાની વિનંતી કરવાનો અધિકાર છે. એકાઉન્ટ ડિલીટ કરવાની વિનંતી કેવી રીતે કરવી તે અંગેની સૂચનાઓ માટે, કૃપા કરીને અમારા <a href="/delete-account" class="text-orange-600 font-bold hover:underline">એકાઉન્ટ ડિલીટ કરો</a> પેજની મુલાકાત લો.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="text-xl font-black text-zinc-900 mb-4 flex items-center gap-3">
+                <span class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-sm font-bold">૬</span>
                 સંપર્ક કરો
             </h2>
             <div class="text-zinc-600 space-y-4 leading-relaxed font-medium pl-11">

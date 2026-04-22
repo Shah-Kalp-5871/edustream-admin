@@ -540,6 +540,7 @@
                     <li><a href="/privacy-policy" class="hover:text-orange-500">Privacy Policy</a></li>
                     <li><a href="/terms-of-service" class="hover:text-orange-500">Terms of Service</a></li>
                     <li><a href="/refund-policy" class="hover:text-orange-500">Refund Policy</a></li>
+                    <li><a href="/delete-account" class="hover:text-orange-500">Delete Account</a></li>
                 </ul>
             </div>
         </div>
