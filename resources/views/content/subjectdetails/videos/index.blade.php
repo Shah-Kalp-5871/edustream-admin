@@ -81,8 +81,8 @@
         <div id="foldersList">
             @foreach($folders as $folder)
             @php $safeFolderName = addslashes(str_replace(["\r", "\n"], ' ', $folder->name)); @endphp
-            <div class="file-row folder-row video-grid" onclick="window.location.href='{{ url('/content/videos/' . $id . '?folder_id=' . $folder->id) }}'">
-                <div style="color: var(--text-muted); text-align: center; opacity: 0.3;"><i class="fa-solid fa-folder" style="font-size: 14px;"></i></div>
+            <div class="file-row folder-row video-grid" data-id="{{ $folder->id }}" onclick="window.location.href='{{ url('/content/videos/' . $id . '?folder_id=' . $folder->id) }}'">
+                <div class="drag-handle" onclick="event.stopPropagation()"><i class="fa-solid fa-grip-vertical"></i></div>
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <div style="width: 36px; height: 36px; border-radius: 8px; background: #E3F2FD; color: #1565C0; display: flex; align-items: center; justify-content: center;">
                         <i class="fa-solid fa-folder" style="font-size: 16px;"></i>
@@ -283,20 +283,48 @@ document.addEventListener('DOMContentLoaded', function() {
                 }).then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        Swal.fire({
-                            toast: true,
-                            position: 'top-end',
-                            icon: 'success',
-                            title: 'Order saved',
-                            showConfirmButton: false,
-                            timer: 1500
-                        });
+                        showOrderSavedToast();
+                    }
+                });
+            }
+        });
+    }
+
+    const folderEl = document.getElementById('foldersList');
+    if (folderEl) {
+        Sortable.create(folderEl, {
+            handle: '.drag-handle',
+            animation: 150,
+            onEnd: function() {
+                const order = Array.from(folderEl.children).map(row => row.dataset.id);
+                fetch('{{ url("/content/videos/folders/reorder") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ order: order })
+                }).then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showOrderSavedToast();
                     }
                 });
             }
         });
     }
 });
+
+function showOrderSavedToast() {
+    Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'success',
+        title: 'Order saved',
+        showConfirmButton: false,
+        timer: 1500
+    });
+}
 
 function toggleFree(name, isFree, id) {
     fetch('{{ url("/content/videos/file") }}/' + id + '/toggle-free', {

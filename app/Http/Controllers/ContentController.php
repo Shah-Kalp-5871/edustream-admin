@@ -369,7 +369,7 @@ class ContentController extends Controller
     public function manageQuiz($id)
     {
         $subject = Subject::findOrFail($id);
-        $quizzes = Quiz::where('subject_id', $id)->orderBy('created_at', 'desc')->get();
+        $quizzes = Quiz::where('subject_id', $id)->orderBy('sort_order')->get();
         $subjectName = $subject->name;
         return view('content.subjectdetails.quiz.index', compact('id', 'subject', 'quizzes', 'subjectName'));
     }
@@ -662,5 +662,75 @@ class ContentController extends Controller
         }
 
         return response()->json(['success' => true, 'message' => 'Videos reordered successfully']);
+    }
+
+    public function reorderNoteFolders(Request $request)
+    {
+        $request->validate([
+            'order' => 'required|array',
+            'order.*' => 'required|integer',
+        ]);
+
+        foreach ($request->order as $index => $id) {
+            NoteFolder::where('id', $id)->update(['sort_order' => $index + 1]);
+        }
+
+        return response()->json(['success' => true, 'message' => 'Folders reordered successfully']);
+    }
+
+    public function reorderVideoFolders(Request $request)
+    {
+        $request->validate([
+            'order' => 'required|array',
+            'order.*' => 'required|integer',
+        ]);
+
+        foreach ($request->order as $index => $id) {
+            VideoFolder::where('id', $id)->update(['sort_order' => $index + 1]);
+        }
+
+        return response()->json(['success' => true, 'message' => 'Folders reordered successfully']);
+    }
+
+    public function reorderQaPaperFolders(Request $request)
+    {
+        $request->validate([
+            'order' => 'required|array',
+            'order.*' => 'required|integer',
+        ]);
+
+        foreach ($request->order as $index => $id) {
+            QaPaperFolder::where('id', $id)->update(['sort_order' => $index + 1]);
+        }
+
+        return response()->json(['success' => true, 'message' => 'Folders reordered successfully']);
+    }
+
+    public function reorderQaPapers(Request $request)
+    {
+        $request->validate([
+            'order' => 'required|array',
+            'order.*' => 'required|integer',
+        ]);
+
+        foreach ($request->order as $index => $id) {
+            QaPaper::where('id', $id)->update(['sort_order' => $index + 1]);
+        }
+
+        return response()->json(['success' => true, 'message' => 'Papers reordered successfully']);
+    }
+
+    public function reorderQuizzes(Request $request)
+    {
+        $request->validate([
+            'order' => 'required|array',
+            'order.*' => 'required|integer',
+        ]);
+
+        foreach ($request->order as $index => $id) {
+            Quiz::where('id', $id)->update(['sort_order' => $index + 1]);
+        }
+
+        return response()->json(['success' => true, 'message' => 'Quizzes reordered successfully']);
     }
 }

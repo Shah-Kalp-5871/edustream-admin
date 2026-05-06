@@ -5,7 +5,14 @@
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/content-manager.css') }}">
 <style>
-.quiz-badge { font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 30px; }
+    .quiz-badge { font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 30px; }
+    .quiz-grid {
+        display: grid;
+        grid-template-columns: 40px 1fr 100px 90px 110px 140px;
+        align-items: center;
+        padding: 12px 20px;
+        gap: 15px;
+    }
 </style>
 @endsection
 
@@ -51,57 +58,61 @@
     </div>
 
     <!-- Quiz List -->
-    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden;">
-        <div style="display: grid; grid-template-columns: 1fr 90px 90px 110px 160px; padding: 12px 20px; background: var(--surface-2); border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 600; color: var(--text-muted);">
+    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow-sm);">
+        <div class="quiz-grid" style="background: var(--surface-2); border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">
+            <div></div>
             <div>Quiz Name</div>
             <div>Questions</div>
             <div>Status</div>
             <div>Access</div>
-            <div>Actions</div>
+            <div style="text-align: right; padding-right: 10px;">Actions</div>
         </div>
 
-        @forelse($quizzes as $quiz)
-        <div class="file-row quiz-row">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <div style="width: 36px; height: 36px; border-radius: 10px; background: #E8F5E9; color: #2E7D32; display: flex; align-items: center; justify-content: center; font-size: 16px;">
-                    <i class="fa-regular fa-circle-question"></i>
+        <div id="quiz-list">
+            @forelse($quizzes as $quiz)
+            <div class="file-row quiz-row quiz-grid" data-id="{{ $quiz->id }}">
+                <div class="drag-handle">
+                    <i class="fa-solid fa-grip-vertical"></i>
                 </div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div class="file-icon-wrapper video">
+                        <i class="fa-regular fa-circle-question" style="color: #2E7D32;"></i>
+                    </div>
+                    <div>
+                        <div style="font-weight: 500; color: var(--text);">{{ $quiz->title }}</div>
+                        <div style="font-size: 11px; color: var(--text-muted);">MCQ • Added {{ $quiz->created_at->diffForHumans() }}</div>
+                    </div>
+                </div>
+                <div style="color: var(--text-muted); font-size: 13px; font-weight: 500;">{{ $quiz->questions->count() }} Questions</div>
                 <div>
-                    <div style="font-weight: 500;">{{ $quiz->title }}</div>
-                    <div style="font-size: 11px; color: var(--text-muted);">MCQ • Added {{ $quiz->created_at->diffForHumans() }}</div>
+                    <label class="switch">
+                        <input type="checkbox" {{ $quiz->status == 'active' ? 'checked' : '' }} onchange="toggleStatus('{{ $quiz->title }}', this.checked, '{{ $quiz->id }}')">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div onclick="event.stopPropagation()">
+                    <label class="toggle-switch">
+                        <input type="checkbox" {{ $quiz->is_free ? 'checked' : '' }} onchange="toggleFree('{{ $quiz->title }}', this.checked, '{{ $quiz->id }}')">
+                        <span class="slider round"></span>
+                    </label>
+                    <span style="font-size: 11px; margin-left: 8px; color: {{ $quiz->is_free ? 'var(--primary)' : 'var(--text-muted)' }}; font-weight: 600;">
+                        {{ $quiz->is_free ? 'Free' : 'Paid' }}
+                    </span>
+                </div>
+                <div class="action-buttons">
+                    <button class="action-icon-btn" onclick="openEditDetailsModal('{{ $quiz->title }}', '{{ $quiz->id }}', '{{ $quiz->description }}', '{{ $quiz->sort_order }}')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
+                    <button class="action-icon-btn" onclick="window.location.href='{{ url('/content/quiz/' . $quiz->id . '/manage') }}'" title="Manage Questions"><i class="fa-solid fa-list-check"></i></button>
+                    <button class="action-icon-btn delete" onclick="openDeleteModal('{{ $quiz->title }}', '{{ $quiz->id }}', 'quiz')" title="Delete"><i class="fa-solid fa-trash"></i></button>
                 </div>
             </div>
-            <div style="color: var(--text-muted);">{{ $quiz->questions->count() }} Qs</div>
-            <div>
-                <label class="switch">
-                    <input type="checkbox" {{ $quiz->status == 'active' ? 'checked' : '' }} onchange="toggleStatus('{{ $quiz->title }}', this.checked, '{{ $quiz->id }}')">
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div style="display: flex; align-items: center;" onclick="event.stopPropagation()">
-                <label class="toggle-switch">
-                    <input type="checkbox" {{ $quiz->is_free ? 'checked' : '' }} onchange="toggleFree('{{ $quiz->title }}', this.checked, '{{ $quiz->id }}')">
-                    <span class="slider round"></span>
-                </label>
-                <span style="font-size: 11px; margin-left: 8px; color: {{ $quiz->is_free ? 'var(--primary)' : 'var(--text-muted)' }}; font-weight: 600;">
-                    {{ $quiz->is_free ? 'Free' : 'Paid' }}
-                </span>
-            </div>
-            <div style="display: flex; gap: 4px;">
-                <button class="action-icon-btn" onclick="openEditDetailsModal('{{ $quiz->title }}', '{{ $quiz->id }}', '{{ $quiz->description }}', '{{ $quiz->sort_order }}')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
-                <button class="action-icon-btn" onclick="window.location.href='{{ url('/content/quiz/' . $quiz->id . '/manage') }}'" title="Manage Questions"><i class="fa-solid fa-list-check"></i></button>
-                <button class="action-icon-btn" onclick="openDeleteModal('{{ $quiz->title }}', '{{ $quiz->id }}', 'quiz')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
-            </div>
+            @empty
+                <div style="padding: 60px 40px; text-align: center; color: var(--text-muted);">
+                    <i class="fa-regular fa-face-meh" style="font-size: 48px; margin-bottom: 16px; opacity: 0.2;"></i>
+                    <p style="font-size: 15px;">No quizzes found for this subject.</p>
+                </div>
+            @endforelse
         </div>
-        @empty
-            <div style="padding: 40px; text-align: center; color: var(--text-muted);">
-                <i class="fa-regular fa-face-meh" style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;"></i>
-                <p>No quizzes found for this subject.</p>
-            </div>
-        @endforelse
     </div>
-
-    <div style="margin-top: 20px; font-size: 12px; color: var(--text-muted);">{{ $quizzes->count() }} quizzes shown</div>
 
     <!-- Hidden form for deletion -->
     <form id="deleteQuizForm" action="" method="POST" style="display: none;">
@@ -166,7 +177,7 @@
         </div>
         <div class="modal-footer">
             <button class="btn btn-secondary" onclick="closeModal('deleteModal')">Cancel</button>
-            <button class="btn" style="background: #e74c3c; color: white;" onclick="confirmDelete()">Delete</button>
+            <button class="btn" style="background: #e74c3c; color: white;" onclick="confirmDelete()">Delete Permanently</button>
         </div>
     </div>
 </div>
@@ -188,13 +199,14 @@
                 <textarea class="form-control" id="editDescription" rows="3" placeholder="Add a description or instructions..."></textarea>
             </div>
             <div style="margin-bottom: 16px;">
-                <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Sort Order</label>
+                <label style="display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500;">Sort Order (Manual)</label>
                 <input type="number" class="form-control" id="editSortOrder" placeholder="e.g. 1" value="0">
+                <p style="font-size: 11px; color: var(--text-muted); mt-1">You can also drag and drop items to reorder them.</p>
             </div>
         </div>
         <div class="modal-footer">
             <button class="btn btn-secondary" onclick="closeModal('editDetailsModal')">Cancel</button>
-            <button class="btn btn-primary" onclick="saveDetails()">Save Details</button>
+            <button class="btn btn-primary" onclick="saveDetails()">Save Changes</button>
         </div>
     </div>
 </div>
@@ -202,7 +214,49 @@
 @endsection
 
 @section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <script>
+let currentActionItem = null;
+
+// Initialize Sorting
+document.addEventListener('DOMContentLoaded', function() {
+    const quizList = document.getElementById('quiz-list');
+    if (quizList && quizList.children.length > 0) {
+        new Sortable(quizList, {
+            animation: 150,
+            handle: '.drag-handle',
+            ghostClass: 'sortable-ghost',
+            onEnd: function() {
+                const order = Array.from(quizList.querySelectorAll('.quiz-row')).map(el => el.dataset.id);
+                updateQuizOrder(order);
+            }
+        });
+    }
+});
+
+function updateQuizOrder(order) {
+    fetch('{{ url("/content/quiz/reorder") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ order: order })
+    }).then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: 'Quiz order updated',
+                showConfirmButton: false,
+                timer: 1500
+            });
+        }
+    });
+}
+
 function toggleStatus(name, active, id) {
     const status = active ? 'active' : 'inactive';
     
@@ -247,7 +301,7 @@ function toggleFree(name, isFree, id) {
                 showConfirmButton: false,
                 timer: 2000,
                 timerProgressBar: true
-            }).then(() => location.reload());
+            });
         } else {
             Swal.fire('Error', 'Something went wrong', 'error');
         }

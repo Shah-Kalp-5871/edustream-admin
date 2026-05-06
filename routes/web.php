@@ -82,6 +82,7 @@ Route::post('/content/notes/folder/{id}/update', [ContentController::class, 'upd
 Route::post('/content/notes/file/{id}/update', [ContentController::class, 'updateNote']);
 Route::post('/content/notes/file/{id}/toggle-free', [ContentController::class, 'toggleNoteFree']);
 Route::post('/content/notes/reorder', [ContentController::class, 'reorderNotes']);
+Route::post('/content/notes/folders/reorder', [ContentController::class, 'reorderNoteFolders']);
 
 Route::get('/content/videos/{id}', [ContentController::class, 'manageVideos']);
 Route::post('/content/videos/{id}/folder', [ContentController::class, 'storeVideoFolder']);
@@ -92,6 +93,7 @@ Route::post('/content/videos/folder/{id}/update', [ContentController::class, 'up
 Route::post('/content/videos/file/{id}/update', [ContentController::class, 'updateVideo']);
 Route::post('/content/videos/file/{id}/toggle-free', [ContentController::class, 'toggleVideoFree']);
 Route::post('/content/videos/reorder', [ContentController::class, 'reorderVideos']);
+Route::post('/content/videos/folders/reorder', [ContentController::class, 'reorderVideoFolders']);
 
 Route::get('/content/qa-papers/{id}', [ContentController::class, 'manageQAPapers']);
 Route::post('/content/qa-papers/{id}/folder', [ContentController::class, 'storeQAPaperFolder']);
@@ -101,6 +103,8 @@ Route::delete('/content/qa-papers/file/{id}', [ContentController::class, 'delete
 Route::post('/content/qa-papers/folder/{id}/update', [ContentController::class, 'updateQAPaperFolder']);
 Route::post('/content/qa-papers/file/{id}/update', [ContentController::class, 'updateQAPaper']);
 Route::post('/content/qa-papers/file/{id}/toggle-free', [ContentController::class, 'toggleQAPaperFree']);
+Route::post('/content/qa-papers/folders/reorder', [ContentController::class, 'reorderQaPaperFolders']);
+Route::post('/content/qa-papers/reorder', [ContentController::class, 'reorderQaPapers']);
 
 Route::get('/content/quiz/{id}', [ContentController::class, 'manageQuiz']);
 Route::get('/content/quiz/{id}/builder', [ContentController::class, 'quizBuilder']);
@@ -109,6 +113,7 @@ Route::get('/content/quiz/{id}/builder', [ContentController::class, 'quizBuilder
 // Quiz Routes
 Route::get('/content/quiz/{id}', [ContentController::class, 'manageQuiz']);
 Route::post('/content/quiz/{id}/store', [QuizController::class, 'store']);
+Route::post('/content/quiz/reorder', [ContentController::class, 'reorderQuizzes']);
 Route::get('/content/quiz/{id}/manage', [QuizController::class, 'manage']);
 Route::post('/quiz/toggle-status/{id}', [QuizController::class, 'toggleStatus']);
 Route::post('/quiz/toggle-free/{id}', [QuizController::class, 'toggleFree']);
