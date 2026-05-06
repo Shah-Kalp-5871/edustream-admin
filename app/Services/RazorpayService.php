@@ -19,11 +19,19 @@ class RazorpayService
 
     public function createOrder($amount, $receiptId, $notes = [])
     {
+        $amountInPaise = (int)round($amount * 100);
+
+        Log::info('Creating Razorpay Order', [
+            'amount_in_rupees' => $amount,
+            'amount_in_paise' => $amountInPaise,
+            'receipt' => $receiptId
+        ]);
+
         $response = Http::withoutVerifying()
             ->withBasicAuth($this->keyId, $this->keySecret)
             ->post("{$this->baseUrl}/orders", [
                 'receipt' => $receiptId,
-                'amount' => $amount * 100, // Amount in paise
+                'amount' => $amountInPaise,
                 'currency' => 'INR',
                 'notes' => $notes,
             ]);

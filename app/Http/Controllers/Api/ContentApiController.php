@@ -701,7 +701,23 @@ class ContentApiController extends Controller
             return response()->json(['error' => 'Cart is empty or items are no longer available'], 400);
         }
 
-        $totalAmount = $cartItems->sum('price');
+        $totalAmount = (float)$cartItems->sum('price');
+        
+        \Illuminate\Support\Facades\Log::info('Initiating Razorpay Payment', [
+            'student_id' => $student->id,
+            'total_amount_rupees' => $totalAmount,
+            'item_count' => $cartItems->count()
+        ]);
+
+        // Validation: Ensure amount is valid and above minimum (₹10)
+        if ($totalAmount <= 0) {
+            return response()->json(['error' => 'Invalid order amount. Amount must be greater than zero.'], 400);
+        }
+
+        if ($totalAmount < 10) {
+            return response()->json(['error' => 'Minimum order amount is ₹10. Please add more items to your cart.'], 400);
+        }
+
         $receiptId = 'rcpt_' . Str::random(10);
 
         try {
@@ -711,10 +727,17 @@ class ContentApiController extends Controller
                 'email' => $student->email,
             ]);
 
+            $finalAmountPaise = (int)round($totalAmount * 100);
+            
+            \Illuminate\Support\Facades\Log::info('Razorpay Order Created Successfully', [
+                'order_id' => $razorpayOrder['id'],
+                'amount_paise' => $finalAmountPaise
+            ]);
+
             return response()->json([
                 'razorpay_order_id' => $razorpayOrder['id'],
                 'razorpay_key' => config('services.razorpay.key_id'),
-                'amount' => $totalAmount * 100, // in paise
+                'amount' => $finalAmountPaise, 
                 'currency' => 'INR',
                 'name' => 'EduStream',
                 'description' => 'Course Purchase',
