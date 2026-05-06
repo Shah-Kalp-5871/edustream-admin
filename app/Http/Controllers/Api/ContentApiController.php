@@ -470,7 +470,8 @@ class ContentApiController extends Controller
         $percentage = ($totalQuestions > 0) ? ($score / $totalQuestions) * 100 : 0;
         $status = ($percentage >= ($quiz->passing_percentage ?? 0)) ? 'passed' : 'failed';
 
-        // Record the Attempt
+        // Attempt tracking removed as per requirements
+        /*
         QuizAttempt::create([
             'student_id' => auth()->guard('api-student')->id(),
             'quiz_id' => $quiz->id,
@@ -479,6 +480,7 @@ class ContentApiController extends Controller
             'status' => $status,
             'completed_at' => now(),
         ]);
+        */
 
         return response()->json([
             'score'      => $score,

@@ -143,7 +143,7 @@
             <div class="form-group"><label class="form-label">Time (minutes)</label><input type="number" class="form-input" value="{{ $quiz['time'] }}"></div>
             <div class="form-group"><label class="form-label">Total Marks</label><input type="number" class="form-input" value="{{ $quiz['marks'] }}"></div>
             <div class="form-group"><label class="form-label">Pass %</label><input type="number" class="form-input" value="{{ $quiz['pass'] }}"></div>
-            <div class="form-group"><label class="form-label">Max Attempts</label><select class="form-input"><option>1</option><option>2</option><option selected>Unlimited</option></select></div>
+
             <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--surface-2);border-radius:var(--r);border:1px solid var(--border);">
                 <div><span style="font-size:13px;font-weight:600;display:block;">Shuffle Questions</span><small style="color:var(--text-muted);font-size:11.5px;">Random order</small></div>
                 <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>

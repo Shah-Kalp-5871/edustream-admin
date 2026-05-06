@@ -42,7 +42,7 @@
     </div>
 
     <!-- Quick Stats -->
-    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px;">
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px;">
         <div class="card" style="padding: 16px; text-align: center;">
             <div style="font-size: 28px; font-weight: 700; color: #2E7D32;">{{ $quizzes->count() }}</div>
             <div style="font-size: 12px; color: var(--text-muted);">Total Quizzes</div>
@@ -51,10 +51,7 @@
             <div style="font-size: 28px; font-weight: 700; color: #1565C0;">{{ $quizzes->sum(fn($q) => $q->questions->count()) }}</div>
             <div style="font-size: 12px; color: var(--text-muted);">Total Questions</div>
         </div>
-        <div class="card" style="padding: 16px; text-align: center;">
-            <div style="font-size: 28px; font-weight: 700; color: #E65100;">--</div>
-            <div style="font-size: 12px; color: var(--text-muted);">Attempts</div>
-        </div>
+
     </div>
 
     <!-- Quiz List -->

@@ -328,20 +328,12 @@
                 <input type="number" class="form-input" value="60" min="1" max="100">
             </div>
 
-            <div class="form-group">
-                <label class="form-label">Max Attempts</label>
-                <select class="form-input">
-                    <option>1</option>
-                    <option>2</option>
-                    <option>3</option>
-                    <option selected>Unlimited</option>
-                </select>
-            </div>
+
 
             <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:var(--surface-2); border-radius:var(--r); border:1px solid var(--border); margin-bottom:12px;">
                 <div>
                     <span style="font-size:13px; font-weight:600; display:block;">Shuffle Questions</span>
-                    <small style="color:var(--text-muted); font-size:11.5px;">Random order each attempt</small>
+                    <small style="color:var(--text-muted); font-size:11.5px;">Random order</small>
                 </div>
                 <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
             </div>
