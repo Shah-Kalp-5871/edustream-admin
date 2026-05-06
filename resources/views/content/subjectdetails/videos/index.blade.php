@@ -51,7 +51,8 @@
 
     <!-- Videos List -->
     <div id="fileList" style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden;">
-        <div style="display: grid; grid-template-columns: 3fr 1fr 1fr 110px 160px; padding: 12px 20px; background: var(--surface-2); border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 600; color: var(--text-muted);">
+        <div style="display: grid; grid-template-columns: 40px 3fr 1fr 1fr 110px 160px; padding: 12px 20px; background: var(--surface-2); border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 600; color: var(--text-muted);">
+            <div></div>
             <div>Title</div>
             <div>Duration</div>
             <div>Added</div>
@@ -67,61 +68,67 @@
         @endif
 
         <!-- Folders -->
-        @foreach($folders as $folder)
-        <div class="file-row folder-row" onclick="window.location.href='{{ url('/content/videos/' . $id . '?folder_id=' . $folder->id) }}'">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <i class="fa-regular fa-folder" style="color: #1565C0; font-size: 18px;"></i>
-                <span style="font-weight: 500;">{{ $folder->name }}</span>
-            </div>
-            <div style="color: var(--text-muted);">—</div>
-            <div style="color: var(--text-muted);">{{ $folder->created_at->format('Y-m-d') }}</div>
-            <div></div>
-            <div style="display: flex; gap: 4px;" onclick="event.stopPropagation()">
-                <button class="action-icon-btn" onclick="openRenameModal('{{ $folder->name }}', '{{ $folder->id }}', 'folder')" title="Rename"><i class="fa-solid fa-pen"></i></button>
-                <button class="action-icon-btn" onclick="openDeleteModal('{{ $folder->name }}', '{{ $folder->id }}', 'folder')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
-            </div>
-        </div>
-        @endforeach
-
-        <!-- Videos -->
-        @foreach($files as $video)
-        <div class="file-row">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <div class="video-thumb"><i class="fa-solid fa-play"></i></div>
-                <div>
-                    <div style="font-weight: 500;">{{ $video->name }}</div>
-                    <span style="background: var(--primary-glow); color: var(--primary); padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase;">{{ $video->video_source }}</span>
-                    @if($video->processing_status === 'pending')
-                        <span style="background: #f1c40f; color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase;">HLS: Pending</span>
-                    @elseif($video->processing_status === 'processing')
-                        <span style="background: #3498db; color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase;">HLS: Processing</span>
-                    @elseif($video->processing_status === 'failed')
-                        <span style="background: #e74c3c; color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase;">HLS: Failed</span>
-                    @endif
+        <div id="foldersList">
+            @foreach($folders as $folder)
+            <div class="file-row folder-row" onclick="window.location.href='{{ url('/content/videos/' . $id . '?folder_id=' . $folder->id) }}'">
+                <div style="color: var(--text-muted); cursor: default; text-align: center;"><i class="fa-solid fa-folder" style="font-size: 10px; opacity: 0.5;"></i></div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <i class="fa-regular fa-folder" style="color: #1565C0; font-size: 18px;"></i>
+                    <span style="font-weight: 500;">{{ $folder->name }}</span>
+                </div>
+                <div style="color: var(--text-muted);">—</div>
+                <div style="color: var(--text-muted);">{{ $folder->created_at->format('Y-m-d') }}</div>
+                <div></div>
+                <div style="display: flex; gap: 4px;" onclick="event.stopPropagation()">
+                    <button class="action-icon-btn" onclick="openRenameModal('{{ $folder->name }}', '{{ $folder->id }}', 'folder')" title="Rename"><i class="fa-solid fa-pen"></i></button>
+                    <button class="action-icon-btn" onclick="openDeleteModal('{{ $folder->name }}', '{{ $folder->id }}', 'folder')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
                 </div>
             </div>
-            <div style="color: var(--text-muted);">{{ $video->duration ?? '--:--' }}</div>
-            <div style="color: var(--text-muted);">{{ $video->created_at->format('Y-m-d') }}</div>
-            <div style="display: flex; align-items: center;" onclick="event.stopPropagation()">
-                <label class="toggle-switch">
-                    <input type="checkbox" {{ $video->is_free ? 'checked' : '' }} onchange="toggleFree('{{ $video->name }}', this.checked, '{{ $video->id }}')">
-                    <span class="slider round"></span>
-                </label>
-                <span style="font-size: 11px; margin-left: 8px; color: {{ $video->is_free ? 'var(--primary)' : 'var(--text-muted)' }}; font-weight: 600;">
-                    {{ $video->is_free ? 'Free' : 'Paid' }}
-                </span>
-            </div>
-            <div style="display: flex; gap: 4px;">
-                <button class="action-icon-btn" onclick="event.stopPropagation(); openEditDetailsModal('{{ $video->name }}', '{{ $video->id }}', 'file', '{{ $video->description }}', '{{ $video->duration }}', '{{ $video->sort_order }}')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
-                @if($video->processing_status === 'completed')
-                    <button class="action-icon-btn" onclick="event.stopPropagation(); Swal.fire('HLS Ready', 'This video is now streaming via secure HLS. View it in the mobile app to verify.', 'success')" title="HLS Active"><i class="fa-solid fa-circle-check" style="color: var(--primary);"></i></button>
-                @else
-                    <button class="action-icon-btn" style="opacity: 0.5; cursor: not-allowed;" title="Processing..."><i class="fa-solid fa-hourglass-half"></i></button>
-                @endif
-                <button class="action-icon-btn" onclick="openDeleteModal('{{ $video->name }}', '{{ $video->id }}', 'file')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
-            </div>
+            @endforeach
         </div>
-        @endforeach
+
+        <!-- Videos -->
+        <div id="sortableFiles">
+            @foreach($files as $video)
+            <div class="file-row" data-id="{{ $video->id }}">
+                <div class="drag-handle" style="cursor: grab; color: var(--text-muted); text-align: center;"><i class="fa-solid fa-grip-vertical"></i></div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div class="video-thumb"><i class="fa-solid fa-play"></i></div>
+                    <div>
+                        <div style="font-weight: 500;">{{ $video->name }}</div>
+                        <span style="background: var(--primary-glow); color: var(--primary); padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase;">{{ $video->video_source }}</span>
+                        @if($video->processing_status === 'pending')
+                            <span style="background: #f1c40f; color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase;">HLS: Pending</span>
+                        @elseif($video->processing_status === 'processing')
+                            <span style="background: #3498db; color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase;">HLS: Processing</span>
+                        @elseif($video->processing_status === 'failed')
+                            <span style="background: #e74c3c; color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase;">HLS: Failed</span>
+                        @endif
+                    </div>
+                </div>
+                <div style="color: var(--text-muted);">{{ $video->duration ?? '--:--' }}</div>
+                <div style="color: var(--text-muted);">{{ $video->created_at->format('Y-m-d') }}</div>
+                <div style="display: flex; align-items: center;" onclick="event.stopPropagation()">
+                    <label class="toggle-switch">
+                        <input type="checkbox" {{ $video->is_free ? 'checked' : '' }} onchange="toggleFree('{{ $video->name }}', this.checked, '{{ $video->id }}')">
+                        <span class="slider round"></span>
+                    </label>
+                    <span style="font-size: 11px; margin-left: 8px; color: {{ $video->is_free ? 'var(--primary)' : 'var(--text-muted)' }}; font-weight: 600;">
+                        {{ $video->is_free ? 'Free' : 'Paid' }}
+                    </span>
+                </div>
+                <div style="display: flex; gap: 4px;">
+                    <button class="action-icon-btn" onclick="event.stopPropagation(); openEditDetailsModal('{{ $video->name }}', '{{ $video->id }}', 'file', '{{ $video->description }}', '{{ $video->duration }}', '{{ $video->sort_order }}')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
+                    @if($video->processing_status === 'completed')
+                        <button class="action-icon-btn" onclick="event.stopPropagation(); Swal.fire('HLS Ready', 'This video is now streaming via secure HLS. View it in the mobile app to verify.', 'success')" title="HLS Active"><i class="fa-solid fa-circle-check" style="color: var(--primary);"></i></button>
+                    @else
+                        <button class="action-icon-btn" style="opacity: 0.5; cursor: not-allowed;" title="Processing..."><i class="fa-solid fa-hourglass-half"></i></button>
+                    @endif
+                    <button class="action-icon-btn" onclick="openDeleteModal('{{ $video->name }}', '{{ $video->id }}', 'file')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            </div>
+            @endforeach
+        </div>
     </div>
 
     <!-- Status bar -->
@@ -234,10 +241,44 @@
 </div>
 @endsection
 
-@section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script src="{{ asset('js/content-manager.js') }}"></script>
 <script>
 let currentActionItem = null;
 let currentActionType = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    const el = document.getElementById('sortableFiles');
+    if (el) {
+        Sortable.create(el, {
+            handle: '.drag-handle',
+            animation: 150,
+            onEnd: function() {
+                const order = Array.from(el.children).map(row => row.dataset.id);
+                fetch('{{ url("/content/videos/reorder") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ order: order })
+                }).then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'Order updated',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                    }
+                });
+            }
+        });
+    }
+});
 
 function toggleFree(name, isFree, id) {
     fetch('{{ url("/content/videos/file") }}/' + id + '/toggle-free', {

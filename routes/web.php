@@ -81,6 +81,7 @@ Route::delete('/content/notes/file/{id}', [ContentController::class, 'deleteNote
 Route::post('/content/notes/folder/{id}/update', [ContentController::class, 'updateNoteFolder']);
 Route::post('/content/notes/file/{id}/update', [ContentController::class, 'updateNote']);
 Route::post('/content/notes/file/{id}/toggle-free', [ContentController::class, 'toggleNoteFree']);
+Route::post('/content/notes/reorder', [ContentController::class, 'reorderNotes']);
 
 Route::get('/content/videos/{id}', [ContentController::class, 'manageVideos']);
 Route::post('/content/videos/{id}/folder', [ContentController::class, 'storeVideoFolder']);
@@ -90,6 +91,7 @@ Route::delete('/content/videos/file/{id}', [ContentController::class, 'deleteVid
 Route::post('/content/videos/folder/{id}/update', [ContentController::class, 'updateVideoFolder']);
 Route::post('/content/videos/file/{id}/update', [ContentController::class, 'updateVideo']);
 Route::post('/content/videos/file/{id}/toggle-free', [ContentController::class, 'toggleVideoFree']);
+Route::post('/content/videos/reorder', [ContentController::class, 'reorderVideos']);
 
 Route::get('/content/qa-papers/{id}', [ContentController::class, 'manageQAPapers']);
 Route::post('/content/qa-papers/{id}/folder', [ContentController::class, 'storeQAPaperFolder']);

@@ -635,4 +635,32 @@ class ContentController extends Controller
         $paper->update($request->only(['name', 'description', 'sort_order']));
         return response()->json(['success' => true, 'message' => 'QA Paper updated successfully']);
     }
+
+    public function reorderNotes(Request $request)
+    {
+        $request->validate([
+            'order' => 'required|array',
+            'order.*' => 'required|integer',
+        ]);
+
+        foreach ($request->order as $index => $id) {
+            Note::where('id', $id)->update(['sort_order' => $index + 1]);
+        }
+
+        return response()->json(['success' => true, 'message' => 'Notes reordered successfully']);
+    }
+
+    public function reorderVideos(Request $request)
+    {
+        $request->validate([
+            'order' => 'required|array',
+            'order.*' => 'required|integer',
+        ]);
+
+        foreach ($request->order as $index => $id) {
+            Video::where('id', $id)->update(['sort_order' => $index + 1]);
+        }
+
+        return response()->json(['success' => true, 'message' => 'Videos reordered successfully']);
+    }
 }

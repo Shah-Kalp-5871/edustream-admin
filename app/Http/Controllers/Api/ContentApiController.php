@@ -209,14 +209,14 @@ class ContentApiController extends Controller
             ->active()
             ->exists();
 
-        $videoFolders = $subject->videoFolders()->active()->whereNull('parent_id')->withCount('videos')->get();
-        $noteFolders = $subject->noteFolders()->active()->whereNull('parent_id')->withCount('notes')->get();
-        $paperFolders = $subject->qaPaperFolders()->active()->whereNull('parent_id')->withCount('qaPapers')->get();
-        $quizzes = $subject->quizzes()->active()->withCount('questions')->get();
+        $videoFolders = $subject->videoFolders()->active()->whereNull('parent_id')->withCount('videos')->orderBy('sort_order')->get();
+        $noteFolders = $subject->noteFolders()->active()->whereNull('parent_id')->withCount('notes')->orderBy('sort_order')->get();
+        $paperFolders = $subject->qaPaperFolders()->active()->whereNull('parent_id')->withCount('qaPapers')->orderBy('sort_order')->get();
+        $quizzes = $subject->quizzes()->active()->withCount('questions')->orderBy('sort_order')->get();
         
-        $rootVideos = $subject->videos()->active()->whereNull('folder_id')->get();
-        $rootNotes = $subject->notes()->active()->whereNull('folder_id')->get();
-        $rootPapers = $subject->qaPapers()->active()->whereNull('folder_id')->get();
+        $rootVideos = $subject->videos()->active()->whereNull('folder_id')->orderBy('sort_order')->get();
+        $rootNotes = $subject->notes()->active()->whereNull('folder_id')->orderBy('sort_order')->get();
+        $rootPapers = $subject->qaPapers()->active()->whereNull('folder_id')->orderBy('sort_order')->get();
 
         // Attach free content flag to folders
         $videoFolders->each(function($f) { $f->is_free = $f->videos()->active()->free()->exists(); });

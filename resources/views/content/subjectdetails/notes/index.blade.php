@@ -72,7 +72,8 @@
     <!-- Files List -->
     <div id="fileList" style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden;">
         <!-- Table Header -->
-        <div style="display: grid; grid-template-columns: 3fr 1fr 1fr 110px 160px; padding: 12px 20px; background: var(--surface-2); border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 600; color: var(--text-muted);">
+        <div style="display: grid; grid-template-columns: 40px 3fr 1fr 1fr 110px 160px; padding: 12px 20px; background: var(--surface-2); border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 600; color: var(--text-muted);">
+            <div></div>
             <div>Name</div>
             <div>Size</div>
             <div>Modified</div>
@@ -88,55 +89,61 @@
         @endif
 
         <!-- Folders -->
-        @foreach($folders as $folder)
-        <div class="file-row folder-row" onclick="window.location.href='{{ url('/content/notes/' . $id . '?folder_id=' . $folder->id) }}'">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <i class="fa-regular fa-folder" style="color: #1565C0; font-size: 18px;"></i>
-                <span style="font-weight: 500;">{{ $folder->name }}</span>
+        <div id="foldersList">
+            @foreach($folders as $folder)
+            <div class="file-row folder-row" onclick="window.location.href='{{ url('/content/notes/' . $id . '?folder_id=' . $folder->id) }}'">
+                <div style="color: var(--text-muted); cursor: default; text-align: center;"><i class="fa-solid fa-folder" style="font-size: 10px; opacity: 0.5;"></i></div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <i class="fa-regular fa-folder" style="color: #1565C0; font-size: 18px;"></i>
+                    <span style="font-weight: 500;">{{ $folder->name }}</span>
+                </div>
+                <div style="color: var(--text-muted);">—</div>
+                <div style="color: var(--text-muted);">{{ $folder->updated_at->format('Y-m-d') }}</div>
+                <div></div>
+                <div style="display: flex; gap: 4px;">
+                    <button class="action-icon-btn" onclick="event.stopPropagation(); openEditDetailsModal('{{ $folder->name }}', '{{ $folder->id }}', 'folder')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
+                    <button class="action-icon-btn" onclick="event.stopPropagation(); openRenameModal('{{ $folder->name }}', '{{ $folder->id }}', 'folder')" title="Rename"><i class="fa-solid fa-pen"></i></button>
+                    <button class="action-icon-btn" onclick="event.stopPropagation(); openDeleteModal('{{ $folder->name }}', '{{ $folder->id }}', 'folder')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
+                </div>
             </div>
-            <div style="color: var(--text-muted);">—</div>
-            <div style="color: var(--text-muted);">{{ $folder->updated_at->format('Y-m-d') }}</div>
-            <div></div>
-            <div style="display: flex; gap: 4px;">
-                <button class="action-icon-btn" onclick="event.stopPropagation(); openEditDetailsModal('{{ $folder->name }}', '{{ $folder->id }}', 'folder')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
-                <button class="action-icon-btn" onclick="event.stopPropagation(); openRenameModal('{{ $folder->name }}', '{{ $folder->id }}', 'folder')" title="Rename"><i class="fa-solid fa-pen"></i></button>
-                <button class="action-icon-btn" onclick="event.stopPropagation(); openDeleteModal('{{ $folder->name }}', '{{ $folder->id }}', 'folder')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
-            </div>
+            @endforeach
         </div>
-        @endforeach
 
         <!-- Files -->
-        @foreach($files as $file)
-        <div class="file-row" ondblclick="window.open('{{ asset('storage/' . $file->file_path) }}')">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <i class="fa-regular fa-file-pdf" style="color: #e74c3c; font-size: 18px;"></i>
-                <span>{{ $file->name }}</span>
+        <div id="sortableFiles">
+            @foreach($files as $file)
+            <div class="file-row" data-id="{{ $file->id }}" ondblclick="window.open('{{ asset('storage/' . $file->file_path) }}')">
+                <div class="drag-handle" style="cursor: grab; color: var(--text-muted); text-align: center;"><i class="fa-solid fa-grip-vertical"></i></div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <i class="fa-regular fa-file-pdf" style="color: #e74c3c; font-size: 18px;"></i>
+                    <span>{{ $file->name }}</span>
+                </div>
+                @php
+                    $fileSize = 'N/A';
+                    if ($file->file_path && Storage::disk('public')->exists($file->file_path)) {
+                        $fileSize = round(Storage::disk('public')->size($file->file_path) / 1024 / 1024, 2) . ' MB';
+                    }
+                @endphp
+                <div style="color: var(--text-muted);">{{ $fileSize }}</div>
+                <div style="color: var(--text-muted);">{{ $file->updated_at->format('Y-m-d') }}</div>
+                <div style="display: flex; align-items: center;" onclick="event.stopPropagation()">
+                    <label class="toggle-switch">
+                        <input type="checkbox" {{ $file->is_free ? 'checked' : '' }} onchange="toggleFree('{{ $file->name }}', this.checked, '{{ $file->id }}')">
+                        <span class="slider round"></span>
+                    </label>
+                    <span style="font-size: 11px; margin-left: 8px; color: {{ $file->is_free ? 'var(--primary)' : 'var(--text-muted)' }}; font-weight: 600;">
+                        {{ $file->is_free ? 'Free' : 'Paid' }}
+                    </span>
+                </div>
+                <div style="display: flex; gap: 4px;">
+                    <button class="action-icon-btn" onclick="event.stopPropagation(); openEditDetailsModal('{{ $file->name }}', '{{ $file->id }}', 'file', '{{ $file->description }}', '{{ $file->sort_order }}')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
+                    <button class="action-icon-btn" onclick="event.stopPropagation(); openRenameModal('{{ $file->name }}', '{{ $file->id }}', 'file')" title="Rename"><i class="fa-solid fa-pen"></i></button>
+                    <button class="action-icon-btn" onclick="event.stopPropagation(); window.open('{{ asset('storage/' . $file->file_path) }}')" title="Download"><i class="fa-solid fa-download"></i></button>
+                    <button class="action-icon-btn" onclick="event.stopPropagation(); openDeleteModal('{{ $file->name }}', '{{ $file->id }}', 'file')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
+                </div>
             </div>
-            @php
-                $fileSize = 'N/A';
-                if ($file->file_path && Storage::disk('public')->exists($file->file_path)) {
-                    $fileSize = round(Storage::disk('public')->size($file->file_path) / 1024 / 1024, 2) . ' MB';
-                }
-            @endphp
-            <div style="color: var(--text-muted);">{{ $fileSize }}</div>
-            <div style="color: var(--text-muted);">{{ $file->updated_at->format('Y-m-d') }}</div>
-            <div style="display: flex; align-items: center;" onclick="event.stopPropagation()">
-                <label class="toggle-switch">
-                    <input type="checkbox" {{ $file->is_free ? 'checked' : '' }} onchange="toggleFree('{{ $file->name }}', this.checked, '{{ $file->id }}')">
-                    <span class="slider round"></span>
-                </label>
-                <span style="font-size: 11px; margin-left: 8px; color: {{ $file->is_free ? 'var(--primary)' : 'var(--text-muted)' }}; font-weight: 600;">
-                    {{ $file->is_free ? 'Free' : 'Paid' }}
-                </span>
-            </div>
-            <div style="display: flex; gap: 4px;">
-                <button class="action-icon-btn" onclick="event.stopPropagation(); openEditDetailsModal('{{ $file->name }}', '{{ $file->id }}', 'file', '{{ $file->description }}', '{{ $file->sort_order }}')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
-                <button class="action-icon-btn" onclick="event.stopPropagation(); openRenameModal('{{ $file->name }}', '{{ $file->id }}', 'file')" title="Rename"><i class="fa-solid fa-pen"></i></button>
-                <button class="action-icon-btn" onclick="event.stopPropagation(); window.open('{{ asset('storage/' . $file->file_path) }}')" title="Download"><i class="fa-solid fa-download"></i></button>
-                <button class="action-icon-btn" onclick="event.stopPropagation(); openDeleteModal('{{ $file->name }}', '{{ $file->id }}', 'file')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
-            </div>
+            @endforeach
         </div>
-        @endforeach
     </div>
 
     <!-- Bottom Status Bar -->
@@ -266,12 +273,46 @@
         // Toggle scripts moved to inline
     });
 </script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <script src="{{ asset('js/content-manager.js') }}"></script>
 <script>
 let currentPath = 'root';
 let selectedItems = new Set();
 let currentActionItem = null;
 let currentActionType = null; // 'folder' or 'file'
+
+document.addEventListener('DOMContentLoaded', function() {
+    const el = document.getElementById('sortableFiles');
+    if (el) {
+        Sortable.create(el, {
+            handle: '.drag-handle',
+            animation: 150,
+            onEnd: function() {
+                const order = Array.from(el.children).map(row => row.dataset.id);
+                fetch('{{ url("/content/notes/reorder") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ order: order })
+                }).then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'Order updated',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                    }
+                });
+            }
+        });
+    }
+});
 
 function toggleFree(name, isFree, id) {
     fetch('{{ url("/content/notes/file") }}/' + id + '/toggle-free', {
