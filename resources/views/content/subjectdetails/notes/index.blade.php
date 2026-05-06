@@ -101,9 +101,9 @@
                 <div style="color: var(--text-muted);">{{ $folder->updated_at->format('Y-m-d') }}</div>
                 <div></div>
                 <div style="display: flex; gap: 4px;">
-                    <button class="action-icon-btn" onclick="event.stopPropagation(); openEditDetailsModal('{{ $folder->name }}', '{{ $folder->id }}', 'folder')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
-                    <button class="action-icon-btn" onclick="event.stopPropagation(); openRenameModal('{{ $folder->name }}', '{{ $folder->id }}', 'folder')" title="Rename"><i class="fa-solid fa-pen"></i></button>
-                    <button class="action-icon-btn" onclick="event.stopPropagation(); openDeleteModal('{{ $folder->name }}', '{{ $folder->id }}', 'folder')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
+                    <button class="action-icon-btn" onclick="event.stopPropagation(); openEditDetailsModal('{{ addslashes(str_replace(["\r", "\n"], ' ', $folder->name)) }}', '{{ $folder->id }}', 'folder')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
+                    <button class="action-icon-btn" onclick="event.stopPropagation(); openRenameModal('{{ addslashes(str_replace(["\r", "\n"], ' ', $folder->name)) }}', '{{ $folder->id }}', 'folder')" title="Rename"><i class="fa-solid fa-pen"></i></button>
+                    <button class="action-icon-btn" onclick="event.stopPropagation(); openDeleteModal('{{ addslashes(str_replace(["\r", "\n"], ' ', $folder->name)) }}', '{{ $folder->id }}', 'folder')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
                 </div>
             </div>
             @endforeach
@@ -128,7 +128,7 @@
                 <div style="color: var(--text-muted);">{{ $file->updated_at->format('Y-m-d') }}</div>
                 <div style="display: flex; align-items: center;" onclick="event.stopPropagation()">
                     <label class="toggle-switch">
-                        <input type="checkbox" {{ $file->is_free ? 'checked' : '' }} onchange="toggleFree('{{ $file->name }}', this.checked, '{{ $file->id }}')">
+                        <input type="checkbox" {{ $file->is_free ? 'checked' : '' }} onchange="toggleFree('{{ addslashes(str_replace(["\r", "\n"], ' ', $file->name)) }}', this.checked, '{{ $file->id }}')">
                         <span class="slider round"></span>
                     </label>
                     <span style="font-size: 11px; margin-left: 8px; color: {{ $file->is_free ? 'var(--primary)' : 'var(--text-muted)' }}; font-weight: 600;">
@@ -136,10 +136,10 @@
                     </span>
                 </div>
                 <div style="display: flex; gap: 4px;">
-                    <button class="action-icon-btn" onclick="event.stopPropagation(); openEditDetailsModal('{{ $file->name }}', '{{ $file->id }}', 'file', '{{ $file->description }}', '{{ $file->sort_order }}')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
-                    <button class="action-icon-btn" onclick="event.stopPropagation(); openRenameModal('{{ $file->name }}', '{{ $file->id }}', 'file')" title="Rename"><i class="fa-solid fa-pen"></i></button>
+                    <button class="action-icon-btn" onclick="event.stopPropagation(); openEditDetailsModal('{{ addslashes(str_replace(["\r", "\n"], ' ', $file->name)) }}', '{{ $file->id }}', 'file', '{{ addslashes(str_replace(["\r", "\n"], ' ', $file->description ?? '')) }}', '{{ $file->sort_order }}')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
+                    <button class="action-icon-btn" onclick="event.stopPropagation(); openRenameModal('{{ addslashes(str_replace(["\r", "\n"], ' ', $file->name)) }}', '{{ $file->id }}', 'file')" title="Rename"><i class="fa-solid fa-pen"></i></button>
                     <button class="action-icon-btn" onclick="event.stopPropagation(); window.open('{{ asset('storage/' . $file->file_path) }}')" title="Download"><i class="fa-solid fa-download"></i></button>
-                    <button class="action-icon-btn" onclick="event.stopPropagation(); openDeleteModal('{{ $file->name }}', '{{ $file->id }}', 'file')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
+                    <button class="action-icon-btn" onclick="event.stopPropagation(); openDeleteModal('{{ addslashes(str_replace(["\r", "\n"], ' ', $file->name)) }}', '{{ $file->id }}', 'file')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
                 </div>
             </div>
             @endforeach

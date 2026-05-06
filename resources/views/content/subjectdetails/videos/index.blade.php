@@ -80,8 +80,8 @@
                 <div style="color: var(--text-muted);">{{ $folder->created_at->format('Y-m-d') }}</div>
                 <div></div>
                 <div style="display: flex; gap: 4px;" onclick="event.stopPropagation()">
-                    <button class="action-icon-btn" onclick="openRenameModal('{{ addslashes($folder->name) }}', '{{ $folder->id }}', 'folder')" title="Rename"><i class="fa-solid fa-pen"></i></button>
-                    <button class="action-icon-btn" onclick="openDeleteModal('{{ addslashes($folder->name) }}', '{{ $folder->id }}', 'folder')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
+                    <button class="action-icon-btn" onclick="openRenameModal('{{ addslashes(str_replace(["\r", "\n"], ' ', $folder->name)) }}', '{{ $folder->id }}', 'folder')" title="Rename"><i class="fa-solid fa-pen"></i></button>
+                    <button class="action-icon-btn" onclick="openDeleteModal('{{ addslashes(str_replace(["\r", "\n"], ' ', $folder->name)) }}', '{{ $folder->id }}', 'folder')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
                 </div>
             </div>
             @endforeach
@@ -110,7 +110,7 @@
                 <div style="color: var(--text-muted);">{{ $video->created_at->format('Y-m-d') }}</div>
                 <div style="display: flex; align-items: center;" onclick="event.stopPropagation()">
                     <label class="toggle-switch">
-                        <input type="checkbox" {{ $video->is_free ? 'checked' : '' }} onchange="toggleFree('{{ addslashes($video->name) }}', this.checked, '{{ $video->id }}')">
+                        <input type="checkbox" {{ $video->is_free ? 'checked' : '' }} onchange="toggleFree('{{ addslashes(str_replace(["\r", "\n"], ' ', $video->name)) }}', this.checked, '{{ $video->id }}')">
                         <span class="slider round"></span>
                     </label>
                     <span style="font-size: 11px; margin-left: 8px; color: {{ $video->is_free ? 'var(--primary)' : 'var(--text-muted)' }}; font-weight: 600;">
@@ -118,13 +118,13 @@
                     </span>
                 </div>
                 <div style="display: flex; gap: 4px;">
-                    <button class="action-icon-btn" onclick="event.stopPropagation(); openEditDetailsModal('{{ addslashes($video->name) }}', '{{ $video->id }}', 'file', '{{ addslashes($video->description ?? '') }}', '{{ $video->duration }}', '{{ $video->sort_order }}')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
+                    <button class="action-icon-btn" onclick="event.stopPropagation(); openEditDetailsModal('{{ addslashes(str_replace(["\r", "\n"], ' ', $video->name)) }}', '{{ $video->id }}', 'file', '{{ addslashes(str_replace(["\r", "\n"], ' ', $video->description ?? '')) }}', '{{ $video->duration }}', '{{ $video->sort_order }}')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
                     @if($video->processing_status === 'completed')
                         <button class="action-icon-btn" onclick="event.stopPropagation(); Swal.fire('HLS Ready', 'This video is now streaming via secure HLS. View it in the mobile app to verify.', 'success')" title="HLS Active"><i class="fa-solid fa-circle-check" style="color: var(--primary);"></i></button>
                     @else
                         <button class="action-icon-btn" style="opacity: 0.5; cursor: not-allowed;" title="Processing..."><i class="fa-solid fa-hourglass-half"></i></button>
                     @endif
-                    <button class="action-icon-btn" onclick="openDeleteModal('{{ addslashes($video->name) }}', '{{ $video->id }}', 'file')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
+                    <button class="action-icon-btn" onclick="openDeleteModal('{{ addslashes(str_replace(["\r", "\n"], ' ', $video->name)) }}', '{{ $video->id }}', 'file')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
                 </div>
             </div>
             @endforeach
