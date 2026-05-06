@@ -508,13 +508,52 @@ class ContentApiController extends Controller
     public function getCart()
     {
         $student = auth()->guard('api-student')->user();
-        $cartItems = CartItem::where('student_id', $student->id)->with('item')->get();
         
-        $total = $cartItems->sum('price');
+        // Fetch all cart items for this student
+        $cartItems = CartItem::where('student_id', $student->id)->get();
+        
+        $validItems = [];
+        $itemsToDelete = [];
+        
+        foreach ($cartItems as $cartItem) {
+            $isValid = false;
+            
+            if ($cartItem->item_type === 'bundle') {
+                // Check if all subjects in the bundle still exist
+                if (is_array($cartItem->bundle_subjects) && !empty($cartItem->bundle_subjects)) {
+                    $existingCount = Subject::whereIn('id', $cartItem->bundle_subjects)->count();
+                    $isValid = ($existingCount === count($cartItem->bundle_subjects));
+                }
+            } else {
+                // Check if the related Course or Subject exists
+                if ($cartItem->item_type === Course::class) {
+                    $isValid = Course::where('id', $cartItem->item_id)->exists();
+                } elseif ($cartItem->item_type === Subject::class) {
+                    $isValid = Subject::where('id', $cartItem->item_id)->exists();
+                }
+            }
+
+            if ($isValid) {
+                if ($cartItem->item_type !== 'bundle') {
+                    $cartItem->load('item');
+                }
+                $validItems[] = $cartItem;
+            } else {
+                $itemsToDelete[] = $cartItem->id;
+            }
+        }
+        
+        // Auto-cleanup: Remove invalid items from the database
+        if (!empty($itemsToDelete)) {
+            CartItem::whereIn('id', $itemsToDelete)->delete();
+        }
+
+        $total = collect($validItems)->sum('price');
         
         return response()->json([
-            'items' => $cartItems,
-            'total' => $total
+            'items' => $validItems,
+            'total' => $total,
+            'cleaned_up_count' => count($itemsToDelete)
         ]);
     }
 
@@ -608,24 +647,58 @@ class ContentApiController extends Controller
     public function removeFromCart($id)
     {
         $student = auth()->guard('api-student')->user();
-        $cartItem = CartItem::where('student_id', $student->id)->where('id', $id)->first();
+        
+        // Directly delete to avoid dependency on record existence for "Remove" success
+        $deleted = CartItem::where('student_id', $student->id)->where('id', $id)->delete();
 
-        if (!$cartItem) {
-            return response()->json(['message' => 'Item not found in cart'], 404);
+        // Always return success as per requirement: "Remove should ALWAYS succeed"
+        return response()->json([
+            'message' => 'Item removed from cart',
+            'success' => true
+        ]);
+    }
+
+    private function getValidCartItems($studentId)
+    {
+        $cartItems = CartItem::where('student_id', $studentId)->get();
+        $validItems = [];
+        $itemsToDelete = [];
+
+        foreach ($cartItems as $cartItem) {
+            $isValid = false;
+            if ($cartItem->item_type === 'bundle') {
+                if (is_array($cartItem->bundle_subjects) && !empty($cartItem->bundle_subjects)) {
+                    $isValid = Subject::whereIn('id', $cartItem->bundle_subjects)->count() === count($cartItem->bundle_subjects);
+                }
+            } else {
+                if ($cartItem->item_type === Course::class) {
+                    $isValid = Course::where('id', $cartItem->item_id)->exists();
+                } elseif ($cartItem->item_type === Subject::class) {
+                    $isValid = Subject::where('id', $cartItem->item_id)->exists();
+                }
+            }
+
+            if ($isValid) {
+                $validItems[] = $cartItem;
+            } else {
+                $itemsToDelete[] = $cartItem->id;
+            }
         }
 
-        $cartItem->delete();
+        if (!empty($itemsToDelete)) {
+            CartItem::whereIn('id', $itemsToDelete)->delete();
+        }
 
-        return response()->json(['message' => 'Item removed from cart']);
+        return collect($validItems);
     }
 
     public function initiateRazorpayOrder(Request $request)
     {
         $student = auth()->guard('api-student')->user();
-        $cartItems = CartItem::where('student_id', $student->id)->get();
+        $cartItems = $this->getValidCartItems($student->id);
 
         if ($cartItems->isEmpty()) {
-            return response()->json(['error' => 'Cart is empty'], 400);
+            return response()->json(['error' => 'Cart is empty or items are no longer available'], 400);
         }
 
         $totalAmount = $cartItems->sum('price');
@@ -677,7 +750,7 @@ class ContentApiController extends Controller
 
     private function fulfillOrder($student, $paymentData)
     {
-        $cartItems = CartItem::where('student_id', $student->id)->get();
+        $cartItems = $this->getValidCartItems($student->id);
 
         if ($cartItems->isEmpty()) {
             // Might have been fulfilled by webhook already
@@ -685,7 +758,7 @@ class ContentApiController extends Controller
             if ($existingOrder) {
                 return response()->json(['message' => 'Order already fulfilled', 'order' => $existingOrder]);
             }
-            return response()->json(['error' => 'Cart is empty'], 400);
+            return response()->json(['error' => 'Cart is empty or items became unavailable'], 400);
         }
 
         DB::beginTransaction();
@@ -731,15 +804,17 @@ class ContentApiController extends Controller
                         'status' => 'active',
                     ]);
                 } elseif ($cartItem->item_type === 'bundle') {
-                    foreach ($cartItem->bundle_subjects as $subjectId) {
-                        Enrollment::updateOrCreate([
-                            'student_id' => $student->id,
-                            'subject_id' => $subjectId,
-                        ], [
-                            'course_id' => Subject::find($subjectId)->course_id ?? null,
-                            'order_id' => $order->id,
-                            'status' => 'active',
-                        ]);
+                    if (is_array($cartItem->bundle_subjects)) {
+                        foreach ($cartItem->bundle_subjects as $subjectId) {
+                            Enrollment::updateOrCreate([
+                                'student_id' => $student->id,
+                                'subject_id' => $subjectId,
+                            ], [
+                                'course_id' => Subject::find($subjectId)->course_id ?? null,
+                                'order_id' => $order->id,
+                                'status' => 'active',
+                            ]);
+                        }
                     }
                 }
             }
