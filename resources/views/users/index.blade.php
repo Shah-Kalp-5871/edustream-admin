@@ -124,10 +124,10 @@
 <div class="card animate-scale-in" style="padding: 0;">
     <!-- Table header with search -->
     <div class="flex-between" style="padding: 16px 20px; border-bottom: 1px solid var(--border);">
-        <div style="display:flex; align-items:center; gap:8px; background:var(--surface-2); border:1.5px solid var(--border); border-radius:var(--r); padding:8px 14px; min-width:320px;">
+        <form action="{{ url('/users') }}" method="GET" style="display:flex; align-items:center; gap:8px; background:var(--surface-2); border:1.5px solid var(--border); border-radius:var(--r); padding:8px 14px; min-width:320px;">
             <i class="fas fa-search" style="color:var(--text-muted); font-size:13px;"></i>
-            <input type="text" placeholder="Search by name, email or phone…" style="background:none;border:none;outline:none;font-family:inherit;font-size:13.5px;width:100%;color:var(--text);">
-        </div>
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by name, email or phone…" style="background:none;border:none;outline:none;font-family:inherit;font-size:13.5px;width:100%;color:var(--text);">
+        </form>
         <div style="display:flex; gap:8px;">
             <button class="btn btn-ghost btn-sm">
                 <i class="fas fa-filter"></i> Filter

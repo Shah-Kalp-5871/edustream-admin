@@ -7,9 +7,20 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $students = Student::orderBy('created_at', 'desc')->paginate(10);
+        $query = Student::query();
+
+        if ($request->has('search')) {
+            $search = $request->input('search');
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                  ->orWhere('email', 'LIKE', "%{$search}%")
+                  ->orWhere('mobile', 'LIKE', "%{$search}%");
+            });
+        }
+
+        $students = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
         $totalStudents = Student::count();
         $activeNow = 0; // Placeholder for real-time tracking
         $newToday = Student::whereDate('created_at', today())->count();
@@ -29,7 +40,8 @@ class UserController extends Controller
 
     public function show($id)
     {
-        return view('users.show');
+        $student = Student::with(['enrollments.course', 'orders'])->findOrFail($id);
+        return view('users.show', compact('student'));
     }
 
     public function edit($id)
