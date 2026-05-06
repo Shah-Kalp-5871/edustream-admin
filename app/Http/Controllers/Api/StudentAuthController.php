@@ -220,7 +220,6 @@ class StudentAuthController extends Controller
         
         $validator = Validator::make($request->all(), [
             'name' => 'sometimes|string|max:255',
-            'email' => 'sometimes|string|email|max:255|unique:students,email,' . $student->id . ',id,deleted_at,NULL',
             'mobile' => 'sometimes|string|digits:10|unique:students,mobile,' . $student->id . ',id,deleted_at,NULL',
             'bio' => 'nullable|string',
             'password' => 'sometimes|string|min:6|confirmed',
@@ -230,7 +229,8 @@ class StudentAuthController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $data = $request->only(['name', 'email', 'mobile', 'bio']);
+        // Strictly ignore email changes to maintain data consistency
+        $data = $request->only(['name', 'mobile', 'bio']);
         if ($request->has('password')) {
             $data['password'] = bcrypt($request->password);
         }

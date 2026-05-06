@@ -76,6 +76,12 @@ Route::group(['middleware' => 'auth:api-student'], function () {
         Route::put('/', [StudentAuthController::class, 'updateProfile']);
     });
 
+    Route::group(['prefix' => 'downloads'], function () {
+        Route::get('/', [\App\Http\Controllers\Api\DownloadController::class, 'index']);
+        Route::post('/', [\App\Http\Controllers\Api\DownloadController::class, 'store']);
+        Route::delete('/{id}', [\App\Http\Controllers\Api\DownloadController::class, 'destroy']);
+    });
+
     // Video Streaming
     Route::get('/video/{id}/stream', [VideoStreamController::class, 'getStreamUrl']);
 });
