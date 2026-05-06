@@ -126,17 +126,14 @@
                 </span>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div style="display: block;">
                 <form action="{{ url('/users/'.$student->id.'/toggle-status') }}" method="POST">
                     @csrf
-                    <button type="submit" class="btn {{ $student->status === 'active' ? 'btn-outline-danger' : 'btn-outline-success' }}" style="width: 100%; font-size: 13px;">
+                    <button type="submit" class="btn {{ $student->status === 'active' ? 'btn-danger' : 'btn-success' }}" style="width: 100%; font-size: 13px; color: white;">
                         <i class="fas fa-{{ $student->status === 'active' ? 'ban' : 'check-circle' }}"></i>
                         {{ $student->status === 'active' ? 'Block User' : 'Unblock' }}
                     </button>
                 </form>
-                <a href="{{ url('/users/'.$student->id.'/edit') }}" class="btn btn-outline" style="width: 100%; font-size: 13px;">
-                    <i class="fas fa-edit"></i> Edit
-                </a>
             </div>
 
             <div class="info-group">
@@ -162,12 +159,11 @@
         <!-- Main Content: Courses & Activity -->
         <div class="card" style="padding: 24px;">
             <div class="tab-nav">
-                <a href="#" class="tab-link active">Enrolled Courses ({{ $student->enrollments->count() }})</a>
-                <a href="#" class="tab-link">Order History</a>
-                <a href="#" class="tab-link">Device Log</a>
+                <a href="javascript:void(0)" class="tab-link active" data-target="courses">Enrolled Courses ({{ $student->enrollments->count() }})</a>
+                <a href="javascript:void(0)" class="tab-link" data-target="orders">Order History ({{ $student->orders->count() }})</a>
             </div>
 
-            <div id="enrolled-courses">
+            <div id="tab-courses" class="tab-pane active">
                 @forelse($student->enrollments as $enrollment)
                 <div class="enrollment-card">
                     <div class="course-icon" style="background: {{ $enrollment->course->color_code ?? '#E3F2FD' }}20; color: {{ $enrollment->course->color_code ?? '#1565C0' }};">
@@ -188,7 +184,67 @@
                 </div>
                 @endforelse
             </div>
+
+            <div id="tab-orders" class="tab-pane" style="display: none;">
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Order #</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th style="text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($student->orders as $order)
+                            <tr>
+                                <td style="font-weight: 600;">#{{ $order->order_number }}</td>
+                                <td style="font-weight: 700;">₹{{ number_format($order->total_amount, 2) }}</td>
+                                <td>
+                                    <span class="badge {{ $order->payment_status === 'paid' ? 'badge-success' : 'badge-warning' }}">
+                                        {{ ucfirst($order->payment_status) }}
+                                    </span>
+                                </td>
+                                <td style="color: var(--text-muted); font-size: 13px;">{{ $order->created_at->format('M d, Y') }}</td>
+                                <td style="text-align: right;">
+                                    <a href="{{ url('/orders/'.$order->id) }}" class="btn btn-ghost btn-sm">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 48px; color: var(--text-muted);">
+                                    No orders found for this student.
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+document.querySelectorAll('.tab-link').forEach(link => {
+    link.addEventListener('click', function() {
+        // Toggle Active Link
+        document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
+        this.classList.add('active');
+
+        // Toggle Active Pane
+        const target = this.getAttribute('data-target');
+        document.querySelectorAll('.tab-pane').forEach(pane => {
+            pane.style.display = 'none';
+        });
+        document.getElementById('tab-' + target).style.display = 'block';
+    });
+});
+</script>
 @endsection
