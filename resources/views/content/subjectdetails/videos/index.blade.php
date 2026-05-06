@@ -70,6 +70,7 @@
         <!-- Folders -->
         <div id="foldersList">
             @foreach($folders as $folder)
+            @php $safeFolderName = addslashes(str_replace(["\r", "\n"], ' ', $folder->name)); @endphp
             <div class="file-row folder-row" onclick="window.location.href='{{ url('/content/videos/' . $id . '?folder_id=' . $folder->id) }}'">
                 <div style="color: var(--text-muted); cursor: default; text-align: center;"><i class="fa-solid fa-folder" style="font-size: 10px; opacity: 0.5;"></i></div>
                 <div style="display: flex; align-items: center; gap: 12px;">
@@ -80,8 +81,8 @@
                 <div style="color: var(--text-muted);">{{ $folder->created_at->format('Y-m-d') }}</div>
                 <div></div>
                 <div style="display: flex; gap: 4px;" onclick="event.stopPropagation()">
-                    <button class="action-icon-btn" onclick="openRenameModal('{{ addslashes(str_replace(["\r", "\n"], ' ', $folder->name)) }}', '{{ $folder->id }}', 'folder')" title="Rename"><i class="fa-solid fa-pen"></i></button>
-                    <button class="action-icon-btn" onclick="openDeleteModal('{{ addslashes(str_replace(["\r", "\n"], ' ', $folder->name)) }}', '{{ $folder->id }}', 'folder')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
+                    <button class="action-icon-btn" onclick="openRenameModal('{{ $safeFolderName }}', '{{ $folder->id }}', 'folder')" title="Rename"><i class="fa-solid fa-pen"></i></button>
+                    <button class="action-icon-btn" onclick="openDeleteModal('{{ $safeFolderName }}', '{{ $folder->id }}', 'folder')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
                 </div>
             </div>
             @endforeach
@@ -90,6 +91,10 @@
         <!-- Videos -->
         <div id="sortableFiles">
             @foreach($files as $video)
+            @php
+                $safeVideoName = addslashes(str_replace(["\r", "\n"], ' ', $video->name));
+                $safeVideoDesc = addslashes(str_replace(["\r", "\n"], ' ', $video->description ?? ''));
+            @endphp
             <div class="file-row" data-id="{{ $video->id }}">
                 <div class="drag-handle" style="cursor: grab; color: var(--text-muted); text-align: center;"><i class="fa-solid fa-grip-vertical"></i></div>
                 <div style="display: flex; align-items: center; gap: 12px;">
@@ -110,7 +115,7 @@
                 <div style="color: var(--text-muted);">{{ $video->created_at->format('Y-m-d') }}</div>
                 <div style="display: flex; align-items: center;" onclick="event.stopPropagation()">
                     <label class="toggle-switch">
-                        <input type="checkbox" {{ $video->is_free ? 'checked' : '' }} onchange="toggleFree('{{ addslashes(str_replace(["\r", "\n"], ' ', $video->name)) }}', this.checked, '{{ $video->id }}')">
+                        <input type="checkbox" {{ $video->is_free ? 'checked' : '' }} onchange="toggleFree('{{ $safeVideoName }}', this.checked, '{{ $video->id }}')">
                         <span class="slider round"></span>
                     </label>
                     <span style="font-size: 11px; margin-left: 8px; color: {{ $video->is_free ? 'var(--primary)' : 'var(--text-muted)' }}; font-weight: 600;">
@@ -118,13 +123,13 @@
                     </span>
                 </div>
                 <div style="display: flex; gap: 4px;">
-                    <button class="action-icon-btn" onclick="event.stopPropagation(); openEditDetailsModal('{{ addslashes(str_replace(["\r", "\n"], ' ', $video->name)) }}', '{{ $video->id }}', 'file', '{{ addslashes(str_replace(["\r", "\n"], ' ', $video->description ?? '')) }}', '{{ $video->duration }}', '{{ $video->sort_order }}')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
+                    <button class="action-icon-btn" onclick="event.stopPropagation(); openEditDetailsModal('{{ $safeVideoName }}', '{{ $video->id }}', 'file', '{{ $safeVideoDesc }}', '{{ $video->duration }}', '{{ $video->sort_order }}')" title="Edit Details"><i class="fa-solid fa-sliders"></i></button>
                     @if($video->processing_status === 'completed')
                         <button class="action-icon-btn" onclick="event.stopPropagation(); Swal.fire('HLS Ready', 'This video is now streaming via secure HLS. View it in the mobile app to verify.', 'success')" title="HLS Active"><i class="fa-solid fa-circle-check" style="color: var(--primary);"></i></button>
                     @else
                         <button class="action-icon-btn" style="opacity: 0.5; cursor: not-allowed;" title="Processing..."><i class="fa-solid fa-hourglass-half"></i></button>
                     @endif
-                    <button class="action-icon-btn" onclick="openDeleteModal('{{ addslashes(str_replace(["\r", "\n"], ' ', $video->name)) }}', '{{ $video->id }}', 'file')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
+                    <button class="action-icon-btn" onclick="openDeleteModal('{{ $safeVideoName }}', '{{ $video->id }}', 'file')" title="Delete" style="color: #e74c3c;"><i class="fa-solid fa-trash"></i></button>
                 </div>
             </div>
             @endforeach
@@ -221,7 +226,6 @@
     </div>
 </div>
 
-
 <!-- Delete Confirmation Modal -->
 <div class="modal-backdrop" id="deleteModal" onclick="if(event.target===this) closeModal('deleteModal')">
     <div class="modal" style="max-width: 400px;">
@@ -241,6 +245,7 @@
 </div>
 @endsection
 
+@section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <script src="{{ asset('js/content-manager.js') }}"></script>
 <script>
@@ -338,7 +343,7 @@ function openRenameModal(name, id, type) {
 
 function renameItem() {
     const newName = document.getElementById('renameInput').value;
-    const url = currentActionType === 'folder' 
+    const url = currentActionType === 'folder'
         ? '{{ url('/content/videos/folder') }}/' + currentActionItem + '/update'
         : '{{ url('/content/videos/file') }}/' + currentActionItem + '/update';
 
@@ -359,11 +364,11 @@ function renameItem() {
     });
 }
 
-function openEditDetailsModal(name, id, type, description = '', duration = '', sortOrder = 0) {
+function openEditDetailsModal(name, id, type, description, duration, sortOrder) {
     document.getElementById('editTitle').value = name;
-    document.getElementById('editDescription').value = description;
-    document.getElementById('editDuration').value = duration;
-    document.getElementById('editSortOrder').value = sortOrder;
+    document.getElementById('editDescription').value = description || '';
+    document.getElementById('editDuration').value = duration || '';
+    document.getElementById('editSortOrder').value = sortOrder || 0;
     currentActionItem = id;
     currentActionType = type;
     openModal('editDetailsModal');
@@ -374,8 +379,8 @@ function saveDetails() {
     const description = document.getElementById('editDescription').value;
     const duration = document.getElementById('editDuration').value;
     const sortOrder = document.getElementById('editSortOrder').value;
-    
-    const url = currentActionType === 'folder' 
+
+    const url = currentActionType === 'folder'
         ? '{{ url('/content/videos/folder') }}/' + currentActionItem + '/update'
         : '{{ url('/content/videos/file') }}/' + currentActionItem + '/update';
 
@@ -385,7 +390,7 @@ function saveDetails() {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': '{{ csrf_token() }}'
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
             name: name,
             description: description,
             duration: duration,
@@ -401,5 +406,4 @@ function saveDetails() {
     });
 }
 </script>
-<script src="{{ asset('js/content-manager.js') }}"></script>
 @endsection

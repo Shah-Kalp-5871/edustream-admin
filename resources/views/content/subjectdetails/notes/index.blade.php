@@ -12,9 +12,6 @@
         <input type="hidden" name="folder_id" value="{{ $currentFolder->id ?? '' }}">
         <input type="file" id="fileUpload" name="files[]" multiple accept=".pdf,.doc,.docx,.txt" onchange="this.form.submit()">
     </form>
-@endsection
-
-@section('actions')
     <button class="action-btn" onclick="document.getElementById('fileUpload').click()">
         <i class="fa-solid fa-cloud-arrow-up"></i> Upload Notes
     </button>
