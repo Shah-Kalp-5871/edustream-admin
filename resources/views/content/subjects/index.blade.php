@@ -122,7 +122,7 @@
 
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
                 <h3 class="subject-name" style="margin-bottom: 0;">{{ $subject->name }}</h3>
-                <span style="font-weight: 700; color: var(--primary); font-size: 14px;">₹{{ number_format($subject->price) }}</span>
+                {{-- <span style="font-weight: 700; color: var(--primary); font-size: 14px;">₹{{ number_format($subject->price) }}</span> --}}
             </div>
 
             <div style="margin-bottom: 16px;">

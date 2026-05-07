@@ -184,10 +184,8 @@
                     <input type="hidden" name="color_code" id="selectedColor" value="{{ $currentColor }}">
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">Subject Price (₹)</label>
-                    <input type="number" name="price" class="form-control" value="{{ $subject->price }}" required>
-                </div>
+                {{-- Hidden: Individual subject purchase disabled --}}
+                <input type="hidden" name="price" value="{{ $subject->price }}">
 
                 <div class="form-group">
                     <label class="form-label">Status</label>

@@ -201,10 +201,13 @@
                     <input type="hidden" name="color_code" id="selectedColor" value="#1565C0">
                 </div>
 
+                {{-- HIDDEN: individual subject purchase
                 <div class="form-group">
                     <label class="form-label">Subject Price (₹)</label>
-                    <input type="number" name="price" class="form-control" placeholder="e.g., 500" required>
+                    <input type="number" name="price" class="form-control" placeholder="e.g., 500">
                 </div>
+                --}}
+                <input type="hidden" name="price" value="0">
 
                 <div class="form-group">
                     <label class="form-label">Status</label>
