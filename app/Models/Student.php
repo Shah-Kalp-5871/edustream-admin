@@ -87,6 +87,26 @@ class Student extends Authenticatable implements JWTSubject
         return [];
     }
 
+    protected $appends = ['is_premium'];
+
+    public function getIsPremiumAttribute()
+    {
+        // 1. Check if manually set to premium plan
+        if ($this->plan === 'premium') {
+            return true;
+        }
+
+        // 2. Check for any active enrollments that were part of a paid order
+        // This covers both specific course/subject purchases and active subscriptions
+        return $this->enrollments()
+            ->active()
+            ->whereHas('order', function ($query) {
+                $query->where('payment_status', 'completed')
+                    ->where('total_amount', '>', 0);
+            })
+            ->exists();
+    }
+
     protected function avatarUrl(): Attribute
     {
         return Attribute::make(
