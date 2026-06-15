@@ -70,6 +70,12 @@ class StudentAuthController extends Controller
             return response()->json(['error' => 'Invalid credentials'], 401);
         }
 
+        try {
+            \Illuminate\Support\Facades\Mail::to($result['student']->email)->queue(new \App\Mail\LoginDetectedMail($result['student']));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to send LoginDetectedMail: ' . $e->getMessage());
+        }
+
         return response()->json([
             'student' => $result['student'],
             'token' => $result['token'],
@@ -193,6 +199,12 @@ class StudentAuthController extends Controller
         }
 
         $token = auth()->guard('api-student')->login($student);
+
+        try {
+            \Illuminate\Support\Facades\Mail::to($student->email)->queue(new \App\Mail\LoginDetectedMail($student));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to send LoginDetectedMail: ' . $e->getMessage());
+        }
 
         return response()->json([
             'status' => 'login',
