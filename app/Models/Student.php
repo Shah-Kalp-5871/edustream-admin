@@ -24,6 +24,8 @@ class Student extends Authenticatable implements JWTSubject
         'plan',
         'status',
         'email_verified_at',
+        'auth_mode',
+        'password',
     ];
 
     protected $casts = [

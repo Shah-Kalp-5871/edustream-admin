@@ -22,6 +22,8 @@ Route::group(['prefix' => 'auth'], function () {
     Route::post('/login', [StudentAuthController::class, 'login']);
     Route::post('/send-otp', [StudentAuthController::class, 'sendOtp']);
     Route::post('/verify-otp', [StudentAuthController::class, 'verifyOtp']);
+    Route::post('/check-user', [StudentAuthController::class, 'checkUser']);
+    Route::post('/reset-password', [StudentAuthController::class, 'resetPassword']);
 });
 
 Route::group(['prefix' => 'public'], function () {
@@ -35,6 +37,7 @@ Route::group(['middleware' => 'auth:api-student'], function () {
         Route::get('/me', [StudentAuthController::class, 'me']);
         Route::post('/logout', [StudentAuthController::class, 'logout']);
         Route::post('/refresh', [StudentAuthController::class, 'refresh']);
+        Route::post('/switch-mode', [StudentAuthController::class, 'switchMode']);
     });
 
     Route::group(['prefix' => 'content'], function () {
